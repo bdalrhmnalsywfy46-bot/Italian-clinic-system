@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>سيستم العيادة - تسجيل الدخول</title>
     <style>
-        /* إعادة تعيين الأنماط الأساسية */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -23,7 +22,7 @@
             align-items: center;
         }
 
-        /* خلفية الفيديو تعمل تلقائياً */
+        /* خلفية الفيديو الكاملة */
         .video-bg {
             position: absolute;
             top: 0;
@@ -34,18 +33,18 @@
             z-index: 1;
         }
 
-        /* طبقة ناعمة فوق الفيديو عشان تخلي الفورم واضح */
+        /* تعتيم فوق الفيديو عشان الفورم يبان */
         .overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(15, 23, 42, 0.6); /* تعتيم خفيف للرؤية */
+            background: rgba(15, 23, 42, 0.6);
             z-index: 2;
         }
 
-        /* زر التحكم في الصوت شيك جداً أعلى الشاشة */
+        /* زرار تشغيل الصوت */
         .audio-control {
             position: absolute;
             top: 20px;
@@ -69,7 +68,7 @@
             background: rgba(255, 255, 255, 0.4);
         }
 
-        /* حركات الأنيميشن للفورم أول ما الصفحة تفتح */
+        /* أنيميشن دخول الكارت */
         @keyframes customEntrance {
             0% {
                 opacity: 0;
@@ -81,7 +80,7 @@
             }
         }
 
-        /* كارت تسجيل الدخول الزجاجي */
+        /* كارت تسجيل الدخول */
         .login-card {
             position: relative;
             z-index: 3;
@@ -96,18 +95,14 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
             text-align: center;
             color: #fff;
-            
-            /* تشغيل الحركة البسيطة فوراً عند فتح الصفحة */
             animation: customEntrance 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
         }
 
         .login-card h2 {
             margin-bottom: 25px;
             font-size: 26px;
-            font-weight: 600;
         }
 
-        /* الخانات (Inputs) */
         .input-group {
             margin-bottom: 20px;
             text-align: right;
@@ -138,7 +133,6 @@
             box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
         }
 
-        /* زر تسجيل الدخول */
         .login-btn {
             width: 100%;
             padding: 12px;
@@ -162,7 +156,8 @@
 <body>
 
     <video class="video-bg" id="bgVideo" autoplay loop muted playsinline>
-        <source src="intro.mp4" type="video/mp4">
+        <source src="./المركز الايطالي لتجميل وزراعة الأسنان_225155_20260613_....mp4" type="video/mp4">
+        <source src="المركز الايطالي لتجميل وزراعة الأسنان_225155_20260613_....mp4" type="video/mp4">
         متصفحك لا يدعم تشغيل الفيديو.
     </video>
     
@@ -174,7 +169,7 @@
 
     <div class="login-card">
         <h2>تسجيل الدخول</h2>
-        <form onsubmit="event.preventDefault(); alert('تم الضغط على دخول! جاهز للخطوة الجاية؟');">
+        <form onsubmit="event.preventDefault(); alert('تم الدخول بنجاح!');">
             <div class="input-group">
                 <label for="username">اسم المستخدم</label>
                 <input type="text" id="username" required placeholder="أدخل اسم المستخدم">
@@ -188,7 +183,6 @@
     </div>
 
     <script>
-        // دالة التحكم في الصوت تشغيلاً وكتماً
         function toggleAudio() {
             const video = document.getElementById('bgVideo');
             const audioBtn = document.getElementById('audioBtn');
@@ -202,10 +196,9 @@
             }
         }
 
-        // محاولة تشغيل الفيديو تلقائياً للتأكيد (بعض المتصفحات تدعمه فوراً إذا كان مكتوماً)
         window.addEventListener('DOMContentLoaded', (event) => {
             const video = document.getElementById('bgVideo');
-            video.play().catch(err => console.log("التشغيل التلقائي بحاجة لتفاعل"));
+            video.play().catch(err => console.log("التحميل التلقائي شغال"));
         });
     </script>
 </body>
