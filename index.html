@@ -22,7 +22,7 @@
             align-items: center;
         }
 
-        /* خلفية الفيديو الكاملة */
+        /* خلفية الفيديو */
         .video-bg {
             position: absolute;
             top: 0;
@@ -33,7 +33,7 @@
             z-index: 1;
         }
 
-        /* تعتيم فوق الفيديو عشان الفورم يبان */
+        /* تعتيم فوق الفيديو */
         .overlay {
             position: absolute;
             top: 0;
@@ -44,7 +44,7 @@
             z-index: 2;
         }
 
-        /* زرار تشغيل الصوت */
+        /* التحكم في الصوت */
         .audio-control {
             position: absolute;
             top: 20px;
@@ -156,8 +156,8 @@
 <body>
 
     <video class="video-bg" id="bgVideo" autoplay loop muted playsinline>
-        <source src="./المركز الايطالي لتجميل وزراعة الأسنان_225155_20260613_....mp4" type="video/mp4">
-        <source src="المركز الايطالي لتجميل وزراعة الأسنان_225155_20260613_....mp4" type="video/mp4">
+        <source src="intro.mp4" type="video/mp4">
+        <source src="./intro.mp4" type="video/mp4">
         متصفحك لا يدعم تشغيل الفيديو.
     </video>
     
@@ -198,7 +198,7 @@
 
         window.addEventListener('DOMContentLoaded', (event) => {
             const video = document.getElementById('bgVideo');
-            video.play().catch(err => console.log("التحميل التلقائي شغال"));
+            video.play().catch(err => console.log("التشغيل التلقائي شغال"));
         });
     </script>
 </body>
