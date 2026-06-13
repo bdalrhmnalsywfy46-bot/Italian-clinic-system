@@ -17,7 +17,7 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #0f172a; /* خلفية داكنة مريحة للعين */
+            background-color: #0f172a;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -61,7 +61,7 @@
             position: relative;
             width: 100%;
             height: 100%;
-            display: none; /* مخفية في الأول */
+            display: none;
             justify-content: center;
             align-items: center;
             opacity: 0;
@@ -86,7 +86,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(15, 23, 42, 0.6); /* تعتيم خفيف */
+            background: rgba(15, 23, 42, 0.6);
             z-index: 2;
         }
 
@@ -107,7 +107,7 @@
             position: relative;
             z-index: 3;
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px); /* تأثير زجاجي رايق */
+            backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             padding: 40px;
             border-radius: 20px;
@@ -117,8 +117,6 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
             text-align: center;
             color: #fff;
-            
-            /* تفعيل الحركة البسيطة قبل الثبات */
             animation: customEntrance 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
         }
 
@@ -180,23 +178,18 @@
 </head>
 <body>
 
-    <!-- الشاشة الأولى: زر بدء السيستم وتفعيل الصوت -->
     <div class="intro-screen" id="introScreen">
         <button class="start-btn" onclick="startSystem()">دخول السيستم</button>
     </div>
 
-    <!-- الشاشة الرئيسية: الفيديو وفورم التسجيل -->
     <div class="main-container" id="mainContainer">
-        <!-- الفيديو الجاهز يعمل تلقائياً بالصوت بعد الضغط على الزر -->
         <video class="video-bg" id="bgVideo" loop>
             <source src="intro.mp4" type="video/mp4">
             متصفحك لا يدعم تشغيل الفيديو.
         </video>
         
-        <!-- الطبقة الناعمة فوق الفيديو -->
         <div class="overlay"></div>
 
-        <!-- كارت تسجيل الدخول المتحرك -->
         <div class="login-card">
             <h2>تسجيل الدخول</h2>
             <form onsubmit="event.preventDefault(); alert('تم الضغط على دخول! جاهز للخطوة الجاية؟');">
@@ -219,24 +212,20 @@
             const mainContainer = document.getElementById('mainContainer');
             const video = document.getElementById('bgVideo');
 
-            // 1. إخفاء شاشة البداية بنعومة
             introScreen.style.opacity = '0';
             
             setTimeout(() => {
                 introScreen.style.display = 'none';
-                
-                // 2. إظهار السيستم والفيديو
                 mainContainer.style.display = 'flex';
                 setTimeout(() => {
                     mainContainer.style.opacity = '1';
                 }, 50);
 
-                // 3. تشغيل الفيديو بالصوت عل طول
                 video.play().catch(error => {
                     console.log("حدث خطأ أثناء تشغيل الفيديو: ", error);
                 });
 
-            }, 800); // الانتظار لحد ما تختفي شاشة البداية
+            }, 800);
         }
     </script>
 </body>
