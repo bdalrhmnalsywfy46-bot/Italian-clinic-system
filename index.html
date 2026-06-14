@@ -3,358 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Italian Dental Center</title>
+    <title>تسجيل الدخول - سيستم العيادة</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        body, html {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: #ffffff;
-        }
-
-        /* حاوية الشاشة الكاملة */
-        #loginScreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+        body {
+            /* خلفية هادية ومريحة للعين تناسب العيادات */
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 100;
+            padding: 20px;
         }
 
-        /* الفيديو شغال في الخلفية مرة واحدة */
-        .video-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .login-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            padding: 30px 25px;
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 1;
-        }
-
-        /* طبقة بيضاء شفافة خفيفة فوق الفيديو */
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.85);
-            z-index: 2;
-        }
-
-        /* محتوى واجهة تسجيل الدخول */
-        .login-content {
-            position: relative;
-            z-index: 3;
-            width: 100%;
-            max-width: 420px;
-            height: 100%;
-            padding: 40px 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        /* الجزء العلوي: الاسم */
-        .header-brand {
+            max-width: 400px;
             text-align: center;
-            margin-top: 20px;
-            width: 100%;
+            border: 1px solid #e2e8f0;
         }
 
-        .brand-title {
-            font-size: 38px;
-            font-weight: 900;
-            color: #000000;
-            line-height: 1.2;
+        /* تنسيق اللوجو في المنتصف فوق الحقول */
+        .clinic-logo-container {
+            margin-bottom: 25px;
         }
 
-        .brand-sub {
-            font-size: 26px;
-            font-weight: bold;
-            color: #000000;
-            margin-top: 5px;
+        .clinic-logo-container img {
+            max-width: 140px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
         }
 
-        /* الجزء الأوسط: خانات الإدخال */
-        .form-container {
-            width: 100%;
-            margin-top: -20px;
+        .login-card h2 {
+            color: #2e3e52;
+            font-size: 22px;
+            margin-bottom: 25px;
+            font-weight: 600;
         }
 
         .input-group {
-            margin-bottom: 25px;
+            position: relative;
+            margin-bottom: 20px;
             text-align: right;
         }
 
         .input-group label {
             display: block;
-            margin-bottom: 12px;
-            font-size: 24px;
-            font-weight: bold;
-            color: #000000;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 10px;
-            font-size: 18px;
-            border: none;
-            border-bottom: 2px solid #000000;
-            background: transparent;
-            color: #000000;
-            outline: none;
-            text-align: right;
-        }
-
-        /* رابط نسيت كلمة السر */
-        .forgot-password {
-            display: block;
-            text-align: left;
             font-size: 14px;
-            font-weight: bold;
-            color: #334155;
-            text-decoration: none;
-            margin-top: -15px;
-            margin-bottom: 30px;
-            transition: color 0.2s;
-            cursor: pointer;
+            color: #627d98;
+            margin-bottom: 8px;
+            font-weight: 500;
         }
 
-        .forgot-password:hover {
-            color: #b91c1c;
+        .input-wrapper {
+            position: relative;
         }
 
-        /* زر الدخول */
-        .login-btn {
-            width: 100%;
-            padding: 14px;
-            background: #b91c1c;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-
-        /* الجزء السفلي: العنوان */
-        .footer-address {
-            text-align: center;
-            font-size: 16px;
-            font-weight: bold;
-            color: #000000;
-            line-height: 1.5;
-            margin-bottom: 20px;
-            width: 100%;
-        }
-
-        /* زر كتم وصوت الفيديو */
-        .audio-btn {
+        .input-wrapper i {
             position: absolute;
-            top: 15px;
-            left: 15px;
-            z-index: 10;
-            background: rgba(0, 0, 0, 0.7);
-            border: none;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        /* --- واجهة لوحة التحكم الحالية --- */
-        #dashboard {
-            display: none;
-            width: 100%;
-            height: 100%;
-            padding: 20px;
-            text-align: center;
-            background: #f8fafc;
-        }
-
-        /* --- تصميم النافذة المنبثقة لاستعادة الباسورد --- */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 200;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-card {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 15px;
-            width: 85%;
-            max-width: 360px;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            border-top: 5px solid #b91c1c;
-        }
-
-        .modal-card h3 {
-            font-size: 20px;
-            margin-bottom: 15px;
-            color: #000;
-        }
-
-        .modal-card input {
-            width: 100%;
-            padding: 10px;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9fb3c8;
             font-size: 16px;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 12px 45px 12px 15px; /* مساحة أكبر من اليمين للأيقونة */
             border: 1px solid #cbd5e1;
             border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
             outline: none;
+            font-size: 15px;
+            color: #334e68;
+            background-color: #f8fafc;
+            transition: all 0.3s ease;
         }
 
-        .modal-btn {
+        .input-wrapper input:focus {
+            border-color: #3b82f6;
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* زر الدخول المربوط بصفحة الـ Dashboard */
+        .login-btn {
             width: 100%;
-            padding: 10px;
-            background: #15803d;
+            background-color: #3b82f6;
             color: white;
             border: none;
+            padding: 14px;
             border-radius: 8px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            margin-bottom: 10px;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+            display: block;
+            text-decoration: none; /* عشان لو استعملناه كـ رابط للتنقل */
         }
 
-        .close-btn {
-            font-size: 14px;
-            color: #64748b;
-            cursor: pointer;
-            text-decoration: underline;
+        .login-btn:hover {
+            background-color: #2563eb;
+        }
+
+        .footer-text {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #9fb3c8;
         }
     </style>
 </head>
 <body>
 
-    <div id="loginScreen">
-        <video class="video-bg" id="bgVideo" autoplay playsinline muted>
-            <source src="intro.mp4" type="video/mp4">
-        </video>
+    <div class="login-card">
         
-        <div class="overlay"></div>
-        
-        <button class="audio-btn" onclick="toggleMute()">🔇 تشغيل الصوت</button>
+        <div class="clinic-logo-container">
+            <img src="logo.png" alt="Smile Show Logo" onerror="this.src='https://via.placeholder.com/140x60?text=SMILE+SHOW'">
+        </div>
 
-        <div class="login-content">
+        <h2>تسجيل الدخول إلى السيستم</h2>
+
+        <form action="dashboard.html" method="GET">
             
-            <div class="header-brand">
-                <div class="brand-title">المركز</div>
-                <div class="brand-title">الإيطالي</div>
-                <div class="brand-sub">لتجميل وزراعة الأسنان</div>
+            <div class="input-group">
+                <label>اسم المستخدم</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" placeholder="أدخل اسم المستخدم" required>
+                </div>
             </div>
 
-            <form id="loginForm" class="form-container">
-                <div class="input-group">
-                    <label>اسم المستخدم:</label>
-                    <input type="text" id="userInput" required placeholder="Italian dental center">
+            <div class="input-group">
+                <label>كلمة المرور</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" placeholder="أدخل كلمة المرور" required>
                 </div>
-                <div class="input-group">
-                    <label>كلمة المرور:</label>
-                    <input type="password" id="passInput" required placeholder="••••••••">
-                </div>
-                
-                <span class="forgot-password" onclick="openModal()">هل نسيت كلمة السر؟</span>
-
-                <button type="submit" class="login-btn">دخول</button>
-            </form>
-
-            <div class="footer-address">
-                7 القضاة - شارع الطاقة - النادي الأهلي<br>مدينة نصر - القاهرة
             </div>
 
+            <button type="submit" class="login-btn">دخول</button>
+
+        </form>
+
+        <div class="footer-text">
+            نظام إدارة العيادة الذكي © 2026
         </div>
+
     </div>
 
-    <div class="modal-overlay" id="resetModal">
-        <div class="modal-card">
-            <h3>استعادة كلمة السر</h3>
-            <p style="font-size: 14px; color: #475569; margin-bottom: 15px;">أدخل البريد الإلكتروني المسجل لإرسال رابط التعيين</p>
-            <input type="email" id="resetEmailInput" required placeholder="example@gmail.com">
-            <button class="modal-btn" onclick="handleResetSubmit()">إرسال الرابط</button>
-            <div class="close-btn" onclick="closeModal()">إلغاء</div>
-        </div>
-    </div>
-
-    <div id="dashboard">
-        <h1 style="color: #15803d; margin-top: 50px;">مرحباً بك في لوحة تحكم المركز الإيطالي</h1>
-        <p style="margin-top: 20px;">تم تسجيل الدخول بنجاح بالبيانات المطلوبة.</p>
-        <button onclick="location.reload()" style="margin-top: 30px; padding: 10px 25px; background: #b91c1c; color: white; border: none; border-radius: 5px; cursor: pointer;">تسجيل خروج</button>
-    </div>
-
-    <script>
-        const video = document.getElementById('bgVideo');
-        video.loop = false;
-
-        function toggleMute() {
-            video.muted = !video.muted;
-            event.target.innerText = video.muted ? "🔇 تشغيل الصوت" : "🔊 كتم الصوت";
-        }
-
-        // التحكم في فتح وقفل النافذة المنبثقة
-        function openModal() {
-            document.getElementById('resetModal').style.display = 'flex';
-        }
-
-        function closeModal() {
-            document.getElementById('resetModal').style.display = 'none';
-            document.getElementById('resetEmailInput').value = '';
-        }
-
-        // التعامل مع إرسال البريد المكتوب والتحقق منه
-        function handleResetSubmit() {
-            const emailInput = document.getElementById('resetEmailInput').value;
-            const targetEmail = "Bdalrhmnalsywfy38@gmail.com";
-
-            if (emailInput.trim().toLowerCase() === targetEmail.toLowerCase()) {
-                alert("تم إرسال رابط تعيين كلمة السر إلى بريدك بنجاح!");
-                closeModal();
-            } else {
-                alert("هذا البريد الإلكتروني غير مسجل في النظام!");
-            }
-        }
-
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const user = document.getElementById('userInput').value;
-            const pass = document.getElementById('passInput').value;
-
-            if (user === "Italian dental center" && pass === "Italian 712554") {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'block';
-                video.pause();
-            } else {
-                alert("اسم المستخدم أو كلمة المرور غير صحيحة!");
-            }
-        });
-    </script>
 </body>
 </html>
