@@ -15,11 +15,10 @@
         body, html {
             width: 100%;
             height: 100%;
-            overflow: hidden;
-            background-color: #ffffff;
+            background-color: #f1f5f9;
         }
 
-        /* حاوية الشاشة الكاملة */
+        /* --- الشاشة الأولى: تسجيل الدخول --- */
         #loginScreen {
             position: fixed;
             top: 0;
@@ -32,7 +31,6 @@
             z-index: 100;
         }
 
-        /* الفيديو شغال في الخلفية مرة واحدة */
         .video-bg {
             position: absolute;
             top: 0;
@@ -43,7 +41,6 @@
             z-index: 1;
         }
 
-        /* طبقة بيضاء شفافة خفيفة فوق الفيديو */
         .overlay {
             position: absolute;
             top: 0;
@@ -54,7 +51,6 @@
             z-index: 2;
         }
 
-        /* محتوى واجهة تسجيل الدخول */
         .login-content {
             position: relative;
             z-index: 3;
@@ -68,7 +64,6 @@
             justify-content: space-between;
         }
 
-        /* الجزء العلوي: الاسم */
         .header-brand {
             text-align: center;
             margin-top: 20px;
@@ -89,14 +84,13 @@
             margin-top: 5px;
         }
 
-        /* الجزء الأوسط: خانات الإدخال */
         .form-container {
             width: 100%;
             margin-top: -20px;
         }
 
         .input-group {
-            margin-bottom: 25px;
+            margin-bottom: 35px;
             text-align: right;
         }
 
@@ -120,25 +114,6 @@
             text-align: right;
         }
 
-        /* رابط نسيت كلمة السر */
-        .forgot-password {
-            display: block;
-            text-align: left;
-            font-size: 14px;
-            font-weight: bold;
-            color: #334155;
-            text-decoration: none;
-            margin-top: -15px;
-            margin-bottom: 30px;
-            transition: color 0.2s;
-            cursor: pointer;
-        }
-
-        .forgot-password:hover {
-            color: #b91c1c;
-        }
-
-        /* زر الدخول */
         .login-btn {
             width: 100%;
             padding: 14px;
@@ -153,7 +128,6 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
-        /* الجزء السفلي: العنوان */
         .footer-address {
             text-align: center;
             font-size: 16px;
@@ -164,7 +138,6 @@
             width: 100%;
         }
 
-        /* زر كتم وصوت الفيديو */
         .audio-btn {
             position: absolute;
             top: 15px;
@@ -179,81 +152,164 @@
             font-size: 12px;
         }
 
-        /* --- واجهة لوحة التحكم الحالية --- */
+        /* --- الشاشة الثانية: لوحة التحكم (Dashboard) --- */
         #dashboard {
             display: none;
             width: 100%;
-            height: 100%;
-            padding: 20px;
-            text-align: center;
-            background: #f8fafc;
+            min-height: 100vh;
+            background: #f4f6f9;
+            padding: 15px;
         }
 
-        /* --- تصميم النافذة المنبثقة لاستعادة الباسورد --- */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 200;
-            justify-content: center;
+        /* الهيدر العلوي */
+        .dash-header {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-        }
-
-        .modal-card {
             background: #ffffff;
-            padding: 30px;
-            border-radius: 15px;
-            width: 85%;
-            max-width: 360px;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            border-top: 5px solid #b91c1c;
-        }
-
-        .modal-card h3 {
-            font-size: 20px;
-            margin-bottom: 15px;
-            color: #000;
-        }
-
-        .modal-card input {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             margin-bottom: 20px;
-            text-align: center;
-            outline: none;
         }
 
-        .modal-btn {
-            width: 100%;
-            padding: 10px;
-            background: #15803d;
+        .dash-title {
+            color: #1e293b;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background: #b91c1c;
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
+            border-radius: 6px;
             cursor: pointer;
-            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 14px;
         }
 
-        .close-btn {
-            font-size: 14px;
+        /* كارت الإحصائيات الأخضر */
+        .stats-card {
+            background: #4caf50;
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .stats-right {
+            text-align: center;
+            flex: 1;
+            border-left: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .stats-right .date-label {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stats-right .date-val {
+            font-size: 22px;
+            font-weight: 900;
+        }
+
+        .stats-left {
+            flex: 1;
+            padding-right: 20px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 16px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        /* قسم الساعة وزيارات الغرف */
+        .room-section {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .room-title {
+            font-size: 18px;
             color: #64748b;
-            cursor: pointer;
-            text-decoration: underline;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .live-clock {
+            font-size: 42px;
+            font-weight: 900;
+            color: #1e293b;
+        }
+
+        /* ستايل الجداول العام */
+        .table-container {
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .table-header {
+            padding: 15px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        /* ألوان الهيدر الخاصة بكل جدول */
+        .bg-orange { background: #f59e0b; }
+        .bg-blue { background: #38bdf8; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #64748b;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        td {
+            padding: 14px 12px;
+            font-size: 15px;
+            color: #334155;
+            border-bottom: 1px solid #f1f5f9;
+            font-weight: 600;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* تمييز خانة الوقت */
+        .time-col {
+            color: #0284c7;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
+    <!-- الواجهة الأولى: تسجيل الدخول -->
     <div id="loginScreen">
         <video class="video-bg" id="bgVideo" autoplay playsinline muted>
             <source src="intro.mp4" type="video/mp4">
@@ -264,7 +320,6 @@
         <button class="audio-btn" onclick="toggleMute()">🔇 تشغيل الصوت</button>
 
         <div class="login-content">
-            
             <div class="header-brand">
                 <div class="brand-title">المركز</div>
                 <div class="brand-title">الإيطالي</div>
@@ -280,33 +335,133 @@
                     <label>كلمة المرور:</label>
                     <input type="password" id="passInput" required placeholder="••••••••">
                 </div>
-                
-                <span class="forgot-password" onclick="openModal()">هل نسيت كلمة السر؟</span>
-
                 <button type="submit" class="login-btn">دخول</button>
             </form>
 
             <div class="footer-address">
                 7 القضاة - شارع الطاقة - النادي الأهلي<br>مدينة نصر - القاهرة
             </div>
-
         </div>
     </div>
 
-    <div class="modal-overlay" id="resetModal">
-        <div class="modal-card">
-            <h3>استعادة كلمة السر</h3>
-            <p style="font-size: 14px; color: #475569; margin-bottom: 15px;">أدخل البريد الإلكتروني المسجل لإرسال رابط التعيين</p>
-            <input type="email" id="resetEmailInput" required placeholder="example@gmail.com">
-            <button class="modal-btn" onclick="handleResetSubmit()">إرسال الرابط</button>
-            <div class="close-btn" onclick="closeModal()">إلغاء</div>
-        </div>
-    </div>
-
+    <!-- الواجهة الثانية: لوحة التحكم المستوحاة من دنتالور -->
     <div id="dashboard">
-        <h1 style="color: #15803d; margin-top: 50px;">مرحباً بك في لوحة تحكم المركز الإيطالي</h1>
-        <p style="margin-top: 20px;">تم تسجيل الدخول بنجاح بالبيانات المطلوبة.</p>
-        <button onclick="location.reload()" style="margin-top: 30px; padding: 10px 25px; background: #b91c1c; color: white; border: none; border-radius: 5px; cursor: pointer;">تسجيل خروج</button>
+        
+        <!-- هيدر اللوحة -->
+        <div class="dash-header">
+            <div class="dash-title">المركز الإيطالي للأسنان</div>
+            <button class="logout-btn" onclick="location.reload()">تسجيل خروج</button>
+        </div>
+
+        <!-- كارت الإحصائيات الأخضر العلوي (صورة 1000563640.jpg) -->
+        <div class="stats-card">
+            <div class="stats-left">
+                <div class="stat-row"><span>منتظر:</span><span>0</span></div>
+                <div class="stat-row"><span>غير مؤكد:</span><span>0</span></div>
+                <div class="stat-row"><span>مؤكد:</span><span>6</span></div>
+                <div class="stat-row"><span>تم إلغاءه:</span><span>0</span></div>
+                <div class="stat-row"><span>فقد:</span><span>0</span></div>
+            </div>
+            <div class="stats-right">
+                <div class="date-label">اليوم</div>
+                <div class="date-val" id="currentDate">14/06/2026</div>
+            </div>
+        </div>
+
+        <!-- قسم زيارات الغرف والساعة الحية (صورة 1000563640.jpg) -->
+        <div class="room-section">
+            <div class="room-title">زيارات الغرف</div>
+            <div class="live-clock" id="liveClock">05:16 مساءً</div>
+        </div>
+
+        <!-- جدول الزيارات المتأخرة (البرتقالي - صورة 1000563641.jpg) -->
+        <div class="table-container">
+            <div class="table-header bg-orange">الزيارات المتأخرة</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">الوقت</th>
+                        <th style="width: 40%;">المريض</th>
+                        <th style="width: 20%;">الغرفة</th>
+                        <th style="width: 20%;">الطبيب</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="time-col">04:30 م</td>
+                        <td>صابر احمد حسن بخيت</td>
+                        <td>Clinic 2</td>
+                        <td>Dr Mohamed Elsyoufy</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- جدول الزيارات القادمة (الأزرق - صورة 1000563642.jpg) -->
+        <div class="table-container">
+            <div class="table-header bg-blue">الزيارات القادمة</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">الوقت</th>
+                        <th style="width: 40%;">المريض</th>
+                        <th style="width: 20%;">الغرفة</th>
+                        <th style="width: 20%;">الطبيب</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="time-col">05:30 م</td>
+                        <td>منه الله مجدى محمد حافظ</td>
+                        <td>clinic 3</td>
+                        <td>Dr Mostafa AbuElkair</td>
+                    </tr>
+                    <tr>
+                        <td class="time-col">06:00 م</td>
+                        <td>شيماء عدلي ابو الحسن</td>
+                        <td>Clinic 2</td>
+                        <td>Dr Mohamed Elsyoufy</td>
+                    </tr>
+                    <tr>
+                        <td class="time-col">07:00 م</td>
+                        <td>عامر مصطفي عمر</td>
+                        <td>clinic 3</td>
+                        <td>Dr Mohamed Elsyoufy</td>
+                    </tr>
+                    <tr>
+                        <td class="time-col">07:30 م</td>
+                        <td>انور صالح محمد احمد</td>
+                        <td>Clinic 2</td>
+                        <td>Dr Mohamed Elsyoufy</td>
+                    </tr>
+                    <tr>
+                        <td class="time-col">08:30 م</td>
+                        <td>احمد عبد الغني ابراهيم احمد</td>
+                        <td>clinic 3</td>
+                        <td>Dr Mohamed Elsyoufy</td>
+                    </tr>
+                    <tr>
+                        <td class="time-col">08:30 م</td>
+                        <td>عناني خليل ادم نجيب</td>
+                        <td>clinic 3</td>
+                        <td>Dr Mohamed Elsyoufy</td>
+                    </tr>
+                    <tr>
+                        <td class="time-col">09:00 م</td>
+                        <td>ولاء مصطفى محمود السيوفي</td>
+                        <td>Clinic 2</td>
+                        <td>Dr Mohamed Elsyoufy</td>
+                    </tr>
+                    <tr>
+                        <td class="time-col">10:30 م</td>
+                        <td>زياد مجدي سيد</td>
+                        <td>clinic 3</td>
+                        <td>Dr Mohamed Elsyoufy</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
     </div>
 
     <script>
@@ -318,29 +473,31 @@
             event.target.innerText = video.muted ? "🔇 تشغيل الصوت" : "🔊 كتم الصوت";
         }
 
-        // التحكم في فتح وقفل النافذة المنبثقة
-        function openModal() {
-            document.getElementById('resetModal').style.display = 'flex';
+        // كود تشغيل الساعة بشكل حي وتلقائي
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'مساءً' : 'صباحاً';
+            
+            hours = hours % 12;
+            hours = hours ? hours : 12; // الساعة 0 نخليها 12
+            const strHours = String(hours).padStart(2, '0');
+
+            document.getElementById('liveClock').innerText = `${strHours}:${minutes} ${ampm}`;
         }
+        setInterval(updateClock, 1000);
+        updateClock();
 
-        function closeModal() {
-            document.getElementById('resetModal').style.display = 'none';
-            document.getElementById('resetEmailInput').value = '';
-        }
+        // تحديث التاريخ الحالي تلقائياً
+        const today = new Date();
+        const dd = String(today.getDate()).padStart(2, '0');
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const yyyy = today.getFullYear();
+        document.getElementById('currentDate').innerText = `${dd}/${mm}/${yyyy}`;
 
-        // التعامل مع إرسال البريد المكتوب والتحقق منه
-        function handleResetSubmit() {
-            const emailInput = document.getElementById('resetEmailInput').value;
-            const targetEmail = "Bdalrhmnalsywfy38@gmail.com";
 
-            if (emailInput.trim().toLowerCase() === targetEmail.toLowerCase()) {
-                alert("تم إرسال رابط تعيين كلمة السر إلى بريدك بنجاح!");
-                closeModal();
-            } else {
-                alert("هذا البريد الإلكتروني غير مسجل في النظام!");
-            }
-        }
-
+        // التحقق من تسجيل الدخول
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
