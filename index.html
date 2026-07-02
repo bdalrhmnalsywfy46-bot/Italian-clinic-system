@@ -163,7 +163,6 @@
             position: relative;
         }
 
-        /* هيدر اللوحة المحدث بالثلاث شرط */
         .dash-header {
             display: flex;
             align-items: center;
@@ -176,7 +175,6 @@
             gap: 15px;
         }
 
-        /* زرار الثلاث شرط */
         .menu-toggle {
             background: none;
             border: none;
@@ -204,7 +202,6 @@
             font-weight: bold;
         }
 
-        /* القائمة الجانبية (Sidebar) */
         .sidebar {
             position: fixed;
             top: 0;
@@ -256,16 +253,15 @@
             display: block;
         }
 
-        /* --- أقسام المحتوى الداخلي --- */
         .page-section {
-            display: none; /* إخفاء كل الصفحات افتراضياً */
+            display: none;
         }
         
         .page-section.active-page {
-            display: block; /* إظهار الصفحة النشطة فقط */
+            display: block;
         }
 
-        /* كارت الإحصائيات الأخضر العلوي */
+        /* كارت الإحصائيات الأخضر */
         .stats-card {
             background: #4caf50;
             color: white;
@@ -276,6 +272,11 @@
             align-items: center;
             margin-bottom: 25px;
             box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .stats-left {
+            flex: 1;
+            padding-right: 20px;
         }
 
         .stats-right {
@@ -295,11 +296,6 @@
             font-weight: 900;
         }
 
-        .stats-left {
-            flex: 1;
-            padding-right: 20px;
-        }
-
         .stat-row {
             display: flex;
             justify-content: space-between;
@@ -308,7 +304,6 @@
             font-weight: bold;
         }
 
-        /* قسم الساعة وزيارات الغرف */
         .room-section {
             text-align: center;
             margin-bottom: 25px;
@@ -327,7 +322,6 @@
             color: #1e293b;
         }
 
-        /* ستايل الجداول */
         .table-container {
             background: #ffffff;
             border-radius: 12px;
@@ -368,6 +362,8 @@
             color: #334155;
             border-bottom: 1px solid #f1f5f9;
             font-weight: 600;
+            vertical-align: middle;
+            position: relative;
         }
 
         .no-data {
@@ -378,7 +374,77 @@
             font-weight: normal;
         }
 
-        /* --- ستايل صفحة إضافة موعد جديد --- */
+        /* ستايل اسم المريض التفاعلي وقائمة الحالات المنبثقة */
+        .patient-name-click {
+            cursor: pointer;
+            color: #1e293b;
+            font-weight: bold;
+            display: inline-block;
+            transition: color 0.2s;
+        }
+        .patient-name-click:hover {
+            color: #0284c7;
+            text-decoration: underline;
+        }
+
+        .status-dropdown {
+            display: none;
+            position: absolute;
+            top: 45px;
+            right: 12px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 50;
+            width: 150px;
+            overflow: hidden;
+        }
+        .status-dropdown.show-menu {
+            display: block;
+        }
+        .status-dropdown div {
+            padding: 10px 12px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #334155;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-align: right;
+        }
+        .status-dropdown div:hover {
+            background: #f1f5f9;
+            color: #0284c7;
+        }
+
+        /* شارات الحالة والملاحظات الملونة */
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .badge-waiting { background: #fef3c7; color: #d97706; }
+        .badge-unconfirmed { background: #f1f5f9; color: #64748b; }
+        .badge-confirmed { background: #e0f2fe; color: #0369a1; }
+        .badge-canceled { background: #fee2e2; color: #b91c1c; }
+        .badge-lost { background: #ffedd5; color: #ea580c; }
+        
+        .note-badge {
+            display: inline-block; 
+            margin-top: 5px; 
+            padding: 2px 8px; 
+            background: #f0fdf4; 
+            color: #16a34a; 
+            border-radius: 4px; 
+            font-size: 11px; 
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        /* --- ستايل صفحة إضافة موعد --- */
         .form-card {
             background: #ffffff;
             border-radius: 12px;
@@ -452,8 +518,7 @@
         </video>
         
         <div class="overlay"></div>
-        
-        <button class="audio-btn" onclick="toggleMute()">🔇 تشغيل الصوت</button>
+        <button class="audio-btn" onclick="toggleMute(event)">🔇 تشغيل الصوت</button>
 
         <div class="login-content">
             <div class="header-brand">
@@ -481,7 +546,6 @@
     </div>
 
     <div id="dashboard">
-        
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
         <div class="sidebar" id="sidebar">
@@ -502,7 +566,6 @@
             </button>
             <div class="dash-title" id="pageMainTitle">المركز الإيطالي للأسنان - الرئيسية</div>
         </div>
-
 
         <div id="page-home" class="page-section active-page">
             <div class="stats-card">
@@ -536,7 +599,7 @@
                         </tr>
                     </thead>
                     <tbody id="lateVisitsBody">
-                        <tr>
+                        <tr id="noLateRow">
                             <td colspan="4" class="no-data">لا توجد زيارات متأخرة حالياً</td>
                         </tr>
                     </tbody>
@@ -555,7 +618,7 @@
                         </tr>
                     </thead>
                     <tbody id="upcomingVisitsBody">
-                        <tr>
+                        <tr id="noUpcomingRow">
                             <td colspan="4" class="no-data">لا توجد زيارات قادمة اليوم</td>
                         </tr>
                     </tbody>
@@ -563,12 +626,10 @@
             </div>
         </div>
 
-
         <div id="page-add" class="page-section">
             <div class="form-card">
                 <h3>حجز موعد عيادة جديد</h3>
-                <form id="appointmentForm" onsubmit="event.preventDefault(); alert('تم حفظ الموعد بنجاح (مؤقتاً)!');">
-                    
+                <form id="appointmentForm">
                     <div class="custom-form-group">
                         <label for="patientName">اسم المريض:</label>
                         <input type="text" id="patientName" placeholder="أدخل اسم المريض الرباعي" required>
@@ -576,7 +637,7 @@
 
                     <div class="custom-form-group">
                         <label for="patientPhone">رقم المريض:</label>
-                        <input type="tel" id="patientPhone" placeholder="أدخل رقم الهاتف (مثال: 01xxxxxxxxx)" required>
+                        <input type="tel" id="patientPhone" placeholder="أدخل رقم الهاتف" required>
                     </div>
 
                     <div class="custom-form-group">
@@ -589,18 +650,21 @@
                         <input type="number" id="appointmentCode" placeholder="أدخل رقم الكود الخاص بالمريض" required>
                     </div>
 
+                    <div class="custom-form-group">
+                        <label for="appointmentNote">نوع الزيارة (ملاحظات):</label>
+                        <input type="text" id="appointmentNote" placeholder="مثال: بروفة، نهائي، حشو، خلع...">
+                    </div>
+
                     <button type="submit" class="submit-appointment-btn">حفظ وتأكيد الموعد</button>
                 </form>
             </div>
         </div>
-
     </div>
 
     <script>
         const video = document.getElementById('bgVideo');
-        video.loop = false;
 
-        function toggleMute() {
+        function toggleMute(event) {
             video.muted = !video.muted;
             event.target.innerText = video.muted ? "🔇 تشغيل الصوت" : "🔊 كتم الصوت";
         }
@@ -610,13 +674,10 @@
             document.getElementById('sidebarOverlay').classList.toggle('show');
         }
 
-        // دالة التنقل السلس بين الصفحات
         function switchPage(pageName) {
-            // إخفاء كل السكاشن وإزالة الـ active من أزرار القائمة
             document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active-page'));
             document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
 
-            // إظهار السكشن المطلوب وتحديث العنوان والزرار النشط
             if (pageName === 'home') {
                 document.getElementById('page-home').classList.add('active-page');
                 document.getElementById('menu-home').classList.add('active');
@@ -626,38 +687,206 @@
                 document.getElementById('menu-add').classList.add('active');
                 document.getElementById('pageMainTitle').innerText = "المركز الإيطالي للأسنان - إضافة موعد";
             }
-
-            // إغلاق القائمة الجانبية بعد الاختيار
             toggleSidebar();
         }
 
-        // كود تشغيل الساعة تلقائياً
+        // كائن مركزي لتخزين بيانات العدادات
+        const stats = {
+            waiting: 0,
+            unconfirmed: 0,
+            confirmed: 0,
+            canceled: 0,
+            lost: 0
+        };
+
+        // لتخزين الحالات الحالية لكل مريض لتسهيل الإضافة والخصم
+        const patientStatusMap = {};
+
+        function updateStatsDOM() {
+            document.getElementById('count-waiting').innerText = stats.waiting;
+            document.getElementById('count-unconfirmed').innerText = stats.unconfirmed;
+            document.getElementById('count-confirmed').innerText = stats.confirmed;
+            document.getElementById('count-canceled').innerText = stats.canceled;
+            document.getElementById('count-lost').innerText = stats.lost;
+        }
+
+        // إظهار/إخفاء القائمة المنسدلة عند الضغط على اسم المريض
+        function toggleDropdown(e, rowId) {
+            e.stopPropagation();
+            document.querySelectorAll('.status-dropdown').forEach(menu => {
+                if (menu.id !== `drop_${rowId}`) menu.classList.remove('show-menu');
+            });
+            const targetMenu = document.getElementById(`drop_${rowId}`);
+            if (targetMenu) targetMenu.classList.toggle('show-menu');
+        }
+
+        // إغلاق أي قائمة مفتوحة بمجرد الضغط في أي مكان فارغ بالشاشة
+        document.addEventListener('click', function() {
+            document.querySelectorAll('.status-dropdown').forEach(menu => menu.classList.remove('show-menu'));
+        });
+
+        // دالة تحديث الحالة، النقل بين الجداول، وإعادة ضبط الإحصائيات بالكامل
+        function changePatientStatus(rowId, newStatus, time, name, code, phone, note, currentTable) {
+            const oldStatus = patientStatusMap[rowId];
+            
+            // 1. إدارة الأرقام والعدادات في الكارت الأخضر
+            if (oldStatus) stats[oldStatus]--;
+            stats[newStatus]++;
+            patientStatusMap[rowId] = newStatus;
+            updateStatsDOM();
+
+            // تخصيص الشارة التوضيحية للحالة المحددة
+            let badgeHTML = '';
+            if (newStatus === 'waiting') badgeHTML = `<span class="status-badge badge-waiting">منتظر</span>`;
+            if (newStatus === 'unconfirmed') badgeHTML = `<span class="status-badge badge-unconfirmed">غير مؤكد</span>`;
+            if (newStatus === 'confirmed') badgeHTML = `<span class="status-badge badge-confirmed">مؤكد</span>`;
+            if (newStatus === 'canceled') badgeHTML = `<span class="status-badge badge-canceled">تم إلغاؤه</span>`;
+            if (newStatus === 'lost') badgeHTML = `<span class="status-badge badge-lost">فقد</span>`;
+
+            // 2. تدمير السطر القديم من مكانه الحالي
+            const oldRow = document.getElementById(rowId);
+            if (oldRow) oldRow.remove();
+
+            // 3. توجيه المريض للجدول المستهدف بناء على الحالة الجديدة
+            let targetTableId = 'upcomingVisitsBody';
+            if (newStatus === 'lost' || newStatus === 'canceled') {
+                targetTableId = 'lateVisitsBody';
+            }
+
+            const targetTbody = document.getElementById(targetTableId);
+            
+            if (targetTableId === 'lateVisitsBody') {
+                document.getElementById('noLateRow').style.display = 'none';
+            } else {
+                document.getElementById('noUpcomingRow').style.display = 'none';
+            }
+
+            // بناء السطر وإعادة إدراج الميزات التفاعلية كاملة
+            const newRow = document.createElement('tr');
+            newRow.setAttribute('id', rowId);
+
+            const timeColor = (targetTableId === 'lateVisitsBody') ? 'style="color: #b91c1c;"' : '';
+
+            newRow.innerHTML = `
+                <td ${timeColor}>${time}</td>
+                <td>
+                    <div class="patient-name-click" onclick="toggleDropdown(event, '${rowId}')">${name}</div>
+                    <small style="color:#64748b; font-size:12px; display:block; margin-top:2px;">كود: ${code} | ت: ${phone}</small>
+                    <div style="margin-top: 5px;">
+                        ${badgeHTML}
+                        <span class="note-badge">${note}</span>
+                    </div>
+
+                    <div class="status-dropdown" id="drop_${rowId}">
+                        <div onclick="changePatientStatus('${rowId}', 'waiting', '${time}', '${name}', '${code}', '${phone}', '${note}', '${targetTableId}')">⏳ منتظر</div>
+                        <div onclick="changePatientStatus('${rowId}', 'unconfirmed', '${time}', '${name}', '${code}', '${phone}', '${note}', '${targetTableId}')">⚪ غير مؤكد</div>
+                        <div onclick="changePatientStatus('${rowId}', 'confirmed', '${time}', '${name}', '${code}', '${phone}', '${note}', '${targetTableId}')">🔵 مؤكد</div>
+                        <div onclick="changePatientStatus('${rowId}', 'canceled', '${time}', '${name}', '${code}', '${phone}', '${note}', '${targetTableId}')">❌ تم إلغاؤه</div>
+                        <div onclick="changePatientStatus('${rowId}', 'lost', '${time}', '${name}', '${code}', '${phone}', '${note}', '${targetTableId}')">⚠️ فقد</div>
+                    </div>
+                </td>
+                <td>Clinic 1</td>
+                <td>دكتور العيادة</td>
+            `;
+
+            targetTbody.appendChild(newRow);
+
+            // مراجعة الجداول لعرض رسالة "لا توجد زيارات" عند خلوها
+            checkTableEmptyState('upcomingVisitsBody', 'noUpcomingRow');
+            checkTableEmptyState('lateVisitsBody', 'noLateRow');
+        }
+
+        function checkTableEmptyState(tbodyId, noDataRowId) {
+            const tbody = document.getElementById(tbodyId);
+            const placeholder = document.getElementById(noDataRowId);
+            
+            let visibleRows = 0;
+            for (let child of tbody.children) {
+                if (child.id !== noDataRowId) visibleRows++;
+            }
+
+            if (visibleRows === 0) {
+                placeholder.style.display = 'table-row';
+            } else {
+                placeholder.style.display = 'none';
+            }
+        }
+
+        // معالجة إضافة الموعد الجديد وضبط الحالة الافتراضية لـ "منتظر"
+        document.getElementById('appointmentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('patientName').value;
+            const phone = document.getElementById('patientPhone').value;
+            const code = document.getElementById('appointmentCode').value;
+            const note = document.getElementById('appointmentNote').value || "زيارة عادية"; 
+
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'م' : 'ص';
+            hours = hours % 12 || 12;
+            const timeStr = `${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
+
+            const rowId = 'row_' + Date.now();
+
+            document.getElementById('noUpcomingRow').style.display = 'none';
+            
+            stats.waiting++;
+            patientStatusMap[rowId] = 'waiting';
+            updateStatsDOM();
+
+            const tbody = document.getElementById('upcomingVisitsBody');
+            const newRow = document.createElement('tr');
+            newRow.setAttribute('id', rowId);
+
+            newRow.innerHTML = `
+                <td>${timeStr}</td>
+                <td>
+                    <div class="patient-name-click" onclick="toggleDropdown(event, '${rowId}')">${name}</div>
+                    <small style="color:#64748b; font-size:12px; display:block; margin-top:2px;">كود: ${code} | ت: ${phone}</small>
+                    <div style="margin-top: 5px;">
+                        <span class="status-badge badge-waiting">منتظر</span>
+                        <span class="note-badge">${note}</span>
+                    </div>
+
+                    <div class="status-dropdown" id="drop_${rowId}">
+                        <div onclick="changePatientStatus('${rowId}', 'waiting', '${timeStr}', '${name}', '${code}', '${phone}', '${note}', 'upcomingVisitsBody')">⏳ منتظر</div>
+                        <div onclick="changePatientStatus('${rowId}', 'unconfirmed', '${timeStr}', '${name}', '${code}', '${phone}', '${note}', 'upcomingVisitsBody')">⚪ غير مؤكد</div>
+                        <div onclick="changePatientStatus('${rowId}', 'confirmed', '${timeStr}', '${name}', '${code}', '${phone}', '${note}', 'upcomingVisitsBody')">🔵 مؤكد</div>
+                        <div onclick="changePatientStatus('${rowId}', 'canceled', '${timeStr}', '${name}', '${code}', '${phone}', '${note}', 'upcomingVisitsBody')">❌ تم إلغاؤه</div>
+                        <div onclick="changePatientStatus('${rowId}', 'lost', '${timeStr}', '${name}', '${code}', '${phone}', '${note}', 'upcomingVisitsBody')">⚠️ فقد</div>
+                    </div>
+                </td>
+                <td>Clinic 1</td>
+                <td>دكتور العيادة</td>
+            `;
+            tbody.appendChild(newRow);
+
+            document.getElementById('appointmentForm').reset();
+            alert('تم تسجيل المريض وحفظ حالته كـ "منتظر" بنجاح!');
+            switchPage('home');
+        });
+
+        // ساعة النظام الرقمية للعيادة
         function updateClock() {
             const now = new Date();
             let hours = now.getHours();
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const ampm = hours >= 12 ? 'مساءً' : 'صباحاً';
-            
-            hours = hours % 12;
-            hours = hours ? hours : 12;
-            const strHours = String(hours).padStart(2, '0');
-
-            document.getElementById('liveClock').innerText = `${strHours}:${minutes} ${ampm}`;
+            hours = hours % 12 || 12;
+            document.getElementById('liveClock').innerText = `${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
         }
         setInterval(updateClock, 1000);
         updateClock();
 
-        // تاريخ اليوم تلقائياً
+        // تاريخ اليوم التلقائي
         const today = new Date();
-        const dd = String(today.getDate()).padStart(2, '0');
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const yyyy = today.getFullYear();
-        document.getElementById('currentDate').innerText = `${dd}/${mm}/${yyyy}`;
+        document.getElementById('currentDate').innerText = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
 
-        // التحقق من تسجيل الدخول
+        // لوحة التحقق من شاشة تسجيل الدخول المعتمدة
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
             const user = document.getElementById('userInput').value;
             const pass = document.getElementById('passInput').value;
 
