@@ -553,7 +553,6 @@
 </head>
 <body>
 
-    <!-- الواجهة الأولى: تسجيل الدخول بالفيديو والأصوات -->
     <div id="loginScreen">
         <video class="video-bg" id="bgVideo" autoplay playsinline muted loop>
             <source src="intro.mp4" type="video/mp4">
@@ -587,11 +586,9 @@
         </div>
     </div>
 
-    <!-- الواجهة الثانية: لوحة التحكم الديناميكية الشاملة -->
     <div id="dashboard">
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-        <!-- القائمة الجانبية -->
         <div class="sidebar" id="sidebar">
             <ul class="sidebar-menu">
                 <li id="menu-home" class="active" onclick="switchPage('home')">الرئيسية</li>
@@ -611,7 +608,6 @@
             <div class="dash-title" id="pageMainTitle">المركز الإيطالي للأسنان - الرئيسية</div>
         </div>
 
-        <!-- ================= صفحة الرئيسية (المواعيد الحالية) ================= -->
         <div id="page-home" class="page-section active-page">
             <div class="stats-card">
                 <div class="stats-left">
@@ -632,13 +628,12 @@
                 <div class="live-clock" id="liveClock">--:-- --</div>
             </div>
 
-            <!-- جدول الزيارات المتأخرة (البرتقالي) -->
             <div class="table-container" id="lateTableContainer">
                 <div class="table-header bg-orange">الزيارات المتأخرة</div>
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 20%;">الوقت</th>
+                            <th style="width: 20%;">الوقت المحدد</th>
                             <th style="width: 40%;">المريض</th>
                             <th style="width: 20%;">الغرفة</th>
                             <th style="width: 20%;">الطبيب</th>
@@ -652,13 +647,12 @@
                 </table>
             </div>
 
-            <!-- جدول الزيارات القادمة (الأزرق) -->
             <div class="table-container" id="upcomingTableContainer">
                 <div class="table-header bg-blue">الزيارات القادمة</div>
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 20%;">الوقت</th>
+                            <th style="width: 20%;">الوقت المحدد</th>
                             <th style="width: 40%;">المريض</th>
                             <th style="width: 20%;">الغرفة</th>
                             <th style="width: 20%;">الطبيب</th>
@@ -673,7 +667,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة إضافة موعد جديد ================= -->
         <div id="page-add" class="page-section">
             <div class="form-card">
                 <h3>حجز موعد عيادة جديد</h3>
@@ -694,6 +687,11 @@
                     </div>
 
                     <div class="custom-form-group">
+                        <label for="appointmentTime">ساعة الموعد (الوقت المحدد للحجز):</label>
+                        <input type="time" id="appointmentTime" required>
+                    </div>
+
+                    <div class="custom-form-group">
                         <label for="appointmentCode">الكود (رقم):</label>
                         <input type="number" id="appointmentCode" placeholder="أدخل رقم الكود الخاص بالمريض" required>
                     </div>
@@ -708,7 +706,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة سجل المرضى المطور والبحث التفاعلي الشامل ================= -->
         <div id="page-history" class="page-section">
             <div class="search-wrapper">
                 <input type="text" id="historySearchInput" class="search-input" oninput="filterHistory()" placeholder="🔍 ابحث عن مريض بالاسم، رقم الهاتف، أو الكود الفردي...">
@@ -738,12 +735,10 @@
     <script>
         const video = document.getElementById('bgVideo');
 
-        // كائنات البيانات والـ Storage المحدثة لمنع الحذف والضياع نهائياً
         let stats = { waiting: 0, unconfirmed: 0, confirmed: 0, canceled: 0, lost: 0 };
         let patientDataMap = {}; 
         let archivePatientsMap = {}; 
 
-        // دالة استرجاع وتحميل البيانات المحفوظة بمجرد فتح المنظومة
         function loadSavedData() {
             const savedStats = localStorage.getItem('italian_clinic_stats');
             const savedPatients = localStorage.getItem('italian_clinic_patients');
@@ -754,7 +749,6 @@
             if (savedPatients) patientDataMap = JSON.parse(savedPatients);
             if (savedArchive) archivePatientsMap = JSON.parse(savedArchive);
 
-            // استعادة جلسة الدخول المباشرة لو كان مسجل دخول من قبل لمنع طلب الباسورد في كل مرة
             if (savedLoginStatus === 'true') {
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
@@ -765,7 +759,6 @@
             rebuildCurrentVisitsTables();
         }
 
-        // دالة الحفظ المركزي في المتصفح عند أي عملية تحديث أو إضافة
         function saveDataToStorage() {
             localStorage.setItem('italian_clinic_stats', JSON.stringify(stats));
             localStorage.setItem('italian_clinic_patients', JSON.stringify(patientDataMap));
@@ -832,7 +825,6 @@
             document.querySelectorAll('.status-dropdown').forEach(menu => menu.classList.remove('show-menu'));
         });
 
-        // دالة تغيير الحالات الشاملة والنقل التلقائي
         function changePatientStatus(rowId, newStatus) {
             const patient = patientDataMap[rowId];
             if (!patient) return;
@@ -844,18 +836,15 @@
             updateStatsDOM();
 
             pushToArchive(patient);
-            saveDataToStorage(); // حفظ فوري في التخزين
+            saveDataToStorage(); 
 
-            // إعادة بناء الجداول بالكامل لتحديث العرض على الفور
             rebuildCurrentVisitsTables();
         }
 
-        // بناء جداول المواعيد الحالية في شاشة الرئيسية بناءً على البيانات المسترجعة
         function rebuildCurrentVisitsTables() {
             const upcomingBody = document.getElementById('upcomingVisitsBody');
             const lateBody = document.getElementById('lateVisitsBody');
 
-            // تنظيف الجداول باستثناء صفوف الطوارئ أو الرسائل الفارغة
             upcomingBody.innerHTML = `<tr id="noUpcomingRow"><td colspan="4" class="no-data">لا توجد زيارات قادمة اليوم</td></tr>`;
             lateBody.innerHTML = `<tr id="noLateRow"><td colspan="4" class="no-data">لا توجد زيارات متأخرة حالياً</td></tr>`;
 
@@ -984,7 +973,7 @@
                             <thead>
                                 <tr>
                                     <th>التاريخ</th>
-                                    <th>الوقت</th>
+                                    <th>الوقت المحدد</th>
                                     <th>الملاحظات / نوع العمل</th>
                                     <th>حالة الموعد الحالية</th>
                                 </tr>
@@ -1043,11 +1032,21 @@
             placeholder.style.display = (visibleRows === 0) ? 'table-row' : 'none';
         }
 
-        // دالة تسجيل الخروج الآمنة (تحفظ البيانات وتغلق الشاشة فقط دون حذف الكاش)
         function logoutSystem() {
-            saveDataToStorage(); // تأكيد نهائي للحفظ قبل الخروج
-            localStorage.setItem('italian_clinic_logged_in', 'false'); // إنهاء جلسة الدخول
-            location.reload(); // إعادة تحميل الصفحة للرجوع لواجهة الفيديو والدخول
+            saveDataToStorage(); 
+            localStorage.setItem('italian_clinic_logged_in', 'false'); 
+            location.reload(); 
+        }
+
+        // تحويل الساعة من نظام 24 ساعة المخرج من الـ Input إلى نظام 12 ساعة (ص/م) المألوف للعيادة
+        function formatTime12Hour(timeString) {
+            if (!timeString) return '--:--';
+            const [sHours, sMinutes] = timeString.split(':');
+            let hours = parseInt(sHours);
+            const minutes = sMinutes;
+            const ampm = hours >= 12 ? 'م' : 'ص';
+            hours = hours % 12 || 12;
+            return `${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
         }
 
         document.getElementById('appointmentForm').addEventListener('submit', function(e) {
@@ -1056,18 +1055,15 @@
             const name = document.getElementById('patientName').value;
             const phone = document.getElementById('patientPhone').value;
             const rawDate = document.getElementById('appointmentDate').value; 
+            const rawTime = document.getElementById('appointmentTime').value; // جلب قيمة حقل الساعة الجديد
             const code = document.getElementById('appointmentCode').value;
             const note = document.getElementById('appointmentNote').value || "حشو فحص عام"; 
 
             const dateObj = new Date(rawDate);
             const formattedDate = `${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth() + 1).padStart(2, '0')}/${dateObj.getFullYear()}`;
-
-            const now = new Date();
-            let hours = now.getHours();
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const ampm = hours >= 12 ? 'م' : 'ص';
-            hours = hours % 12 || 12;
-            const timeStr = `${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
+            
+            // تحويل الوقت المدخل يدوياً بصيغة مريحة
+            const timeStr = formatTime12Hour(rawTime);
 
             const rowId = 'row_' + Date.now();
 
@@ -1085,7 +1081,7 @@
             changePatientStatus(rowId, 'waiting');
 
             document.getElementById('appointmentForm').reset();
-            alert('تم حجز الموعد بنجاح وحفظه في سجل الأرشيف التلقائي للمريض!');
+            alert('تم حجز الموعد بنجاح بالساعة المحددة وحفظه تلقائياً في السجل التاريخي!');
             switchPage('home');
         });
 
@@ -1109,7 +1105,7 @@
             const pass = document.getElementById('passInput').value;
 
             if (user === "Italian dental center" && pass === "Italian 712554") {
-                localStorage.setItem('italian_clinic_logged_in', 'true'); // تذكر حالة الدخول للمتصفح
+                localStorage.setItem('italian_clinic_logged_in', 'true'); 
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
                 video.pause();
@@ -1118,7 +1114,6 @@
             }
         });
 
-        // تشغيل التحميل التلقائي بمجرد فتح المتصفح للملف
         window.onload = loadSavedData;
     </script>
 </body>
