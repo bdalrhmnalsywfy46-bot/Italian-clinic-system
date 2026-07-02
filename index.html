@@ -322,7 +322,6 @@
             color: #1e293b;
         }
 
-        /* جداول الحالات الملوّنة وبنية العرض المرن للـ Dropdown */
         .table-container {
             background: #ffffff;
             border-radius: 12px;
@@ -443,7 +442,6 @@
             margin-right: 5px;
         }
 
-        /* --- ستايلات صفحة الإضافة وسجل المرضى --- */
         .form-card {
             background: #ffffff;
             border-radius: 12px;
@@ -508,7 +506,6 @@
             background: #0369a1;
         }
 
-        /* صندوق البحث المطور المخصص لسجل المرضى */
         .search-wrapper {
             background: #ffffff;
             border-radius: 12px;
@@ -533,7 +530,6 @@
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
         }
 
-        /* تصميم الكارت الداخلي لجدول تاريخ المريض الفرعي */
         .history-sub-table {
             width: 100%;
             margin-top: 8px;
@@ -595,14 +591,14 @@
     <div id="dashboard">
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-        <!-- القائمة الجانبية المحدثة بناءً على ملف 1000563659.jpg -->
+        <!-- القائمة الجانبية -->
         <div class="sidebar" id="sidebar">
             <ul class="sidebar-menu">
                 <li id="menu-home" class="active" onclick="switchPage('home')">الرئيسية</li>
                 <li id="menu-add" onclick="switchPage('add')">إضافة موعد جديد</li>
                 <li id="menu-history" onclick="switchPage('history')">سجل المرضى</li>
                 <li>التقارير والإحصائيات</li>
-                <li onclick="location.reload()" style="color: #b91c1c;">تسجيل الخروج</li>
+                <li onclick="logoutSystem()" style="color: #b91c1c;">تسجيل الخروج</li>
             </ul>
         </div>
         
@@ -742,6 +738,40 @@
     <script>
         const video = document.getElementById('bgVideo');
 
+        // كائنات البيانات والـ Storage المحدثة لمنع الحذف والضياع نهائياً
+        let stats = { waiting: 0, unconfirmed: 0, confirmed: 0, canceled: 0, lost: 0 };
+        let patientDataMap = {}; 
+        let archivePatientsMap = {}; 
+
+        // دالة استرجاع وتحميل البيانات المحفوظة بمجرد فتح المنظومة
+        function loadSavedData() {
+            const savedStats = localStorage.getItem('italian_clinic_stats');
+            const savedPatients = localStorage.getItem('italian_clinic_patients');
+            const savedArchive = localStorage.getItem('italian_clinic_archive');
+            const savedLoginStatus = localStorage.getItem('italian_clinic_logged_in');
+
+            if (savedStats) stats = JSON.parse(savedStats);
+            if (savedPatients) patientDataMap = JSON.parse(savedPatients);
+            if (savedArchive) archivePatientsMap = JSON.parse(savedArchive);
+
+            // استعادة جلسة الدخول المباشرة لو كان مسجل دخول من قبل لمنع طلب الباسورد في كل مرة
+            if (savedLoginStatus === 'true') {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                video.pause();
+            }
+
+            updateStatsDOM();
+            rebuildCurrentVisitsTables();
+        }
+
+        // دالة الحفظ المركزي في المتصفح عند أي عملية تحديث أو إضافة
+        function saveDataToStorage() {
+            localStorage.setItem('italian_clinic_stats', JSON.stringify(stats));
+            localStorage.setItem('italian_clinic_patients', JSON.stringify(patientDataMap));
+            localStorage.setItem('italian_clinic_archive', JSON.stringify(archivePatientsMap));
+        }
+
         function toggleMute(event) {
             video.muted = !video.muted;
             event.target.innerText = video.muted ? "🔇 تشغيل الصوت" : "🔊 كتم الصوت";
@@ -768,15 +798,10 @@
                 document.getElementById('page-history').classList.add('active-page');
                 document.getElementById('menu-history').classList.add('active');
                 document.getElementById('pageMainTitle').innerText = "المركز الإيطالي للأسنان - سجل الأرشيف التاريخي";
-                renderHistoryDOM(); // إعادة بناء شاشة السجل وتحديث البيانات فوراً عند الفتح
+                renderHistoryDOM(); 
             }
             toggleSidebar();
         }
-
-        // كائن البيانات المركزي والمجموعات الإحصائية
-        const stats = { waiting: 0, unconfirmed: 0, confirmed: 0, canceled: 0, lost: 0 };
-        const patientDataMap = {}; // للمواعيد المفتوحة الجارية حالياً في الصفحة الرئيسية
-        const archivePatientsMap = {}; // قاعدة البيانات التاريخية الموحدة لتخزين أرشيف المرضى بالكامل
 
         function updateStatsDOM() {
             document.getElementById('count-waiting').innerText = stats.waiting;
@@ -807,7 +832,7 @@
             document.querySelectorAll('.status-dropdown').forEach(menu => menu.classList.remove('show-menu'));
         });
 
-        // دالة تحويل الحالات الذكية
+        // دالة تغيير الحالات الشاملة والنقل التلقائي
         function changePatientStatus(rowId, newStatus) {
             const patient = patientDataMap[rowId];
             if (!patient) return;
@@ -818,72 +843,83 @@
             patient.status = newStatus;
             updateStatsDOM();
 
-            // تحديث السجل التاريخي فوراً عند حدوث أي تعديل على الحالة الحالية للموعد
             pushToArchive(patient);
+            saveDataToStorage(); // حفظ فوري في التخزين
 
-            let badgeHTML = '';
-            if (newStatus === 'waiting') badgeHTML = `<span class="status-badge badge-waiting">منتظر</span>`;
-            if (newStatus === 'unconfirmed') badgeHTML = `<span class="status-badge badge-unconfirmed">غير مؤكد</span>`;
-            if (newStatus === 'confirmed') badgeHTML = `<span class="status-badge badge-confirmed">مؤكد</span>`;
-            if (newStatus === 'canceled') badgeHTML = `<span class="status-badge badge-canceled">تم إلغاؤه</span>`;
-            if (newStatus === 'lost') badgeHTML = `<span class="status-badge badge-lost">فقد</span>`;
+            // إعادة بناء الجداول بالكامل لتحديث العرض على الفور
+            rebuildCurrentVisitsTables();
+        }
 
-            const oldRow = document.getElementById(rowId);
-            if (oldRow) oldRow.remove();
+        // بناء جداول المواعيد الحالية في شاشة الرئيسية بناءً على البيانات المسترجعة
+        function rebuildCurrentVisitsTables() {
+            const upcomingBody = document.getElementById('upcomingVisitsBody');
+            const lateBody = document.getElementById('lateVisitsBody');
 
-            let targetTbodyId = 'upcomingVisitsBody';
-            if (newStatus === 'lost' || newStatus === 'canceled') {
-                targetTbodyId = 'lateVisitsBody';
-            }
+            // تنظيف الجداول باستثناء صفوف الطوارئ أو الرسائل الفارغة
+            upcomingBody.innerHTML = `<tr id="noUpcomingRow"><td colspan="4" class="no-data">لا توجد زيارات قادمة اليوم</td></tr>`;
+            lateBody.innerHTML = `<tr id="noLateRow"><td colspan="4" class="no-data">لا توجد زيارات متأخرة حالياً</td></tr>`;
 
-            const targetTbody = document.getElementById(targetTbodyId);
-            const newRow = document.createElement('tr');
-            newRow.setAttribute('id', rowId);
+            Object.keys(patientDataMap).forEach(rowId => {
+                const patient = patientDataMap[rowId];
+                const newStatus = patient.status;
 
-            const timeColor = (targetTbodyId === 'lateVisitsBody') ? 'style="color: #b91c1c;"' : '';
+                let badgeHTML = '';
+                if (newStatus === 'waiting') badgeHTML = `<span class="status-badge badge-waiting">منتظر</span>`;
+                if (newStatus === 'unconfirmed') badgeHTML = `<span class="status-badge badge-unconfirmed">غير مؤكد</span>`;
+                if (newStatus === 'confirmed') badgeHTML = `<span class="status-badge badge-confirmed">مؤكد</span>`;
+                if (newStatus === 'canceled') badgeHTML = `<span class="status-badge badge-canceled">تم إلغاؤه</span>`;
+                if (newStatus === 'lost') badgeHTML = `<span class="status-badge badge-lost">فقد</span>`;
 
-            newRow.innerHTML = `
-                <td ${timeColor}>${patient.time}</td>
-                <td style="position: static;">
-                    <div class="patient-name-click" onclick="toggleDropdown(event, '${rowId}')">${patient.name}</div>
-                    <small style="color:#64748b; font-size:12px; display:block; margin-top:2px;">كود: ${patient.code} | ت: ${patient.phone}</small>
-                    <div style="margin-top: 5px;">
-                        ${badgeHTML}
-                        <span class="note-badge">${patient.note}</span>
-                    </div>
+                let targetTbodyId = 'upcomingVisitsBody';
+                if (newStatus === 'lost' || newStatus === 'canceled') {
+                    targetTbodyId = 'lateVisitsBody';
+                }
 
-                    <div class="status-dropdown" id="drop_${rowId}">
-                        <div onclick="changePatientStatus('${rowId}', 'waiting')">⏳ منتظر</div>
-                        <div onclick="changePatientStatus('${rowId}', 'unconfirmed')">⚪ غير مؤكد</div>
-                        <div onclick="changePatientStatus('${rowId}', 'confirmed')">🔵 مؤكد</div>
-                        <div onclick="changePatientStatus('${rowId}', 'canceled')">❌ تم إلغاؤه</div>
-                        <div onclick="changePatientStatus('${rowId}', 'lost')">⚠️ فقد</div>
-                    </div>
-                </td>
-                <td>Clinic 1</td>
-                <td>دكتور العيادة</td>
-            `;
+                const targetTbody = document.getElementById(targetTbodyId);
+                const newRow = document.createElement('tr');
+                newRow.setAttribute('id', rowId);
 
-            targetTbody.appendChild(newRow);
+                const timeColor = (targetTbodyId === 'lateVisitsBody') ? 'style="color: #b91c1c;"' : '';
+
+                newRow.innerHTML = `
+                    <td ${timeColor}>${patient.time}</td>
+                    <td style="position: static;">
+                        <div class="patient-name-click" onclick="toggleDropdown(event, '${rowId}')">${patient.name}</div>
+                        <small style="color:#64748b; font-size:12px; display:block; margin-top:2px;">كود: ${patient.code} | ت: ${patient.phone}</small>
+                        <div style="margin-top: 5px;">
+                            ${badgeHTML}
+                            <span class="note-badge">${patient.note}</span>
+                        </div>
+
+                        <div class="status-dropdown" id="drop_${rowId}">
+                            <div onclick="changePatientStatus('${rowId}', 'waiting')">⏳ منتظر</div>
+                            <div onclick="changePatientStatus('${rowId}', 'unconfirmed')">⚪ غير مؤكد</div>
+                            <div onclick="changePatientStatus('${rowId}', 'confirmed')">🔵 مؤكد</div>
+                            <div onclick="changePatientStatus('${rowId}', 'canceled')">❌ تم إلغاؤه</div>
+                            <div onclick="changePatientStatus('${rowId}', 'lost')">⚠️ فقد</div>
+                        </div>
+                    </td>
+                    <td>Clinic 1</td>
+                    <td>دكتور العيادة</td>
+                `;
+
+                targetTbody.appendChild(newRow);
+            });
 
             checkTableEmptyState('upcomingVisitsBody', 'noUpcomingRow');
             checkTableEmptyState('lateVisitsBody', 'noLateRow');
         }
 
-        // دالة إضافة المواعيد وتحديثها بداخل الأرشيف المركزي المطور تمنع التكرار وتدعم دمج الملاحظات
         function pushToArchive(patient) {
-            const uniqueKey = patient.code.trim(); // استخدام الكود كمعرّف أساسي للمريض في الأرشيف لجمع زياراته كاملة
-            
+            const uniqueKey = patient.code.trim();
             if (!archivePatientsMap[uniqueKey]) {
                 archivePatientsMap[uniqueKey] = {
                     name: patient.name,
                     phone: patient.phone,
                     code: patient.code,
-                    visits: {} // تخزين المواعيد الفرعية داخل ماب يمنع التكرار ويعمل على التحديث المباشر
+                    visits: {}
                 };
             }
-
-            // إدراج أو تحديث تفاصيل الزيارة الفرعية بناء على معرّف الموعد
             archivePatientsMap[uniqueKey].visits[patient.id] = {
                 date: patient.date,
                 time: patient.time,
@@ -892,10 +928,9 @@
             };
         }
 
-        // بناء وعرض السجل في الـ DOM بشكل تفصيلي مرتب
         function renderHistoryDOM() {
             const tbody = document.getElementById('historyTableBody');
-            tbody.innerHTML = ''; // تصفير السجل القديم
+            tbody.innerHTML = ''; 
 
             const keys = Object.keys(archivePatientsMap);
 
@@ -909,7 +944,6 @@
                 const visitIds = Object.keys(p.visits);
                 const visitCount = visitIds.length;
 
-                // بناء جدول الزيارات الداخلي المطور للمريض لعرض كل المواعيد والملاحظات دفعة واحدة
                 let subTableRowsHTML = '';
                 visitIds.forEach(id => {
                     const v = p.visits[id];
@@ -932,7 +966,6 @@
 
                 const row = document.createElement('tr');
                 row.className = 'history-item-row';
-                // تخزين حقول البحث داخل خصائص داتا لتسهيل البحث السريع الذكي
                 row.setAttribute('data-name', p.name.toLowerCase());
                 row.setAttribute('data-phone', p.phone);
                 row.setAttribute('data-code', p.code);
@@ -966,7 +999,6 @@
             });
         }
 
-        // دالة الفلترة والبحث الثلاثي الذكي الفوري (الاسم، الهاتف، الكود)
         function filterHistory() {
             const query = document.getElementById('historySearchInput').value.toLowerCase().trim();
             const rows = document.querySelectorAll('.history-item-row');
@@ -985,7 +1017,6 @@
                 }
             });
 
-            // التعامل مع حالة عدم العثور على أي نتائج بحث مطابقة لإخطار المستخدم
             const noRow = document.getElementById('noHistoryRow');
             if (!hasResults) {
                 if (!noRow) {
@@ -996,7 +1027,6 @@
                     tbody.appendChild(emptyRow);
                 } else {
                     noRow.style.display = 'table-row';
-                    noRow.querySelector('td').innerText = "عذراً، لم يتم العثور على نتائج مطابقة لبحثك!";
                 }
             } else {
                 if (noRow) noRow.remove();
@@ -1013,17 +1043,22 @@
             placeholder.style.display = (visibleRows === 0) ? 'table-row' : 'none';
         }
 
-        // استقبال وحفظ بيانات استمارة إضافة الموعد وضبطه كـ "منتظر" بشكل أولي
+        // دالة تسجيل الخروج الآمنة (تحفظ البيانات وتغلق الشاشة فقط دون حذف الكاش)
+        function logoutSystem() {
+            saveDataToStorage(); // تأكيد نهائي للحفظ قبل الخروج
+            localStorage.setItem('italian_clinic_logged_in', 'false'); // إنهاء جلسة الدخول
+            location.reload(); // إعادة تحميل الصفحة للرجوع لواجهة الفيديو والدخول
+        }
+
         document.getElementById('appointmentForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
             const name = document.getElementById('patientName').value;
             const phone = document.getElementById('patientPhone').value;
-            const rawDate = document.getElementById('appointmentDate').value; // جلب التاريخ المحدد
+            const rawDate = document.getElementById('appointmentDate').value; 
             const code = document.getElementById('appointmentCode').value;
             const note = document.getElementById('appointmentNote').value || "حشو فحص عام"; 
 
-            // تحسين تنسيق عرض التاريخ المستلم من الحقل
             const dateObj = new Date(rawDate);
             const formattedDate = `${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth() + 1).padStart(2, '0')}/${dateObj.getFullYear()}`;
 
@@ -1074,6 +1109,7 @@
             const pass = document.getElementById('passInput').value;
 
             if (user === "Italian dental center" && pass === "Italian 712554") {
+                localStorage.setItem('italian_clinic_logged_in', 'true'); // تذكر حالة الدخول للمتصفح
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
                 video.pause();
@@ -1081,6 +1117,9 @@
                 alert("اسم المستخدم أو كلمة المرور غير صحيحة!");
             }
         });
+
+        // تشغيل التحميل التلقائي بمجرد فتح المتصفح للملف
+        window.onload = loadSavedData;
     </script>
 </body>
 </html>
