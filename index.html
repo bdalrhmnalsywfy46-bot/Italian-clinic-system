@@ -153,7 +153,7 @@
             font-size: 12px;
         }
 
-        /* --- الشاشة الثانية: لوحة التحكم (Dashboard) --- */
+        /* --- الشاشة الثانية: لوحة التحكم العامة --- */
         #dashboard {
             display: none;
             width: 100%;
@@ -163,7 +163,7 @@
             position: relative;
         }
 
-        /* هيدر اللوحة المحدث مع الثلاث شرط */
+        /* هيدر اللوحة المحدث بالثلاث شرط */
         .dash-header {
             display: flex;
             align-items: center;
@@ -176,7 +176,7 @@
             gap: 15px;
         }
 
-        /* زرار الثلاث شرط (Hamburger) */
+        /* زرار الثلاث شرط */
         .menu-toggle {
             background: none;
             border: none;
@@ -186,6 +186,7 @@
             justify-content: space-between;
             width: 24px;
             height: 18px;
+            z-index: 95;
         }
 
         .menu-toggle span {
@@ -207,7 +208,7 @@
         .sidebar {
             position: fixed;
             top: 0;
-            right: -280px; /* مخفية برة الشاشة على اليمين */
+            right: -280px;
             width: 280px;
             height: 100%;
             background: #ffffff;
@@ -218,7 +219,7 @@
         }
 
         .sidebar.open {
-            right: 0; /* تظهر لما تاخد كلاس open */
+            right: 0;
         }
 
         .sidebar-menu {
@@ -235,12 +236,11 @@
             transition: 0.2s;
         }
 
-        .sidebar-menu li:hover {
+        .sidebar-menu li:hover, .sidebar-menu li.active {
             background: #f8fafc;
             color: #0284c7;
         }
 
-        /* غطاء شفاف خلفي يقفل القائمة لما تضغط بأس مكان برة */
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -254,6 +254,15 @@
 
         .sidebar-overlay.show {
             display: block;
+        }
+
+        /* --- أقسام المحتوى الداخلي --- */
+        .page-section {
+            display: none; /* إخفاء كل الصفحات افتراضياً */
+        }
+        
+        .page-section.active-page {
+            display: block; /* إظهار الصفحة النشطة فقط */
         }
 
         /* كارت الإحصائيات الأخضر العلوي */
@@ -318,7 +327,7 @@
             color: #1e293b;
         }
 
-        /* ستايل الجداول العام */
+        /* ستايل الجداول */
         .table-container {
             background: #ffffff;
             border-radius: 12px;
@@ -368,11 +377,75 @@
             padding: 30px 10px;
             font-weight: normal;
         }
+
+        /* --- ستايل صفحة إضافة موعد جديد --- */
+        .form-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            margin-top: 10px;
+        }
+
+        .form-card h3 {
+            color: #1e293b;
+            font-size: 20px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 10px;
+        }
+
+        .custom-form-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .custom-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #475569;
+        }
+
+        .custom-form-group input {
+            width: 100%;
+            padding: 12px;
+            font-size: 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            outline: none;
+            background-color: #f8fafc;
+            transition: 0.3s;
+        }
+
+        .custom-form-group input:focus {
+            border-color: #0284c7;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+        }
+
+        .submit-appointment-btn {
+            width: 100%;
+            padding: 14px;
+            background: #0284c7;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .submit-appointment-btn:hover {
+            background: #0369a1;
+        }
     </style>
 </head>
 <body>
 
-    <!-- الواجهة الأولى: تسجيل الدخول -->
     <div id="loginScreen">
         <video class="video-bg" id="bgVideo" autoplay playsinline muted>
             <source src="intro.mp4" type="video/mp4">
@@ -407,92 +480,118 @@
         </div>
     </div>
 
-    <!-- الواجهة الثانية: لوحة التحكم مع الثلاث شرط والقائمة الجانبية -->
     <div id="dashboard">
         
-        <!-- غطاء شفاف خلفي يقفل القائمة عند الضغط عليه -->
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-        <!-- القائمة الجانبية (Sidebar) -->
         <div class="sidebar" id="sidebar">
             <ul class="sidebar-menu">
-                <li>الرئيسية</li>
-                <li>إضافة موعد جديد</li>
+                <li id="menu-home" class="active" onclick="switchPage('home')">الرئيسية</li>
+                <li id="menu-add" onclick="switchPage('add')">إضافة موعد جديد</li>
                 <li>سجل المرضى</li>
                 <li>التقارير والإحصائيات</li>
                 <li onclick="location.reload()" style="color: #b91c1c;">تسجيل الخروج</li>
             </ul>
         </div>
         
-        <!-- هيدر اللوحة المحدث بالثلاث شرط يمين الكلمة -->
         <div class="dash-header">
             <button class="menu-toggle" onclick="toggleSidebar()">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
-            <div class="dash-title">المركز الإيطالي للأسنان</div>
+            <div class="dash-title" id="pageMainTitle">المركز الإيطالي للأسنان - الرئيسية</div>
         </div>
 
-        <!-- كارت الإحصائيات الأخضر العلوي -->
-        <div class="stats-card">
-            <div class="stats-left">
-                <div class="stat-row"><span>منتظر:</span><span id="count-waiting">0</span></div>
-                <div class="stat-row"><span>غير مؤكد:</span><span id="count-unconfirmed">0</span></div>
-                <div class="stat-row"><span>مؤكد:</span><span id="count-confirmed">0</span></div>
-                <div class="stat-row"><span>تم إلغاءه:</span><span id="count-canceled">0</span></div>
-                <div class="stat-row"><span>فقد:</span><span id="count-lost">0</span></div>
+
+        <div id="page-home" class="page-section active-page">
+            <div class="stats-card">
+                <div class="stats-left">
+                    <div class="stat-row"><span>منتظر:</span><span id="count-waiting">0</span></div>
+                    <div class="stat-row"><span>غير مؤكد:</span><span id="count-unconfirmed">0</span></div>
+                    <div class="stat-row"><span>مؤكد:</span><span id="count-confirmed">0</span></div>
+                    <div class="stat-row"><span>تم إلغاءه:</span><span id="count-canceled">0</span></div>
+                    <div class="stat-row"><span>فقد:</span><span id="count-lost">0</span></div>
+                </div>
+                <div class="stats-right">
+                    <div class="date-label">اليوم</div>
+                    <div class="date-val" id="currentDate">--/--/----</div>
+                </div>
             </div>
-            <div class="stats-right">
-                <div class="date-label">اليوم</div>
-                <div class="date-val" id="currentDate">--/--/----</div>
+
+            <div class="room-section">
+                <div class="room-title">زيارات الغرف</div>
+                <div class="live-clock" id="liveClock">--:-- --</div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header bg-orange">الزيارات المتأخرة</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 20%;">الوقت</th>
+                            <th style="width: 40%;">المريض</th>
+                            <th style="width: 20%;">الغرفة</th>
+                            <th style="width: 20%;">الطبيب</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lateVisitsBody">
+                        <tr>
+                            <td colspan="4" class="no-data">لا توجد زيارات متأخرة حالياً</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header bg-blue">الزيارات القادمة</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 20%;">الوقت</th>
+                            <th style="width: 40%;">المريض</th>
+                            <th style="width: 20%;">الغرفة</th>
+                            <th style="width: 20%;">الطبيب</th>
+                        </tr>
+                    </thead>
+                    <tbody id="upcomingVisitsBody">
+                        <tr>
+                            <td colspan="4" class="no-data">لا توجد زيارات قادمة اليوم</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <!-- قسم زيارات الغرف والساعة الحية -->
-        <div class="room-section">
-            <div class="room-title">زيارات الغرف</div>
-            <div class="live-clock" id="liveClock">--:-- --</div>
-        </div>
 
-        <!-- جدول الزيارات المتأخرة (البرتقالي) -->
-        <div class="table-container">
-            <div class="table-header bg-orange">الزيارات المتأخرة</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 20%;">الوقت</th>
-                        <th style="width: 40%;">المريض</th>
-                        <th style="width: 20%;">الغرفة</th>
-                        <th style="width: 20%;">الطبيب</th>
-                    </tr>
-                </thead>
-                <tbody id="lateVisitsBody">
-                    <tr>
-                        <td colspan="4" class="no-data">لا توجد زيارات متأخرة حالياً</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <div id="page-add" class="page-section">
+            <div class="form-card">
+                <h3>حجز موعد عيادة جديد</h3>
+                <form id="appointmentForm" onsubmit="event.preventDefault(); alert('تم حفظ الموعد بنجاح (مؤقتاً)!');">
+                    
+                    <div class="custom-form-group">
+                        <label for="patientName">اسم المريض:</label>
+                        <input type="text" id="patientName" placeholder="أدخل اسم المريض الرباعي" required>
+                    </div>
 
-        <!-- جدول الزيارات القادمة (الأزرق) -->
-        <div class="table-container">
-            <div class="table-header bg-blue">الزيارات القادمة</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 20%;">الوقت</th>
-                        <th style="width: 40%;">المريض</th>
-                        <th style="width: 20%;">الغرفة</th>
-                        <th style="width: 20%;">الطبيب</th>
-                    </tr>
-                </thead>
-                <tbody id="upcomingVisitsBody">
-                    <tr>
-                        <td colspan="4" class="no-data">لا توجد زيارات قادمة اليوم</td>
-                    </tr>
-                </tbody>
-            </table>
+                    <div class="custom-form-group">
+                        <label for="patientPhone">رقم المريض:</label>
+                        <input type="tel" id="patientPhone" placeholder="أدخل رقم الهاتف (مثال: 01xxxxxxxxx)" required>
+                    </div>
+
+                    <div class="custom-form-group">
+                        <label for="appointmentDate">تاريخ الموعد:</label>
+                        <input type="date" id="appointmentDate" required>
+                    </div>
+
+                    <div class="custom-form-group">
+                        <label for="appointmentCode">الكود (رقم):</label>
+                        <input type="number" id="appointmentCode" placeholder="أدخل رقم الكود الخاص بالمريض" required>
+                    </div>
+
+                    <button type="submit" class="submit-appointment-btn">حفظ وتأكيد الموعد</button>
+                </form>
+            </div>
         </div>
 
     </div>
@@ -506,10 +605,30 @@
             event.target.innerText = video.muted ? "🔇 تشغيل الصوت" : "🔊 كتم الصوت";
         }
 
-        // كود فتح وقفل القائمة الجانبية (Sidebar)
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
             document.getElementById('sidebarOverlay').classList.toggle('show');
+        }
+
+        // دالة التنقل السلس بين الصفحات
+        function switchPage(pageName) {
+            // إخفاء كل السكاشن وإزالة الـ active من أزرار القائمة
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active-page'));
+            document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
+
+            // إظهار السكشن المطلوب وتحديث العنوان والزرار النشط
+            if (pageName === 'home') {
+                document.getElementById('page-home').classList.add('active-page');
+                document.getElementById('menu-home').classList.add('active');
+                document.getElementById('pageMainTitle').innerText = "المركز الإيطالي للأسنان - الرئيسية";
+            } else if (pageName === 'add') {
+                document.getElementById('page-add').classList.add('active-page');
+                document.getElementById('menu-add').classList.add('active');
+                document.getElementById('pageMainTitle').innerText = "المركز الإيطالي للأسنان - إضافة موعد";
+            }
+
+            // إغلاق القائمة الجانبية بعد الاختيار
+            toggleSidebar();
         }
 
         // كود تشغيل الساعة تلقائياً
