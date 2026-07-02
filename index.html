@@ -29,7 +29,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 100;
+            z-index: 10000;
         }
 
         .video-bg {
@@ -322,12 +322,13 @@
             color: #1e293b;
         }
 
+        /* --- حل مشكلة الاختفاء للصورة 1000563657.jpg من خلال تعديل الـ Container --- */
         .table-container {
             background: #ffffff;
             border-radius: 12px;
-            overflow: hidden;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             margin-bottom: 25px;
+            position: relative; /* لربط مكان القائمة بحاوية الجدول */
         }
 
         .table-header {
@@ -336,6 +337,8 @@
             font-size: 18px;
             font-weight: bold;
             text-align: right;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
         }
 
         .bg-orange { background: #f59e0b; }
@@ -363,7 +366,6 @@
             border-bottom: 1px solid #f1f5f9;
             font-weight: 600;
             vertical-align: middle;
-            position: relative;
         }
 
         .no-data {
@@ -374,7 +376,7 @@
             font-weight: normal;
         }
 
-        /* ستايل اسم المريض التفاعلي وقائمة الحالات المنبثقة */
+        /* اسم المريض التفاعلي */
         .patient-name-click {
             cursor: pointer;
             color: #1e293b;
@@ -387,16 +389,15 @@
             text-decoration: underline;
         }
 
+        /* --- تحديث أبعاد وخلفية القائمة المنسدلة لضمان ظهورها الكامل فوق الجدول دائمًا --- */
         .status-dropdown {
             display: none;
             position: absolute;
-            top: 45px;
-            right: 12px;
             background: #ffffff;
             border: 1px solid #cbd5e1;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 50;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            z-index: 99999 !important; /* تجعلها تطفو فوق أي عنصر آخر */
             width: 150px;
             overflow: hidden;
         }
@@ -512,8 +513,9 @@
 </head>
 <body>
 
+    <!-- الواجهة الأولى: تسجيل الدخول بالفيديو والأصوات -->
     <div id="loginScreen">
-        <video class="video-bg" id="bgVideo" autoplay playsinline muted>
+        <video class="video-bg" id="bgVideo" autoplay playsinline muted loop>
             <source src="intro.mp4" type="video/mp4">
         </video>
         
@@ -545,9 +547,11 @@
         </div>
     </div>
 
+    <!-- الواجهة الثانية: لوحة التحكم الديناميكية -->
     <div id="dashboard">
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
+        <!-- القائمة الجانبية -->
         <div class="sidebar" id="sidebar">
             <ul class="sidebar-menu">
                 <li id="menu-home" class="active" onclick="switchPage('home')">الرئيسية</li>
@@ -567,6 +571,7 @@
             <div class="dash-title" id="pageMainTitle">المركز الإيطالي للأسنان - الرئيسية</div>
         </div>
 
+        <!-- ================= صفحة الرئيسية (المواعيد) ================= -->
         <div id="page-home" class="page-section active-page">
             <div class="stats-card">
                 <div class="stats-left">
@@ -587,7 +592,8 @@
                 <div class="live-clock" id="liveClock">--:-- --</div>
             </div>
 
-            <div class="table-container">
+            <!-- جدول الزيارات المتأخرة (البرتقالي) -->
+            <div class="table-container" id="lateTableContainer">
                 <div class="table-header bg-orange">الزيارات المتأخرة</div>
                 <table>
                     <thead>
@@ -606,7 +612,8 @@
                 </table>
             </div>
 
-            <div class="table-container">
+            <!-- جدول الزيارات القادمة (الأزرق) -->
+            <div class="table-container" id="upcomingTableContainer">
                 <div class="table-header bg-blue">الزيارات القادمة</div>
                 <table>
                     <thead>
@@ -626,6 +633,7 @@
             </div>
         </div>
 
+        <!-- ================= صفحة إضافة موعد جديد ================= -->
         <div id="page-add" class="page-section">
             <div class="form-card">
                 <h3>حجز موعد عيادة جديد</h3>
@@ -661,6 +669,9 @@
         </div>
     </div>
 
+    <!-- إضافة حاوية خارجية ومستقلة تمامًا تطفو فيها القوائم المنسدلة منعًا للقص نهائيًا -->
+    <div id="globalDropdownContainer"></div>
+
     <script>
         const video = document.getElementById('bgVideo');
 
@@ -690,17 +701,9 @@
             toggleSidebar();
         }
 
-        // كائن مركزي لتخزين بيانات العدادات
-        const stats = {
-            waiting: 0,
-            unconfirmed: 0,
-            confirmed: 0,
-            canceled: 0,
-            lost: 0
-        };
-
-        // لتخزين الحالات الحالية لكل مريض لتسهيل الإضافة والخصم
-        const patientStatusMap = {};
+        // كائن الإحصائيات الرئيسي
+        const stats = { waiting: 0, unconfirmed: 0, confirmed: 0, canceled: 0, lost: 0 };
+        const patientDataMap = {};
 
         function updateStatsDOM() {
             document.getElementById('count-waiting').innerText = stats.waiting;
@@ -710,32 +713,48 @@
             document.getElementById('count-lost').innerText = stats.lost;
         }
 
-        // إظهار/إخفاء القائمة المنسدلة عند الضغط على اسم المريض
+        // --- إصلاح دالة فتح القائمة المنسدلة وحساب مكانها المباشر من الشاشة منعا للقطع ---
         function toggleDropdown(e, rowId) {
             e.stopPropagation();
+            
+            // إغلاق أي قائمة أخرى مفتوحة
             document.querySelectorAll('.status-dropdown').forEach(menu => {
                 if (menu.id !== `drop_${rowId}`) menu.classList.remove('show-menu');
             });
+
             const targetMenu = document.getElementById(`drop_${rowId}`);
-            if (targetMenu) targetMenu.classList.toggle('show-menu');
+            if (targetMenu) {
+                targetMenu.classList.toggle('show-menu');
+                
+                // حساب مكان الضغط بدقة تامة فوق اسم المريض
+                const rect = e.target.getBoundingClientRect();
+                const containerRect = e.target.closest('.table-container').getBoundingClientRect();
+                
+                // إدراج موضع القائمة المنسدلة ديناميكيًا أسفل الاسم ومحاذاتها بشكل مثالي داخل حاوية الكرت
+                targetMenu.style.top = (rect.bottom - containerRect.top + 5) + 'px';
+                targetMenu.style.right = (containerRect.right - rect.right) + 'px';
+            }
         }
 
-        // إغلاق أي قائمة مفتوحة بمجرد الضغط في أي مكان فارغ بالشاشة
+        // إغلاق القوائم عند النقر في أي مكان فارغ
         document.addEventListener('click', function() {
             document.querySelectorAll('.status-dropdown').forEach(menu => menu.classList.remove('show-menu'));
         });
 
-        // دالة تحديث الحالة، النقل بين الجداول، وإعادة ضبط الإحصائيات بالكامل
-        function changePatientStatus(rowId, newStatus, time, name, code, phone, note, currentTable) {
-            const oldStatus = patientStatusMap[rowId];
+        // دالة تغيير الحالات الشاملة والنقل الآلي المتطور بين الجداول والعدادات
+        function changePatientStatus(rowId, newStatus) {
+            const patient = patientDataMap[rowId];
+            if (!patient) return;
+
+            const oldStatus = patient.status;
             
-            // 1. إدارة الأرقام والعدادات في الكارت الأخضر
+            // تحديث العدادات الذكية في الكارت الأخضر
             if (oldStatus) stats[oldStatus]--;
             stats[newStatus]++;
-            patientStatusMap[rowId] = newStatus;
+            patient.status = newStatus;
             updateStatsDOM();
 
-            // تخصيص الشارة التوضيحية للحالة المحددة
+            // إعداد الشارات الملونة التوضيحية بناء على الاختيار
             let badgeHTML = '';
             if (newStatus === 'waiting') badgeHTML = `<span class="status-badge badge-waiting">منتظر</span>`;
             if (newStatus === 'unconfirmed') badgeHTML = `<span class="status-badge badge-unconfirmed">غير مؤكد</span>`;
@@ -743,46 +762,39 @@
             if (newStatus === 'canceled') badgeHTML = `<span class="status-badge badge-canceled">تم إلغاؤه</span>`;
             if (newStatus === 'lost') badgeHTML = `<span class="status-badge badge-lost">فقد</span>`;
 
-            // 2. تدمير السطر القديم من مكانه الحالي
+            // تدمير السطر القديم لإعادة توجيهه للجدول المناسب
             const oldRow = document.getElementById(rowId);
             if (oldRow) oldRow.remove();
 
-            // 3. توجيه المريض للجدول المستهدف بناء على الحالة الجديدة
-            let targetTableId = 'upcomingVisitsBody';
+            // فرز الجدول المستهدف تلقائيًا (المتأخرة للحالات الملغية والمفقودة، والقادمة للباقي)
+            let targetTbodyId = 'upcomingVisitsBody';
             if (newStatus === 'lost' || newStatus === 'canceled') {
-                targetTableId = 'lateVisitsBody';
+                targetTbodyId = 'lateVisitsBody';
             }
 
-            const targetTbody = document.getElementById(targetTableId);
+            const targetTbody = document.getElementById(targetTbodyId);
             
-            if (targetTableId === 'lateVisitsBody') {
-                document.getElementById('noLateRow').style.display = 'none';
-            } else {
-                document.getElementById('noUpcomingRow').style.display = 'none';
-            }
-
-            // بناء السطر وإعادة إدراج الميزات التفاعلية كاملة
             const newRow = document.createElement('tr');
             newRow.setAttribute('id', rowId);
 
-            const timeColor = (targetTableId === 'lateVisitsBody') ? 'style="color: #b91c1c;"' : '';
+            const timeColor = (targetTbodyId === 'lateVisitsBody') ? 'style="color: #b91c1c;"' : '';
 
             newRow.innerHTML = `
-                <td ${timeColor}>${time}</td>
-                <td>
-                    <div class="patient-name-click" onclick="toggleDropdown(event, '${rowId}')">${name}</div>
-                    <small style="color:#64748b; font-size:12px; display:block; margin-top:2px;">كود: ${code} | ت: ${phone}</small>
+                <td ${timeColor}>${patient.time}</td>
+                <td style="position: static;">
+                    <div class="patient-name-click" onclick="toggleDropdown(event, '${rowId}')">${patient.name}</div>
+                    <small style="color:#64748b; font-size:12px; display:block; margin-top:2px;">كود: ${patient.code} | ت: ${patient.phone}</small>
                     <div style="margin-top: 5px;">
                         ${badgeHTML}
-                        <span class="note-badge">${note}</span>
+                        <span class="note-badge">${patient.note}</span>
                     </div>
 
                     <div class="status-dropdown" id="drop_${rowId}">
-                        <div onclick="changePatientStatus('${rowId}', 'waiting', '${time}', '${name}', '${code}', '${phone}', '${note}', '${targetTableId}')">⏳ منتظر</div>
-                        <div onclick="changePatientStatus('${rowId}', 'unconfirmed', '${time}', '${name}', '${code}', '${phone}', '${note}', '${targetTableId}')">⚪ غير مؤكد</div>
-                        <div onclick="changePatientStatus('${rowId}', 'confirmed', '${time}', '${name}', '${code}', '${phone}', '${note}', '${targetTableId}')">🔵 مؤكد</div>
-                        <div onclick="changePatientStatus('${rowId}', 'canceled', '${time}', '${name}', '${code}', '${phone}', '${note}', '${targetTableId}')">❌ تم إلغاؤه</div>
-                        <div onclick="changePatientStatus('${rowId}', 'lost', '${time}', '${name}', '${code}', '${phone}', '${note}', '${targetTableId}')">⚠️ فقد</div>
+                        <div onclick="changePatientStatus('${rowId}', 'waiting')">⏳ منتظر</div>
+                        <div onclick="changePatientStatus('${rowId}', 'unconfirmed')">⚪ غير مؤكد</div>
+                        <div onclick="changePatientStatus('${rowId}', 'confirmed')">🔵 مؤكد</div>
+                        <div onclick="changePatientStatus('${rowId}', 'canceled')">❌ تم إلغاؤه</div>
+                        <div onclick="changePatientStatus('${rowId}', 'lost')">⚠️ فقد</div>
                     </div>
                 </td>
                 <td>Clinic 1</td>
@@ -791,7 +803,7 @@
 
             targetTbody.appendChild(newRow);
 
-            // مراجعة الجداول لعرض رسالة "لا توجد زيارات" عند خلوها
+            // تحديث رسائل الحالات الفارغة للجداول
             checkTableEmptyState('upcomingVisitsBody', 'noUpcomingRow');
             checkTableEmptyState('lateVisitsBody', 'noLateRow');
         }
@@ -799,20 +811,14 @@
         function checkTableEmptyState(tbodyId, noDataRowId) {
             const tbody = document.getElementById(tbodyId);
             const placeholder = document.getElementById(noDataRowId);
-            
             let visibleRows = 0;
             for (let child of tbody.children) {
                 if (child.id !== noDataRowId) visibleRows++;
             }
-
-            if (visibleRows === 0) {
-                placeholder.style.display = 'table-row';
-            } else {
-                placeholder.style.display = 'none';
-            }
+            placeholder.style.display = (visibleRows === 0) ? 'table-row' : 'none';
         }
 
-        // معالجة إضافة الموعد الجديد وضبط الحالة الافتراضية لـ "منتظر"
+        // استقبال وحفظ بيانات استمارة إضافة الموعد وضبطه كـ "منتظر" بشكل أولي
         document.getElementById('appointmentForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -830,45 +836,26 @@
 
             const rowId = 'row_' + Date.now();
 
-            document.getElementById('noUpcomingRow').style.display = 'none';
-            
-            stats.waiting++;
-            patientStatusMap[rowId] = 'waiting';
-            updateStatsDOM();
+            // خزن البيانات في الماب المركزي الموحد
+            patientDataMap[rowId] = {
+                id: rowId,
+                name: name,
+                phone: phone,
+                code: code,
+                note: note,
+                time: timeStr,
+                status: null
+            };
 
-            const tbody = document.getElementById('upcomingVisitsBody');
-            const newRow = document.createElement('tr');
-            newRow.setAttribute('id', rowId);
-
-            newRow.innerHTML = `
-                <td>${timeStr}</td>
-                <td>
-                    <div class="patient-name-click" onclick="toggleDropdown(event, '${rowId}')">${name}</div>
-                    <small style="color:#64748b; font-size:12px; display:block; margin-top:2px;">كود: ${code} | ت: ${phone}</small>
-                    <div style="margin-top: 5px;">
-                        <span class="status-badge badge-waiting">منتظر</span>
-                        <span class="note-badge">${note}</span>
-                    </div>
-
-                    <div class="status-dropdown" id="drop_${rowId}">
-                        <div onclick="changePatientStatus('${rowId}', 'waiting', '${timeStr}', '${name}', '${code}', '${phone}', '${note}', 'upcomingVisitsBody')">⏳ منتظر</div>
-                        <div onclick="changePatientStatus('${rowId}', 'unconfirmed', '${timeStr}', '${name}', '${code}', '${phone}', '${note}', 'upcomingVisitsBody')">⚪ غير مؤكد</div>
-                        <div onclick="changePatientStatus('${rowId}', 'confirmed', '${timeStr}', '${name}', '${code}', '${phone}', '${note}', 'upcomingVisitsBody')">🔵 مؤكد</div>
-                        <div onclick="changePatientStatus('${rowId}', 'canceled', '${timeStr}', '${name}', '${code}', '${phone}', '${note}', 'upcomingVisitsBody')">❌ تم إلغاؤه</div>
-                        <div onclick="changePatientStatus('${rowId}', 'lost', '${timeStr}', '${name}', '${code}', '${phone}', '${note}', 'upcomingVisitsBody')">⚠️ فقد</div>
-                    </div>
-                </td>
-                <td>Clinic 1</td>
-                <td>دكتور العيادة</td>
-            `;
-            tbody.appendChild(newRow);
+            // تشغيل الدالة لتقوم بعملية البناء وتحديث الإحصائيات الافتراضية كمنتظر
+            changePatientStatus(rowId, 'waiting');
 
             document.getElementById('appointmentForm').reset();
-            alert('تم تسجيل المريض وحفظ حالته كـ "منتظر" بنجاح!');
+            alert('تم حجز وتأكيد موعد المريض على المنظومة وتعيين الحالة: منتظر!');
             switchPage('home');
         });
 
-        // ساعة النظام الرقمية للعيادة
+        // تشغيل نظام ساعة العيادة الرقمية
         function updateClock() {
             const now = new Date();
             let hours = now.getHours();
@@ -880,11 +867,11 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // تاريخ اليوم التلقائي
+        // إدراج تاريخ اليوم الفعلي تلقائيًا
         const today = new Date();
         document.getElementById('currentDate').innerText = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
 
-        // لوحة التحقق من شاشة تسجيل الدخول المعتمدة
+        // فحص بيانات اعتماد الدخول لشاشة الواجهة الرئيسية
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const user = document.getElementById('userInput').value;
