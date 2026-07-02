@@ -160,17 +160,41 @@
             min-height: 100vh;
             background: #f4f6f9;
             padding: 15px;
+            position: relative;
         }
 
+        /* هيدر اللوحة المحدث مع الثلاث شرط */
         .dash-header {
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: flex-start;
             background: #ffffff;
             padding: 15px 20px;
             border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        /* زرار الثلاث شرط (Hamburger) */
+        .menu-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 24px;
+            height: 18px;
+        }
+
+        .menu-toggle span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background-color: #1e293b;
+            border-radius: 3px;
+            transition: 0.3s;
         }
 
         .dash-title {
@@ -179,7 +203,60 @@
             font-weight: bold;
         }
 
-        /* كارت الإحصائيات الأخضر */
+        /* القائمة الجانبية (Sidebar) */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -280px; /* مخفية برة الشاشة على اليمين */
+            width: 280px;
+            height: 100%;
+            background: #ffffff;
+            box-shadow: -4px 0 15px rgba(0,0,0,0.1);
+            z-index: 90;
+            transition: 0.3s ease;
+            padding: 80px 20px 20px 20px;
+        }
+
+        .sidebar.open {
+            right: 0; /* تظهر لما تاخد كلاس open */
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            padding: 15px 10px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 16px;
+            font-weight: bold;
+            color: #334155;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .sidebar-menu li:hover {
+            background: #f8fafc;
+            color: #0284c7;
+        }
+
+        /* غطاء شفاف خلفي يقفل القائمة لما تضغط بأس مكان برة */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            z-index: 80;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+        }
+
+        /* كارت الإحصائيات الأخضر العلوي */
         .stats-card {
             background: #4caf50;
             color: white;
@@ -295,6 +372,7 @@
 </head>
 <body>
 
+    <!-- الواجهة الأولى: تسجيل الدخول -->
     <div id="loginScreen">
         <video class="video-bg" id="bgVideo" autoplay playsinline muted>
             <source src="intro.mp4" type="video/mp4">
@@ -329,12 +407,34 @@
         </div>
     </div>
 
+    <!-- الواجهة الثانية: لوحة التحكم مع الثلاث شرط والقائمة الجانبية -->
     <div id="dashboard">
         
+        <!-- غطاء شفاف خلفي يقفل القائمة عند الضغط عليه -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+        <!-- القائمة الجانبية (Sidebar) -->
+        <div class="sidebar" id="sidebar">
+            <ul class="sidebar-menu">
+                <li>الرئيسية</li>
+                <li>إضافة موعد جديد</li>
+                <li>سجل المرضى</li>
+                <li>التقارير والإحصائيات</li>
+                <li onclick="location.reload()" style="color: #b91c1c;">تسجيل الخروج</li>
+            </ul>
+        </div>
+        
+        <!-- هيدر اللوحة المحدث بالثلاث شرط يمين الكلمة -->
         <div class="dash-header">
+            <button class="menu-toggle" onclick="toggleSidebar()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
             <div class="dash-title">المركز الإيطالي للأسنان</div>
         </div>
 
+        <!-- كارت الإحصائيات الأخضر العلوي -->
         <div class="stats-card">
             <div class="stats-left">
                 <div class="stat-row"><span>منتظر:</span><span id="count-waiting">0</span></div>
@@ -349,11 +449,13 @@
             </div>
         </div>
 
+        <!-- قسم زيارات الغرف والساعة الحية -->
         <div class="room-section">
             <div class="room-title">زيارات الغرف</div>
             <div class="live-clock" id="liveClock">--:-- --</div>
         </div>
 
+        <!-- جدول الزيارات المتأخرة (البرتقالي) -->
         <div class="table-container">
             <div class="table-header bg-orange">الزيارات المتأخرة</div>
             <table>
@@ -373,6 +475,7 @@
             </table>
         </div>
 
+        <!-- جدول الزيارات القادمة (الأزرق) -->
         <div class="table-container">
             <div class="table-header bg-blue">الزيارات القادمة</div>
             <table>
@@ -401,6 +504,12 @@
         function toggleMute() {
             video.muted = !video.muted;
             event.target.innerText = video.muted ? "🔇 تشغيل الصوت" : "🔊 كتم الصوت";
+        }
+
+        // كود فتح وقفل القائمة الجانبية (Sidebar)
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('show');
         }
 
         // كود تشغيل الساعة تلقائياً
