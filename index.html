@@ -63,6 +63,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
+            overflow-y: auto;
         }
 
         .header-brand {
@@ -87,18 +88,53 @@
 
         .form-container {
             width: 100%;
-            margin-top: -20px;
+            margin-top: 10px;
+        }
+
+        .login-tabs {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 25px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            background: transparent;
+            border: 2px solid #000000;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            color: #000000;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .tab-btn.active {
+            background: #b91c1c;
+            color: #ffffff;
+            border-color: #b91c1c;
+        }
+
+        .link-btn {
+            color: #0284c7;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: underline;
+            display: inline-block;
         }
 
         .input-group {
-            margin-bottom: 35px;
+            margin-bottom: 25px;
             text-align: right;
         }
 
         .input-group label {
             display: block;
             margin-bottom: 12px;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             color: #000000;
         }
@@ -200,6 +236,14 @@
             color: #1e293b;
             font-size: 20px;
             font-weight: bold;
+        }
+
+        .user-badge {
+            margin-right: auto;
+            font-size: 13px;
+            color: #64748b;
+            font-weight: bold;
+            white-space: nowrap;
         }
 
         .sidebar {
@@ -594,6 +638,29 @@
             border-bottom: 1px solid #e2e8f0;
         }
 
+        .req-btn {
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 13px;
+            margin-left: 6px;
+            color: #ffffff;
+        }
+        .req-accept { background: #10b981; }
+        .req-reject { background: #ef4444; }
+
+        .req-badge {
+            display: none;
+            background: #ef4444;
+            color: #fff;
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 11px;
+            margin-right: 6px;
+        }
+
         @media (max-width: 480px) {
             .form-row-2 {
                 flex-direction: column;
@@ -610,12 +677,12 @@
 
     <!-- الواجهة الأولى: تسجيل الدخول بالفيديو والأصوات -->
     <div id="loginScreen">
-        <video class="video-bg" id="bgVideo" autoplay playsinline muted loop>
+        <video class="video-bg" id="bgVideo" autoplay playsinline>
             <source src="intro.mp4" type="video/mp4">
         </video>
         
         <div class="overlay"></div>
-        <button class="audio-btn" onclick="toggleMute(event)">🔇 تشغيل الصوت</button>
+        <button class="audio-btn" onclick="toggleMute(event)">🔊 كتم الصوت</button>
 
         <div class="login-content">
             <div class="header-brand">
@@ -624,17 +691,49 @@
                 <div class="brand-sub">لتجميل وزراعة الأسنان</div>
             </div>
 
-            <form id="loginForm" class="form-container">
-                <div class="input-group">
-                    <label>اسم المستخدم:</label>
-                    <input type="text" id="userInput" required placeholder="Italian dental center">
-                </div>
-                <div class="input-group">
-                    <label>كلمة المرور:</label>
-                    <input type="password" id="passInput" required placeholder="••••••••">
-                </div>
-                <button type="submit" class="login-btn">دخول</button>
-            </form>
+            <div class="form-container" id="loginArea">
+
+                <!-- فورم دخول موحّد: يحدد تلقائياً لو الحساب أدمن أو موظف -->
+                <form id="unifiedLoginForm">
+                    <div class="input-group">
+                        <label>اسم المستخدم / الإيميل:</label>
+                        <input type="text" id="unifiedUserInput" required placeholder="اسم المستخدم أو إيميل الإدارة">
+                    </div>
+                    <div class="input-group">
+                        <label>كلمة المرور:</label>
+                        <input type="password" id="unifiedPassInput" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="login-btn">دخول</button>
+                    <div style="text-align:center; margin-top:18px;">
+                        <span class="link-btn" onclick="showRegisterForm()">مستخدم جديد؟ سجّل طلب حساب</span>
+                    </div>
+                </form>
+
+                <!-- فورم طلب تسجيل موظف جديد (يحتاج موافقة الأدمن) -->
+                <form id="employeeRegisterForm" style="display:none;">
+                    <div class="input-group">
+                        <label>الاسم بالكامل:</label>
+                        <input type="text" id="regNameInput" required placeholder="اسمك بالكامل">
+                    </div>
+                    <div class="input-group">
+                        <label>رقم التليفون:</label>
+                        <input type="tel" id="regPhoneInput" required placeholder="رقم تليفونك">
+                    </div>
+                    <div class="input-group">
+                        <label>اسم المستخدم المطلوب:</label>
+                        <input type="text" id="regUserInput" required placeholder="اختر اسم مستخدم">
+                    </div>
+                    <div class="input-group">
+                        <label>كلمة المرور:</label>
+                        <input type="password" id="regPassInput" required placeholder="اختر كلمة مرور">
+                    </div>
+                    <button type="submit" class="login-btn">إرسال طلب التسجيل</button>
+                    <div style="text-align:center; margin-top:18px;">
+                        <span class="link-btn" onclick="showLoginForm()">لديك حساب بالفعل؟ سجّل الدخول</span>
+                    </div>
+                </form>
+
+            </div>
 
             <div class="footer-address">
                 7 القضاة - شارع الطاقة - النادي الأهلي<br>مدينة نصر - القاهرة
@@ -646,14 +745,15 @@
     <div id="dashboard">
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-        <!-- القائمة الجانبية المحدثة بقسم الإدارة -->
+        <!-- القائمة الجانبية -->
         <div class="sidebar" id="sidebar">
             <ul class="sidebar-menu">
                 <li id="menu-home" class="active" onclick="switchPage('home')">الرئيسية</li>
                 <li id="menu-add" onclick="switchPage('add')">إضافة موعد جديد</li>
                 <li id="menu-history" onclick="switchPage('history')">سجل المرضى</li>
                 <li id="menu-lab" onclick="switchPage('lab')">المعامل والتركيبات</li>
-                <li id="menu-admin" onclick="verifyAdminAccess()">الإدارة والماليات 🔐</li>
+                <li id="menu-requests" onclick="switchPage('requests')" style="display:none;">طلبات الموظفين الجدد <span id="requestsBadge" class="req-badge">0</span></li>
+                <li id="menu-admin" onclick="switchPage('admin')" style="display:none;">الإدارة والماليات 🔐</li>
                 <li onclick="logoutSystem()" style="color: #b91c1c;">تسجيل الخروج</li>
             </ul>
         </div>
@@ -665,6 +765,7 @@
                 <span></span>
             </button>
             <div class="dash-title" id="pageMainTitle">المركز الإيطالي للأسنان - الرئيسية</div>
+            <div class="user-badge" id="currentUserDisplay"></div>
         </div>
 
         <!-- ================= صفحة الرئيسية (المواعيد الحالية) ================= -->
@@ -865,7 +966,29 @@
             </div>
         </div>
 
-        <!-- ================= صفحة الإدارة والماليات (الجديدة المحمية) ================= -->
+        <!-- ================= صفحة طلبات الموظفين الجدد (أدمن فقط) ================= -->
+        <div id="page-requests" class="page-section">
+            <div class="table-container">
+                <div class="table-header bg-purple">طلبات تسجيل الموظفين الجدد (بانتظار الموافقة)</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">الاسم</th>
+                            <th style="width: 20%;">رقم التليفون</th>
+                            <th style="width: 20%;">اسم المستخدم المطلوب</th>
+                            <th style="width: 35%;">إجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="requestsTableBody">
+                        <tr id="noRequestsRow">
+                            <td colspan="4" class="no-data">لا توجد طلبات تسجيل جديدة حالياً</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ================= صفحة الإدارة والماليات (أدمن فقط) ================= -->
         <div id="page-admin" class="page-section">
             <!-- كروت الملخص المالي السريع -->
             <div class="finance-cards-grid">
@@ -938,11 +1061,32 @@
     <script>
         const video = document.getElementById('bgVideo');
 
+        // بعض المتصفحات بتمنع تشغيل الفيديو بصوت تلقائياً بدون تفاعل المستخدم،
+        // فلو التشغيل بالصوت فشل، نشغّله صامت كحل بديل بدل ما يتوقف خالص
+        if (video) {
+            const playPromise = video.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {
+                    video.muted = true;
+                    const audioBtn = document.querySelector('.audio-btn');
+                    if (audioBtn) audioBtn.innerText = "🔇 تشغيل الصوت";
+                    video.play();
+                });
+            }
+        }
+
         let stats = { waiting: 0, unconfirmed: 0, confirmed: 0, canceled: 0, lost: 0 };
         let patientDataMap = {}; 
         let archivePatientsMap = {}; 
         let labDataList = []; 
-        let financeTransactions = []; // لتخزين الحركات المالية الجديدة
+        let financeTransactions = [];
+
+        // بيانات نظام الحسابات: الأدمن + الموظفين
+        let adminAccount = { email: "italian$dental$center", password: "OMAR ELSİOFY $$" };
+        let pendingEmployees = [];   // طلبات تسجيل بانتظار موافقة الأدمن
+        let approvedEmployees = [];  // حسابات موظفين مُعتمدة
+        let currentRole = null;      // 'admin' أو 'employee'
+        let currentUserLabel = "";
 
         let longPressTimer;
         const longPressDuration = 1000; 
@@ -954,6 +1098,11 @@
             const savedLab = localStorage.getItem('italian_clinic_lab');
             const savedFinance = localStorage.getItem('italian_clinic_finance');
             const savedLoginStatus = localStorage.getItem('italian_clinic_logged_in');
+            const savedRole = localStorage.getItem('italian_clinic_role');
+            const savedUserLabel = localStorage.getItem('italian_clinic_current_user');
+            const savedAdmin = localStorage.getItem('italian_clinic_admin');
+            const savedPending = localStorage.getItem('italian_clinic_pending_employees');
+            const savedApproved = localStorage.getItem('italian_clinic_approved_employees');
 
             if (savedStats) stats = JSON.parse(savedStats);
             if (savedPatients) patientDataMap = JSON.parse(savedPatients);
@@ -961,10 +1110,29 @@
             if (savedLab) labDataList = JSON.parse(savedLab);
             if (savedFinance) financeTransactions = JSON.parse(savedFinance);
 
-            if (savedLoginStatus === 'true') {
+            if (savedAdmin) {
+                adminAccount = JSON.parse(savedAdmin);
+            } else {
+                localStorage.setItem('italian_clinic_admin', JSON.stringify(adminAccount));
+            }
+
+            if (savedPending) pendingEmployees = JSON.parse(savedPending);
+
+            if (savedApproved) {
+                approvedEmployees = JSON.parse(savedApproved);
+            } else {
+                // حساب استقبال افتراضي (بيانات الدخول القديمة) عشان السيستيم مايتقفلش على حد
+                approvedEmployees = [{ username: "Italian dental center", password: "Italian 712554", name: "موظف الاستقبال", phone: "" }];
+                localStorage.setItem('italian_clinic_approved_employees', JSON.stringify(approvedEmployees));
+            }
+
+            if (savedLoginStatus === 'true' && savedRole) {
+                currentRole = savedRole;
+                currentUserLabel = savedUserLabel || "";
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
                 if(video) video.pause();
+                applyRoleToUI();
                 checkLabDeadlines(); 
             }
 
@@ -1010,17 +1178,43 @@
             document.getElementById('sidebarOverlay').classList.toggle('show');
         }
 
-        /* حماية قسم الإدارة بكلمة مرور مشفرة */
-        function verifyAdminAccess() {
-            const entry = prompt("🔒 يرجى إدخال كلمة مرور الإدارة والماليات للدخول:");
-            if (entry === "$$ OMAR ELSIOFY") {
-                switchPage('admin');
-            } else if (entry !== null) {
-                alert("❌ كلمة المرور غير صحيحة! الدخول مرفوض.");
+        /* ================= التبديل بين فورم الدخول وفورم التسجيل ================= */
+        function showRegisterForm() {
+            document.getElementById('unifiedLoginForm').style.display = 'none';
+            document.getElementById('employeeRegisterForm').style.display = 'block';
+        }
+
+        function showLoginForm() {
+            document.getElementById('employeeRegisterForm').style.display = 'none';
+            document.getElementById('unifiedLoginForm').style.display = 'block';
+        }
+
+        /* ================= صلاحيات الواجهة حسب الدور ================= */
+        function applyRoleToUI() {
+            const adminMenu = document.getElementById('menu-admin');
+            const requestsMenu = document.getElementById('menu-requests');
+            const currentUserDisplay = document.getElementById('currentUserDisplay');
+
+            if (currentRole === 'admin') {
+                if (adminMenu) adminMenu.style.display = 'block';
+                if (requestsMenu) requestsMenu.style.display = 'block';
+                updateRequestsBadge();
+            } else {
+                if (adminMenu) adminMenu.style.display = 'none';
+                if (requestsMenu) requestsMenu.style.display = 'none';
+            }
+
+            if (currentUserDisplay) {
+                currentUserDisplay.innerText = currentRole === 'admin' ? `👑 الإدارة: ${currentUserLabel}` : `👤 ${currentUserLabel}`;
             }
         }
 
         function switchPage(pageName) {
+            if ((pageName === 'admin' || pageName === 'requests') && currentRole !== 'admin') {
+                alert('🚫 هذا القسم مخصص للإدارة فقط.');
+                return;
+            }
+
             document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active-page'));
             document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
 
@@ -1042,6 +1236,11 @@
                 document.getElementById('menu-lab').classList.add('active');
                 document.getElementById('pageMainTitle').innerText = "المركز الإيطالي للأسنان - المعامل والتركيبات";
                 rebuildLabTable();
+            } else if (pageName === 'requests') {
+                document.getElementById('page-requests').classList.add('active-page');
+                document.getElementById('menu-requests').classList.add('active');
+                document.getElementById('pageMainTitle').innerText = "المركز الإيطالي للأسنان - طلبات الموظفين الجدد";
+                renderRequestsDOM();
             } else if (pageName === 'admin') {
                 document.getElementById('page-admin').classList.add('active-page');
                 document.getElementById('menu-admin').classList.add('active');
@@ -1295,7 +1494,68 @@
             checkTableEmptyState('labTableBody', 'noLabRow');
         }
 
-        /* --- الأكواد البرمجية المضافة لقسم الماليات الجديد --- */
+        /* ================= طلبات تسجيل الموظفين (صفحة الأدمن) ================= */
+        function renderRequestsDOM() {
+            const tbody = document.getElementById('requestsTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = `<tr id="noRequestsRow"><td colspan="4" class="no-data">لا توجد طلبات تسجيل جديدة حالياً</td></tr>`;
+
+            pendingEmployees.forEach(req => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${req.name}</strong></td>
+                    <td>${req.phone}</td>
+                    <td>${req.username}</td>
+                    <td>
+                        <button class="req-btn req-accept" onclick="acceptEmployee('${req.id}')">✅ قبول</button>
+                        <button class="req-btn req-reject" onclick="rejectEmployee('${req.id}')">❌ رفض</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            checkTableEmptyState('requestsTableBody', 'noRequestsRow');
+            updateRequestsBadge();
+        }
+
+        function acceptEmployee(id) {
+            const idx = pendingEmployees.findIndex(r => r.id === id);
+            if (idx === -1) return;
+            const req = pendingEmployees[idx];
+
+            approvedEmployees.push({ username: req.username, password: req.password, name: req.name, phone: req.phone });
+            pendingEmployees.splice(idx, 1);
+
+            localStorage.setItem('italian_clinic_approved_employees', JSON.stringify(approvedEmployees));
+            localStorage.setItem('italian_clinic_pending_employees', JSON.stringify(pendingEmployees));
+
+            renderRequestsDOM();
+            alert(`✅ تم قبول الموظف: ${req.name}، هيقدر يدخل بنفس بياناته دلوقتي.`);
+        }
+
+        function rejectEmployee(id) {
+            const idx = pendingEmployees.findIndex(r => r.id === id);
+            if (idx === -1) return;
+            const req = pendingEmployees[idx];
+            if (!confirm(`هل أنت متأكد من رفض طلب: ${req.name}؟`)) return;
+
+            pendingEmployees.splice(idx, 1);
+            localStorage.setItem('italian_clinic_pending_employees', JSON.stringify(pendingEmployees));
+            renderRequestsDOM();
+        }
+
+        function updateRequestsBadge() {
+            const badge = document.getElementById('requestsBadge');
+            if (!badge) return;
+            if (pendingEmployees.length > 0) {
+                badge.style.display = 'inline-block';
+                badge.innerText = pendingEmployees.length;
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        /* --- الأكواد البرمجية لقسم الماليات --- */
         document.getElementById('financeForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const type = document.getElementById('finType').value;
@@ -1481,6 +1741,8 @@
         function logoutSystem() {
             saveDataToStorage(); 
             localStorage.setItem('italian_clinic_logged_in', 'false'); 
+            localStorage.removeItem('italian_clinic_role');
+            localStorage.removeItem('italian_clinic_current_user');
             location.reload(); 
         }
 
@@ -1537,20 +1799,74 @@
         const dateEl = document.getElementById('currentDate');
         if(dateEl) dateEl.innerText = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
 
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        /* ================= دخول موحّد: يتعرف تلقائياً على نوع الحساب (أدمن أو موظف) ================= */
+        document.getElementById('unifiedLoginForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const user = document.getElementById('userInput').value;
-            const pass = document.getElementById('passInput').value;
+            const user = document.getElementById('unifiedUserInput').value.trim();
+            const pass = document.getElementById('unifiedPassInput').value;
 
-            if (user === "Italian dental center" && pass === "Italian 712554") {
-                localStorage.setItem('italian_clinic_logged_in', 'true'); 
+            // 1) هل البيانات دي بيانات الأدمن؟
+            if (user === adminAccount.email && pass === adminAccount.password) {
+                currentRole = 'admin';
+                currentUserLabel = 'الإدارة';
+                localStorage.setItem('italian_clinic_logged_in', 'true');
+                localStorage.setItem('italian_clinic_role', 'admin');
+                localStorage.setItem('italian_clinic_current_user', currentUserLabel);
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
                 if(video) video.pause();
-                checkLabDeadlines(); 
-            } else {
-                alert("اسم المستخدم أو كلمة المرور غير صحيحة!");
+                applyRoleToUI();
+                checkLabDeadlines();
+                return;
             }
+
+            // 2) هل البيانات دي بيانات موظف معتمد؟
+            const match = approvedEmployees.find(emp => emp.username === user && emp.password === pass);
+            if (match) {
+                currentRole = 'employee';
+                currentUserLabel = match.name || match.username;
+                localStorage.setItem('italian_clinic_logged_in', 'true');
+                localStorage.setItem('italian_clinic_role', 'employee');
+                localStorage.setItem('italian_clinic_current_user', currentUserLabel);
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                if(video) video.pause();
+                applyRoleToUI();
+                checkLabDeadlines();
+                return;
+            }
+
+            // 3) البيانات غلط في الحالتين
+            alert("اسم المستخدم / كلمة المرور غير صحيحة، أو حسابك لسه مستنى موافقة الإدارة!");
+        });
+
+        /* ================= طلب تسجيل موظف جديد ================= */
+        document.getElementById('employeeRegisterForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('regNameInput').value.trim();
+            const phone = document.getElementById('regPhoneInput').value.trim();
+            const username = document.getElementById('regUserInput').value.trim();
+            const password = document.getElementById('regPassInput').value;
+
+            const usernameTaken = approvedEmployees.some(emp => emp.username === username) ||
+                                   pendingEmployees.some(req => req.username === username);
+            if (usernameTaken) {
+                alert("اسم المستخدم ده مستخدم بالفعل، اختار اسم مستخدم تاني.");
+                return;
+            }
+
+            pendingEmployees.push({
+                id: 'req_' + Date.now(),
+                name: name,
+                phone: phone,
+                username: username,
+                password: password
+            });
+            localStorage.setItem('italian_clinic_pending_employees', JSON.stringify(pendingEmployees));
+
+            alert("تم إرسال طلبك بنجاح! هتقدر تسجل دخولك بعد ما الإدارة توافق على طلبك.");
+            document.getElementById('employeeRegisterForm').reset();
+            showLoginForm();
         });
 
         window.onload = loadSavedData;
