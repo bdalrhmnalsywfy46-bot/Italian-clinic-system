@@ -8,651 +8,125 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+    
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body, html {
-            width: 100%;
-            height: 100%;
-            overflow-x: hidden;
-            background-color: #f1f5f9;
-        }
-
-        /* --- الشاشة الأولى: تسجيل الدخول --- */
-        #loginScreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-        }
-
-        .video-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 1;
-        }
-
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.85);
-            z-index: 2;
-        }
-
-        .login-content {
-            position: relative;
-            z-index: 3;
-            width: 100%;
-            max-width: 420px;
-            height: 100%;
-            padding: 40px 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .header-brand {
-            text-align: center;
-            margin-top: 20px;
-            width: 100%;
-        }
-
-        .brand-title {
-            font-size: 38px;
-            font-weight: 900;
-            color: #000000;
-            line-height: 1.2;
-        }
-
-        .brand-sub {
-            font-size: 26px;
-            font-weight: bold;
-            color: #000000;
-            margin-top: 5px;
-        }
-
-        .form-container {
-            width: 100%;
-            margin-top: -20px;
-        }
-
-        .input-group {
-            margin-bottom: 35px;
-            text-align: right;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 12px;
-            font-size: 24px;
-            font-weight: bold;
-            color: #000000;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 10px;
-            font-size: 18px;
-            border: none;
-            border-bottom: 2px solid #000000;
-            background: transparent;
-            color: #000000;
-            outline: none;
-            text-align: right;
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 14px;
-            background: #b91c1c;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-
-        .footer-address {
-            text-align: center;
-            font-size: 16px;
-            font-weight: bold;
-            color: #000000;
-            line-height: 1.5;
-            margin-bottom: 20px;
-            width: 100%;
-        }
-
-        .audio-btn {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            z-index: 10;
-            background: rgba(0, 0, 0, 0.7);
-            border: none;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        /* --- الشاشة الثانية: لوحة التحكم العامة --- */
-        #dashboard {
-            display: none;
-            width: 100%;
-            min-height: 100vh;
-            background: #f4f6f9;
-            padding: 15px;
-            position: relative;
-        }
-
-        .dash-header {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            background: #ffffff;
-            padding: 15px 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-            gap: 15px;
-        }
-
-        .menu-toggle {
-            background: none;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            width: 24px;
-            height: 18px;
-            z-index: 95;
-        }
-
-        .menu-toggle span {
-            display: block;
-            height: 3px;
-            width: 100%;
-            background-color: #1e293b;
-            border-radius: 3px;
-            transition: 0.3s;
-        }
-
-        .dash-title {
-            color: #1e293b;
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .sidebar {
-            position: fixed;
-            top: 0;
-            right: -280px;
-            width: 280px;
-            height: 100%;
-            background: #ffffff;
-            box-shadow: -4px 0 15px rgba(0,0,0,0.1);
-            z-index: 90;
-            transition: 0.3s ease;
-            padding: 80px 20px 20px 20px;
-            overflow-y: auto;
-        }
-
-        .sidebar.open {
-            right: 0;
-        }
-
-        .sidebar-menu {
-            list-style: none;
-        }
-
-        .sidebar-menu li {
-            padding: 15px 10px;
-            border-bottom: 1px solid #f1f5f9;
-            font-size: 16px;
-            font-weight: bold;
-            color: #334155;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .sidebar-menu li:hover, .sidebar-menu li.active {
-            background: #f8fafc;
-            color: #0284c7;
-        }
-
-        .menu-parent-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .menu-arrow {
-            display: inline-block;
-            transition: transform 0.25s ease;
-            font-size: 12px;
-        }
-
-        .menu-arrow.rotated {
-            transform: rotate(180deg);
-        }
-
-        .submenu {
-            list-style: none;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.25s ease;
-            background: #f8fafc;
-            border-radius: 8px;
-        }
-
-        .submenu.open {
-            max-height: 200px;
-        }
-
-        .submenu li {
-            padding: 12px 20px !important;
-            font-size: 14px !important;
-            border-bottom: 1px solid #eef2f7 !important;
-        }
-
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.3);
-            z-index: 80;
-        }
-
-        .sidebar-overlay.show {
-            display: block;
-        }
-
-        .page-section {
-            display: none;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body, html { width: 100%; height: 100%; overflow-x: hidden; background-color: #f1f5f9; }
         
-        .page-section.active-page {
-            display: block;
-        }
-
+        /* --- الشاشة الأولى: تسجيل الدخول --- */
+        #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index: 10000; }
+        .video-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.85); z-index: 2; }
+        .login-content { position: relative; z-index: 3; width: 100%; max-width: 420px; height: 100%; padding: 40px 30px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
+        .header-brand { text-align: center; margin-top: 20px; width: 100%; }
+        .brand-title { font-size: 38px; font-weight: 900; color: #000000; line-height: 1.2; }
+        .brand-sub { font-size: 26px; font-weight: bold; color: #000000; margin-top: 5px; }
+        .form-container { width: 100%; margin-top: -20px; }
+        .input-group { margin-bottom: 35px; text-align: right; }
+        .input-group label { display: block; margin-bottom: 12px; font-size: 24px; font-weight: bold; color: #000000; }
+        .input-group input { width: 100%; padding: 10px; font-size: 18px; border: none; border-bottom: 2px solid #000000; background: transparent; color: #000000; outline: none; text-align: right; }
+        .login-btn { width: 100%; padding: 14px; background: #b91c1c; color: white; border: none; border-radius: 8px; font-size: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .footer-address { text-align: center; font-size: 16px; font-weight: bold; color: #000000; line-height: 1.5; margin-bottom: 20px; width: 100%; }
+        .audio-btn { position: absolute; top: 15px; left: 15px; z-index: 10; background: rgba(0, 0, 0, 0.7); border: none; color: white; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; }
+        
+        /* --- الشاشة الثانية: لوحة التحكم العامة --- */
+        #dashboard { display: none; width: 100%; min-height: 100vh; background: #f4f6f9; padding: 15px; position: relative; }
+        .dash-header { display: flex; align-items: center; justify-content: flex-start; background: #ffffff; padding: 15px 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; gap: 15px; }
+        .menu-toggle { background: none; border: none; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; width: 24px; height: 18px; z-index: 95; }
+        .menu-toggle span { display: block; height: 3px; width: 100%; background-color: #1e293b; border-radius: 3px; transition: 0.3s; }
+        .dash-title { color: #1e293b; font-size: 20px; font-weight: bold; }
+        .sidebar { position: fixed; top: 0; right: -280px; width: 280px; height: 100%; background: #ffffff; box-shadow: -4px 0 15px rgba(0,0,0,0.1); z-index: 90; transition: 0.3s ease; padding: 80px 20px 20px 20px; overflow-y: auto; }
+        .sidebar.open { right: 0; }
+        .sidebar-menu { list-style: none; }
+        .sidebar-menu li { padding: 15px 10px; border-bottom: 1px solid #f1f5f9; font-size: 16px; font-weight: bold; color: #334155; cursor: pointer; transition: 0.2s; }
+        .sidebar-menu li:hover, .sidebar-menu li.active { background: #f8fafc; color: #0284c7; }
+        .menu-parent-item { display: flex; align-items: center; justify-content: space-between; }
+        .menu-arrow { display: inline-block; transition: transform 0.25s ease; font-size: 12px; }
+        .menu-arrow.rotated { transform: rotate(180deg); }
+        .submenu { list-style: none; max-height: 0; overflow: hidden; transition: max-height 0.25s ease; background: #f8fafc; border-radius: 8px; }
+        .submenu.open { max-height: 200px; }
+        .submenu li { padding: 12px 20px !important; font-size: 14px !important; border-bottom: 1px solid #eef2f7 !important; }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 80; }
+        .sidebar-overlay.show { display: block; }
+        .page-section { display: none; }
+        .page-section.active-page { display: block; }
+        
         /* كروت الإحصائيات */
-        .stats-card {
-            background: #4caf50;
-            color: white;
-            border-radius: 12px;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
-        }
-
-        .stats-left {
-            flex: 1;
-            padding-right: 20px;
-        }
-
-        .stats-right {
-            text-align: center;
-            flex: 1;
-            border-left: 1px solid rgba(255,255,255,0.3);
-        }
-
-        .stats-right .date-label {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .stats-right .date-val {
-            font-size: 22px;
-            font-weight: 900;
-        }
-
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 16px;
-            margin-bottom: 6px;
-            font-weight: bold;
-        }
-
-        /* كروت المنيو المالي الصغير */
-        .finance-cards-grid {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        .fin-card {
-            flex: 1;
-            padding: 15px;
-            border-radius: 10px;
-            color: white;
-            text-align: center;
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
+        .stats-card { background: #4caf50; color: white; border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3); }
+        .stats-left { flex: 1; padding-right: 20px; }
+        .stats-right { text-align: center; flex: 1; border-left: 1px solid rgba(255,255,255,0.3); }
+        .stats-right .date-label { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
+        .stats-right .date-val { font-size: 22px; font-weight: 900; }
+        .stat-row { display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 6px; font-weight: bold; }
+        
+        /* كروت الحسابات */
+        .finance-cards-grid { display: flex; gap: 15px; margin-bottom: 25px; }
+        .fin-card { flex: 1; padding: 15px; border-radius: 10px; color: white; text-align: center; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .fin-inc { background: #10b981; }
         .fin-exp { background: #ef4444; }
         .fin-net { background: #3b82f6; }
         .fin-card h4 { font-size: 14px; margin-bottom: 5px; opacity: 0.9; }
         .fin-card div { font-size: 20px; font-weight: 900; }
-
-        .room-section {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .room-title {
-            font-size: 18px;
-            color: #64748b;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .live-clock {
-            font-size: 42px;
-            font-weight: 900;
-            color: #1e293b;
-        }
-
-        .table-container {
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
-            position: relative;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .table-header {
-            padding: 15px;
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
-            text-align: right;
-            border-top-left-radius: 12px;
-            border-top-right-radius: 12px;
-            position: sticky;
-            left: 0;
-        }
-
+        
+        .room-section { text-align: center; margin-bottom: 25px; }
+        .room-title { font-size: 18px; color: #64748b; font-weight: bold; margin-bottom: 5px; }
+        .live-clock { font-size: 42px; font-weight: 900; color: #1e293b; }
+        
+        .table-container { background: #ffffff; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 25px; position: relative; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .table-header { padding: 15px; color: white; font-size: 18px; font-weight: bold; text-align: right; border-top-left-radius: 12px; border-top-right-radius: 12px; position: sticky; left: 0; }
         .bg-orange { background: #f59e0b; }
         .bg-blue { background: #38bdf8; }
         .bg-purple { background: #6366f1; }
         .bg-teal { background: #0d9488; }
         .bg-dark-blue { background: #1e293b; }
         .bg-slate { background: #475569; }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: right;
-            min-width: 750px;
-        }
-
-        th {
-            background: #f8fafc;
-            color: #64748b;
-            padding: 12px;
-            font-size: 14px;
-            font-weight: bold;
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        td {
-            padding: 14px 12px;
-            font-size: 15px;
-            color: #334155;
-            border-bottom: 1px solid #f1f5f9;
-            font-weight: 600;
-            vertical-align: middle;
-        }
-
-        .no-data {
-            text-align: center;
-            color: #94a3b8;
-            font-size: 14px;
-            padding: 30px 10px;
-            font-weight: normal;
-        }
-
-        .patient-name-click {
-            cursor: pointer;
-            color: #1e293b;
-            font-weight: bold;
-            display: inline-block;
-            transition: color 0.2s;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        .patient-name-click:hover {
-            color: #0284c7;
-            text-decoration: underline;
-        }
-
-        .status-dropdown, .lab-dropdown {
-            display: none;
-            position: absolute;
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            z-index: 99999 !important;
-            width: 160px;
-            overflow: hidden;
-        }
-        .status-dropdown.show-menu, .lab-dropdown.show-menu {
-            display: block;
-        }
-        .status-dropdown div, .lab-dropdown div {
-            padding: 10px 12px;
-            font-size: 14px;
-            font-weight: bold;
-            color: #334155;
-            cursor: pointer;
-            transition: background 0.2s;
-            text-align: right;
-        }
-        .status-dropdown div:hover, .lab-dropdown div:hover {
-            background: #f1f5f9;
-            color: #0284c7;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
-            margin-top: 5px;
-        }
+        
+        table { width: 100%; border-collapse: collapse; text-align: right; min-width: 750px; }
+        th { background: #f8fafc; color: #64748b; padding: 12px; font-size: 14px; font-weight: bold; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 14px 12px; font-size: 15px; color: #334155; border-bottom: 1px solid #f1f5f9; font-weight: 600; vertical-align: middle; }
+        .no-data { text-align: center; color: #94a3b8; font-size: 14px; padding: 30px 10px; font-weight: normal; }
+        
+        .patient-name-click { cursor: pointer; color: #1e293b; font-weight: bold; display: inline-block; transition: color 0.2s; user-select: none; -webkit-user-select: none; }
+        .patient-name-click:hover { color: #0284c7; text-decoration: underline; }
+        
+        .status-dropdown, .lab-dropdown { display: none; position: absolute; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 99999 !important; width: 160px; overflow: hidden; }
+        .status-dropdown.show-menu, .lab-dropdown.show-menu { display: block; }
+        .status-dropdown div, .lab-dropdown div { padding: 10px 12px; font-size: 14px; font-weight: bold; color: #334155; cursor: pointer; transition: background 0.2s; text-align: right; }
+        .status-dropdown div:hover, .lab-dropdown div:hover { background: #f1f5f9; color: #0284c7; }
+        
+        .status-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-top: 5px; }
         .badge-waiting { background: #fef3c7; color: #d97706; }
         .badge-unconfirmed { background: #f1f5f9; color: #64748b; }
         .badge-confirmed { background: #e0f2fe; color: #0369a1; }
         .badge-canceled { background: #fee2e2; color: #b91c1c; }
         .badge-lost { background: #ffedd5; color: #ea580c; }
-        
         .badge-lab-making { background: #fef3c7; color: #d97706; }
         .badge-lab-ready { background: #e0f2fe; color: #0369a1; }
         .badge-lab-done { background: #dcfce7; color: #15803d; }
-
-        .note-badge {
-            display: inline-block; 
-            margin-top: 5px; 
-            padding: 2px 8px; 
-            background: #f0fdf4; 
-            color: #16a34a; 
-            border-radius: 4px; 
-            font-size: 11px; 
-            font-weight: bold;
-            margin-right: 5px;
-        }
-
-        .form-card {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            margin-top: 10px;
-        }
-
-        .form-card h3 {
-            color: #1e293b;
-            font-size: 20px;
-            margin-bottom: 25px;
-            border-bottom: 2px solid #f1f5f9;
-            padding-bottom: 10px;
-        }
-
-        .custom-form-group {
-            margin-bottom: 20px;
-            text-align: right;
-        }
-
-        .custom-form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 15px;
-            font-weight: bold;
-            color: #475569;
-        }
-
-        .custom-form-group input, .custom-form-group select {
-            width: 100%;
-            padding: 12px;
-            font-size: 15px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            outline: none;
-            background-color: #f8fafc;
-            transition: 0.3s;
-        }
-
-        .custom-form-group input:focus, .custom-form-group select:focus {
-            border-color: #0284c7;
-            background-color: #ffffff;
-            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
-        }
-
-        .form-row-2 {
-            display: flex;
-            gap: 15px;
-        }
-
-        .form-row-2 .custom-form-group {
-            flex: 1;
-        }
-
-        .submit-appointment-btn {
-            width: 100%;
-            padding: 14px;
-            background: #0284c7;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 10px;
-        }
-
-        .submit-appointment-btn:hover {
-            background: #0369a1;
-        }
-
-        .search-wrapper {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 12px 15px;
-            font-size: 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            outline: none;
-            text-align: right;
-            transition: 0.3s;
-        }
-
-        .search-input:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-        }
-
-        .history-sub-table {
-            width: 100%;
-            margin-top: 8px;
-            background: #f8fafc;
-            border-radius: 6px;
-            min-width: 600px;
-        }
-
-        .history-sub-table th {
-            background: #cbd5e1;
-            color: #1e293b;
-            padding: 8px;
-            font-size: 13px;
-        }
-
-        .history-sub-table td {
-            padding: 8px;
-            font-size: 13px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .empty-management {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 40px 20px;
-            text-align: center;
-            color: #94a3b8;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-
+        .note-badge { display: inline-block; margin-top: 5px; padding: 2px 8px; background: #f0fdf4; color: #16a34a; border-radius: 4px; font-size: 11px; font-weight: bold; margin-right: 5px; }
+        
+        .form-card { background: #ffffff; border-radius: 12px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-top: 10px; }
+        .form-card h3 { color: #1e293b; font-size: 20px; margin-bottom: 25px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
+        .custom-form-group { margin-bottom: 20px; text-align: right; }
+        .custom-form-group label { display: block; margin-bottom: 8px; font-size: 15px; font-weight: bold; color: #475569; }
+        .custom-form-group input, .custom-form-group select { width: 100%; padding: 12px; font-size: 15px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; background-color: #f8fafc; transition: 0.3s; }
+        .custom-form-group input:focus, .custom-form-group select:focus { border-color: #0284c7; background-color: #ffffff; box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1); }
+        .form-row-2 { display: flex; gap: 15px; }
+        .form-row-2 .custom-form-group { flex: 1; }
+        
+        .submit-appointment-btn { width: 100%; padding: 14px; background: #0284c7; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .submit-appointment-btn:hover { background: #0369a1; }
+        .search-wrapper { background: #ffffff; border-radius: 12px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .search-input { width: 100%; padding: 12px 15px; font-size: 16px; border: 2px solid #e2e8f0; border-radius: 8px; outline: none; text-align: right; transition: 0.3s; }
+        .search-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
+        
+        .history-sub-table { width: 100%; margin-top: 8px; background: #f8fafc; border-radius: 6px; min-width: 600px; }
+        .history-sub-table th { background: #cbd5e1; color: #1e293b; padding: 8px; font-size: 13px; }
+        .history-sub-table td { padding: 8px; font-size: 13px; border-bottom: 1px solid #e2e8f0; }
+        
         @media (max-width: 480px) {
-            .form-row-2 {
-                flex-direction: column;
-                gap: 0;
-            }
-            .finance-cards-grid {
-                flex-direction: column;
-                gap: 10px;
-            }
+            .form-row-2 { flex-direction: column; gap: 0; }
+            .finance-cards-grid { flex-direction: column; gap: 10px; }
         }
     </style>
 </head>
@@ -663,17 +137,14 @@
         <video class="video-bg" id="bgVideo" autoplay playsinline muted loop>
             <source src="intro.mp4" type="video/mp4">
         </video>
-        
         <div class="overlay"></div>
         <button class="audio-btn" onclick="toggleMute(event)">🔇 تشغيل الصوت</button>
-
         <div class="login-content">
             <div class="header-brand">
                 <div class="brand-title">المركز</div>
                 <div class="brand-title">الإيطالي</div>
                 <div class="brand-sub">لتجميل وزراعة الأسنان</div>
             </div>
-
             <form id="loginForm" class="form-container">
                 <div class="input-group">
                     <label>البريد الإلكتروني:</label>
@@ -686,7 +157,6 @@
                 <button type="submit" class="login-btn">دخول</button>
                 <div id="loginErrorMsg" style="color:#b91c1c; font-size:14px; font-weight:bold; text-align:center; margin-top:12px; display:none;"></div>
             </form>
-
             <div class="footer-address">
                 7 القضاة - شارع الطاقة - النادي الأهلي<br>مدينة نصر - القاهرة
             </div>
@@ -696,15 +166,14 @@
     <!-- الواجهة الثانية: لوحة التحكم الديناميكية الشاملة -->
     <div id="dashboard">
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-        <!-- القائمة الجانبية المحدثة بقسم الإدارة والحسابات المنفصلين -->
+        
+        <!-- القائمة الجانبية بقسم الإدارة والحسابات المنفصلين -->
         <div class="sidebar" id="sidebar">
             <ul class="sidebar-menu">
                 <li id="menu-home" class="active" onclick="switchPage('home')">الرئيسية</li>
                 <li id="menu-add" onclick="switchPage('add')">إضافة موعد جديد</li>
                 <li id="menu-history" onclick="switchPage('history')">سجل المرضى</li>
                 <li id="menu-lab" onclick="switchPage('lab')">المعامل والتركيبات</li>
-
                 <li id="menu-admin-parent" class="menu-parent-item" onclick="toggleAdminSubmenu()" style="display:none;">
                     <span>الإدارة والماليات 🔐</span>
                     <span class="menu-arrow" id="adminArrow">▼</span>
@@ -713,16 +182,13 @@
                     <li id="menu-finance" onclick="switchPage('finance')">💰 الحسابات</li>
                     <li id="menu-management" onclick="switchPage('management')">🗂️ الإدارة</li>
                 </ul>
-
                 <li onclick="logoutSystem()" style="color: #b91c1c;">تسجيل الخروج</li>
             </ul>
         </div>
-        
+
         <div class="dash-header">
             <button class="menu-toggle" onclick="toggleSidebar()">
-                <span></span>
-                <span></span>
-                <span></span>
+                <span></span><span></span><span></span>
             </button>
             <div class="dash-title" id="pageMainTitle">المركز الإيطالي للأسنان - الرئيسية</div>
         </div>
@@ -742,7 +208,7 @@
                     <div class="date-val" id="currentDate">--/--/----</div>
                 </div>
             </div>
-
+            
             <div class="room-section">
                 <div class="room-title">زيارات الغرف</div>
                 <div class="live-clock" id="liveClock">--:-- --</div>
@@ -761,9 +227,7 @@
                         </tr>
                     </thead>
                     <tbody id="lateVisitsBody">
-                        <tr id="noLateRow">
-                            <td colspan="4" class="no-data">لا توجد زيارات متأخرة حالياً</td>
-                        </tr>
+                        <tr id="noLateRow"><td colspan="4" class="no-data">لا توجد زيارات متأخرة حالياً</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -781,9 +245,7 @@
                         </tr>
                     </thead>
                     <tbody id="upcomingVisitsBody">
-                        <tr id="noUpcomingRow">
-                            <td colspan="4" class="no-data">لا توجد زيارات قادمة اليوم</td>
-                        </tr>
+                        <tr id="noUpcomingRow"><td colspan="4" class="no-data">لا توجد زيارات قادمة اليوم</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -798,42 +260,34 @@
                         <label for="patientName">اسم المريض:</label>
                         <input type="text" id="patientName" placeholder="أدخل اسم المريض الرباعي" required>
                     </div>
-
                     <div class="custom-form-group">
                         <label for="patientPhone">رقم المريض:</label>
                         <input type="tel" id="patientPhone" placeholder="أدخل رقم الهاتف" required>
                     </div>
-
                     <div class="custom-form-group">
                         <label for="appointmentDate">تاريخ الموعد:</label>
                         <input type="date" id="appointmentDate" required>
                     </div>
-
                     <div class="custom-form-group">
                         <label for="appointmentTime">ساعة الموعد:</label>
                         <input type="time" id="appointmentTime" required>
                     </div>
-
                     <div class="custom-form-group">
                         <label for="appointmentClinic">رقم أو اسم العيادة (الغرفة):</label>
                         <input type="text" id="appointmentClinic" placeholder="عيادة 1..." required>
                     </div>
-
                     <div class="custom-form-group">
                         <label for="appointmentDoctor">اسم الطبيب المعالج:</label>
                         <input type="text" id="appointmentDoctor" placeholder="أدخل اسم الطبيب" required>
                     </div>
-
                     <div class="custom-form-group">
                         <label for="appointmentCode">الكود (رقم):</label>
                         <input type="number" id="appointmentCode" placeholder="أدخل رقم الكود الخاص بالمريض" required>
                     </div>
-
                     <div class="custom-form-group">
                         <label for="appointmentNote">نوع الزيارة / الملاحظات:</label>
                         <input type="text" id="appointmentNote" placeholder="مثال: حشو عصب، زراعة...">
                     </div>
-
                     <button type="submit" class="submit-appointment-btn">حفظ وتأكيد الموعد</button>
                 </form>
             </div>
@@ -844,7 +298,6 @@
             <div class="search-wrapper">
                 <input type="text" id="historySearchInput" class="search-input" oninput="filterHistory()" placeholder="🔍 ابحث عن مريض بالاسم، رقم الهاتف، أو الكود...">
             </div>
-
             <div class="table-container">
                 <div class="table-header bg-purple">سجل الأرشيف التاريخي للمرضى</div>
                 <table>
@@ -856,9 +309,7 @@
                         </tr>
                     </thead>
                     <tbody id="historyTableBody">
-                        <tr id="noHistoryRow">
-                            <td colspan="3" class="no-data">السجل فارغ حالياً</td>
-                        </tr>
+                        <tr id="noHistoryRow"><td colspan="3" class="no-data">السجل فارغ حالياً</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -885,7 +336,6 @@
                         <label for="labDoctor">الطبيب المسؤول:</label>
                         <input type="text" id="labDoctor" placeholder="اسم الدكتور المشرف" required>
                     </div>
-                    
                     <div class="form-row-2">
                         <div class="custom-form-group">
                             <label for="labExitDate">تاريخ خروج الشغل (الإرسال):</label>
@@ -896,13 +346,10 @@
                             <input type="date" id="labDeliveryDate" required>
                         </div>
                     </div>
-                    
                     <button type="submit" class="submit-appointment-btn" style="background: #0d9488;">إرسال وتسجيل للمعمل</button>
                 </form>
             </div>
-
             <br>
-
             <div class="table-container">
                 <div class="table-header bg-teal">حالات المعمل والتركيبات الحالية</div>
                 <table>
@@ -917,9 +364,7 @@
                         </tr>
                     </thead>
                     <tbody id="labTableBody">
-                        <tr id="noLabRow">
-                            <td colspan="6" class="no-data">لا توجد طلبات معمل مسجلة حالياً</td>
-                        </tr>
+                        <tr id="noLabRow"><td colspan="6" class="no-data">لا توجد طلبات معمل مسجلة حالياً</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -927,23 +372,21 @@
 
         <!-- ================= صفحة الحسابات (الماليات فقط) ================= -->
         <div id="page-finance" class="page-section">
-            <!-- كروت الملخص المالي السريع -->
             <div class="finance-cards-grid">
                 <div class="fin-card fin-inc">
                     <h4>إجمالي الإيرادات</h4>
-                    <div id="total-income">0 EGP</div>
+                    <div id="total-income">0.00 EGP</div>
                 </div>
                 <div class="fin-card fin-exp">
                     <h4>إجمالي المصروفات</h4>
-                    <div id="total-expenses">0 EGP</div>
+                    <div id="total-expenses">0.00 EGP</div>
                 </div>
                 <div class="fin-card fin-net">
                     <h4>صافي الأرباح</h4>
-                    <div id="total-net">0 EGP</div>
+                    <div id="total-net">0.00 EGP</div>
                 </div>
             </div>
 
-            <!-- نموذج إضافة عملية مالية -->
             <div class="form-card">
                 <h3>تسجيل حركة مالية جديدة (حسابات المركز)</h3>
                 <form id="financeForm">
@@ -960,19 +403,14 @@
                             <input type="number" id="finAmount" placeholder="0.00" required>
                         </div>
                     </div>
-
                     <div class="custom-form-group">
                         <label for="finStatement">البيان / الوصف التفصيلي للعملية:</label>
-                        <input type="text" id="finStatement" placeholder="مثال: قسط زراعة أسنان مريض ممدوح / فاتورة معمل الحرمين" required>
+                        <input type="text" id="finStatement" placeholder="مثال: قسط زراعة أسنان مريض ممدوح" required>
                     </div>
-
                     <button type="submit" class="submit-appointment-btn" style="background: #1e293b;">حفظ وتقييد الدفتر المالي</button>
                 </form>
             </div>
-
             <br>
-
-            <!-- جدول القيود المالية التقديرية للعيادة -->
             <div class="table-container">
                 <div class="table-header bg-dark-blue">دفتر الحسابات والتدفقات النقدية العام</div>
                 <table>
@@ -985,9 +423,7 @@
                         </tr>
                     </thead>
                     <tbody id="financeTableBody">
-                        <tr id="noFinanceRow">
-                            <td colspan="4" class="no-data">لم يتم تقييد عمليات مالية لليوم حتى الآن</td>
-                        </tr>
+                        <tr id="noFinanceRow"><td colspan="4" class="no-data">لم يتم تقييد عمليات مالية لليوم حتى الآن</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -1007,19 +443,15 @@
                         </tr>
                     </thead>
                     <tbody id="sessionsTableBody">
-                        <tr id="noSessionsRow">
-                            <td colspan="4" class="no-data">جاري تحميل الأجهزة المتصلة...</td>
-                        </tr>
+                        <tr id="noSessionsRow"><td colspan="4" class="no-data">جاري تحميل الأجهزة المتصلة...</td></tr>
                     </tbody>
                 </table>
             </div>
-
             <br>
-
             <div class="form-card">
                 <h3>إضافة / تعديل صلاحية مستخدم</h3>
                 <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:8px; padding:12px; margin-bottom:20px; font-size:13px; color:#0369a1; line-height:1.8;">
-                    ℹ️ الخطوات: روح على Firebase Console ← Authentication ← Add user (بريد إلكتروني وكلمة مرور)، هيديك UID للمستخدم، انسخه وحطه هنا مع تحديد الدور.
+                    ℹ️ الخطوات: روح على Firebase Console ← Authentication ← Add user، هيديك UID للمخدم، انسخه وحطه هنا مع تحديد الدور.
                 </div>
                 <form id="roleAssignForm">
                     <div class="custom-form-group">
@@ -1044,9 +476,7 @@
                     <button type="submit" class="submit-appointment-btn" style="background:#475569;">حفظ الصلاحية</button>
                 </form>
             </div>
-
             <br>
-
             <div class="table-container">
                 <div class="table-header bg-dark-blue">المستخدمون وصلاحياتهم</div>
                 <table>
@@ -1059,18 +489,15 @@
                         </tr>
                     </thead>
                     <tbody id="rolesTableBody">
-                        <tr id="noRolesRow">
-                            <td colspan="4" class="no-data">جاري التحميل...</td>
-                        </tr>
+                        <tr id="noRolesRow"><td colspan="4" class="no-data">جاري التحميل...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
-
     </div>
 
+    <!-- ==================== الجزء الخاص بالـ JavaScript والتعديلات الآمنة ==================== -->
     <script>
-        /* ==================== إعداد Firebase (تتبع الأجهزة وتسجيل الخروج عن بُعد) ==================== */
         const firebaseConfig = {
             apiKey: "AIzaSyC027Mk4HYklJwWVe5qexV8eYXVVEZ8euE",
             authDomain: "italian-dental-center.firebaseapp.com",
@@ -1081,9 +508,9 @@
             appId: "1:165569762130:web:41bb5c411bb7cd2cd5e08b"
         };
         firebase.initializeApp(firebaseConfig);
+
         const sessionsRef = firebase.database().ref('sessions');
         const userRolesRef = firebase.database().ref('userRoles');
-
         let currentSessionId = null;
         let sessionListenerRef = null;
         let currentUserUid = null;
@@ -1091,45 +518,35 @@
         let currentUserRole = null;
         let currentUserName = null;
 
-        /* أسماء الأدوار بالعربي */
-        const ROLE_LABELS = {
-            admin: 'أدمن (صلاحية كاملة)',
-            reception: 'استقبال'
-        };
+        const ROLE_LABELS = { admin: 'أدمن (صلاحية كاملة)', reception: 'استقبال' };
 
-        /* التعرف على نوع ونظام ومتصفح الجهاز الحالي */
         function getDeviceInfo() {
             const ua = navigator.userAgent;
-
             let type = '💻 كمبيوتر';
             if (/iPad|Tablet/i.test(ua)) type = '📱 تابلت';
             else if (/Mobi|Android/i.test(ua)) type = '📱 موبايل';
-
             let os = 'غير معروف';
             if (/Windows/i.test(ua)) os = 'Windows';
             else if (/Android/i.test(ua)) os = 'Android';
             else if (/iPhone|iPad|iPod/i.test(ua)) os = 'iOS';
             else if (/Mac OS/i.test(ua)) os = 'MacOS';
             else if (/Linux/i.test(ua)) os = 'Linux';
-
             let browser = 'غير معروف';
             if (/Edg/i.test(ua)) browser = 'Edge';
             else if (/OPR|Opera/i.test(ua)) browser = 'Opera';
             else if (/Chrome/i.test(ua)) browser = 'Chrome';
             else if (/Firefox/i.test(ua)) browser = 'Firefox';
             else if (/Safari/i.test(ua)) browser = 'Safari';
-
             return { type: type, label: `${type} - ${os} - ${browser}` };
         }
 
-        /* تسجيل الدخول الحقيقي عبر Firebase Authentication */
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const email = document.getElementById('userInput').value.trim();
             const pass = document.getElementById('passInput').value;
             const errorBox = document.getElementById('loginErrorMsg');
             errorBox.style.display = 'none';
-
+            
             firebase.auth().signInWithEmailAndPassword(email, pass)
                 .catch(function(err) {
                     errorBox.innerText = "❌ البريد الإلكتروني أو كلمة المرور غير صحيحة!";
@@ -1137,7 +554,6 @@
                 });
         });
 
-        /* مراقبة حالة تسجيل الدخول تلقائياً (تفتح الداشبورد أو شاشة الدخول) */
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
                 checkUserRoleAndEnter(user);
@@ -1150,30 +566,29 @@
             }
         });
 
-        /* بعد الدخول: جلب صلاحية المستخدم من قاعدة البيانات وفتح الداشبورد بناءً عليها */
         function checkUserRoleAndEnter(user) {
             currentUserUid = user.uid;
             currentUserEmail = user.email;
-
             userRolesRef.child(user.uid).once('value').then(function(snapshot) {
                 const data = snapshot.val();
-
                 if (!data || !data.role) {
                     alert('⚠️ لم يتم تحديد صلاحية لحسابك بعد. برجاء التواصل مع الأدمن لتفعيل صلاحيتك.');
                     firebase.auth().signOut();
                     return;
                 }
-
                 currentUserRole = data.role;
                 currentUserName = data.name || user.email;
-
+                
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
+                
+                const video = document.getElementById('bgVideo');
                 if (video) video.pause();
-
+                
+                loadSavedData();
                 applyRoleUI();
                 checkLabDeadlines();
-
+                
                 const existingSessionId = sessionStorage.getItem('italian_clinic_session_id');
                 if (existingSessionId) {
                     currentSessionId = existingSessionId;
@@ -1184,24 +599,21 @@
             });
         }
 
-        /* إظهار/إخفاء قسم الإدارة والماليات حسب الصلاحية */
         function applyRoleUI() {
             const adminParent = document.getElementById('menu-admin-parent');
             const adminSubmenu = document.getElementById('adminSubmenu');
             if (currentUserRole === 'admin') {
                 adminParent.style.display = '';
-                adminSubmenu.style.display = '';
+                adminSubmenu.style.display = 'block'; 
             } else {
                 adminParent.style.display = 'none';
                 adminSubmenu.style.display = 'none';
             }
         }
 
-        /* تسجيل جلسة الدخول الحالية في Firebase (مربوطة بالمستخدم الحقيقي) */
         function registerLoginSession() {
             const info = getDeviceInfo();
             const sessionId = 'session_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
-
             const sessionData = {
                 deviceLabel: info.label,
                 deviceType: info.type,
@@ -1211,14 +623,12 @@
                 userName: currentUserName,
                 userRole: ROLE_LABELS[currentUserRole] || currentUserRole
             };
-
             sessionsRef.child(sessionId).set(sessionData);
             sessionStorage.setItem('italian_clinic_session_id', sessionId);
             currentSessionId = sessionId;
             attachSessionListener(sessionId);
         }
 
-        /* مراقبة الجلسة الحالية: لو الأدمن عمل تسجيل خروج عن بُعد، الجهاز يخرج فوراً */
         function attachSessionListener(sessionId) {
             if (sessionListenerRef) sessionListenerRef.off();
             sessionListenerRef = sessionsRef.child(sessionId);
@@ -1231,34 +641,27 @@
             });
         }
 
-        /* تسجيل خروج محلي (بدون إعادة الكتابة على Firebase لأنه أُلغي بالفعل من هناك) */
         function forceLocalLogout() {
             if (sessionListenerRef) sessionListenerRef.off();
             sessionStorage.removeItem('italian_clinic_session_id');
             firebase.auth().signOut();
         }
 
-        /* بناء جدول الأجهزة المتصلة في صفحة الإدارة (تحديث لحظي) */
         function listenToAllSessions() {
             sessionsRef.on('value', function(snapshot) {
                 const tbody = document.getElementById('sessionsTableBody');
                 if (!tbody) return;
-
                 tbody.innerHTML = '';
                 const sessions = snapshot.val();
-
                 if (!sessions) {
                     tbody.innerHTML = `<tr id="noSessionsRow"><td colspan="4" class="no-data">لا توجد أجهزة مسجلة دخول حالياً</td></tr>`;
                     return;
                 }
-
                 Object.keys(sessions).forEach(function(sid) {
                     const s = sessions[sid];
-                    if (s.status === 'loggedout') return; 
-
+                    if (s.status === 'loggedout') return;
                     const row = document.createElement('tr');
                     const isThisDevice = (sid === currentSessionId);
-
                     row.innerHTML = `
                         <td>
                             <strong>${s.userName || 'غير معروف'}</strong>${isThisDevice ? ' <span class="note-badge">هذا الجهاز</span>' : ''}
@@ -1273,34 +676,25 @@
                     `;
                     tbody.appendChild(row);
                 });
-
-                if (tbody.children.length === 0) {
-                    tbody.innerHTML = `<tr id="noSessionsRow"><td colspan="4" class="no-data">لا توجد أجهزة مسجلة دخول حالياً</td></tr>`;
-                }
             });
         }
 
-        /* تسجيل خروج جهاز معين عن بُعد من صفحة الإدارة */
         function remoteLogoutDevice(sid) {
             if (!confirm('هل أنت متأكد من تسجيل خروج هذا الجهاز؟')) return;
             sessionsRef.child(sid).update({ status: 'loggedout' });
             setTimeout(() => { sessionsRef.child(sid).remove(); }, 3000);
         }
 
-        /* ==================== إدارة صلاحيات المستخدمين (للأدمن فقط) ==================== */
         function listenToUserRoles() {
             userRolesRef.on('value', function(snapshot) {
                 const tbody = document.getElementById('rolesTableBody');
                 if (!tbody) return;
-
                 tbody.innerHTML = '';
                 const roles = snapshot.val();
-
                 if (!roles) {
                     tbody.innerHTML = `<tr id="noRolesRow"><td colspan="4" class="no-data">لا يوجد مستخدمون مسجلون بعد</td></tr>`;
                     return;
                 }
-
                 Object.keys(roles).forEach(function(uid) {
                     const r = roles[uid];
                     const row = document.createElement('tr');
@@ -1314,10 +708,6 @@
                     `;
                     tbody.appendChild(row);
                 });
-
-                if (tbody.children.length === 0) {
-                    tbody.innerHTML = `<tr id="noRolesRow"><td colspan="4" class="no-data">لا يوجد مستخدمون مسجلون بعد</td></tr>`;
-                }
             });
         }
 
@@ -1327,7 +717,6 @@
             const name = document.getElementById('roleName').value.trim();
             const email = document.getElementById('roleEmail').value.trim();
             const role = document.getElementById('roleSelect').value;
-
             userRolesRef.child(uid).set({ name: name, email: email, role: role })
                 .then(function() {
                     alert('✅ تم حفظ صلاحية المستخدم بنجاح!');
@@ -1339,20 +728,18 @@
         });
 
         function deleteUserRole(uid) {
-            if (!confirm('هل أنت متأكد من حذف صلاحية هذا المستخدم؟ لن يستطيع الدخول للنظام بعدها.')) return;
+            if (!confirm('هل أنت متأكد من حذف صلاحية هذا المستخدم؟')) return;
             userRolesRef.child(uid).remove();
         }
 
-        const video = document.getElementById('bgVideo');
-
+        /* ==================== منطق البيانات والمواعيد والـ LocalStorage ==================== */
         let stats = { waiting: 0, unconfirmed: 0, confirmed: 0, canceled: 0, lost: 0 };
-        let patientDataMap = {}; 
-        let archivePatientsMap = {}; 
-        let labDataList = []; 
-        let financeTransactions = []; // لتخزين الحركات المالية الجديدة
-
+        let patientDataMap = {};
+        let archivePatientsMap = {};
+        let labDataList = [];
+        let financeTransactions = [];
         let longPressTimer;
-        const longPressDuration = 1000; 
+        const longPressDuration = 1000;
 
         function loadSavedData() {
             const savedStats = localStorage.getItem('italian_clinic_stats');
@@ -1360,13 +747,13 @@
             const savedArchive = localStorage.getItem('italian_clinic_archive');
             const savedLab = localStorage.getItem('italian_clinic_lab');
             const savedFinance = localStorage.getItem('italian_clinic_finance');
-
+            
             if (savedStats) stats = JSON.parse(savedStats);
             if (savedPatients) patientDataMap = JSON.parse(savedPatients);
             if (savedArchive) archivePatientsMap = JSON.parse(savedArchive);
             if (savedLab) labDataList = JSON.parse(savedLab);
             if (savedFinance) financeTransactions = JSON.parse(savedFinance);
-
+            
             updateStatsDOM();
             rebuildCurrentVisitsTables();
             rebuildLabTable();
@@ -1374,18 +761,16 @@
         }
 
         function checkLabDeadlines() {
-            const todayStr = new Date().toISOString().split('T')[0]; 
+            const todayStr = new Date().toISOString().split('T')[0];
             let alertsMessage = "";
-
             labDataList.forEach(item => {
                 if (item.status !== 'done' && item.rawDeliveryDate <= todayStr) {
                     alertsMessage += `⚠️ الحالة: ${item.patientName} - شغل: ${item.workType} (تاريخ استلامها: ${item.deliveryDate})\n`;
                 }
             });
-
             if (alertsMessage !== "") {
                 setTimeout(() => {
-                    alert(`🚨 تنبيه حالات المعمل المطلوبة اليوم:\n\n${alertsMessage}\nيرجى مراجعة المعمل واستلام الشغل المتبقي!`);
+                    alert(`🚨 تنبيه حالات المعمل المطلوبة اليوم:\n\n${alertsMessage}\nيرجى مراجعة المعمل واستلام الشغل!`);
                 }, 800);
             }
         }
@@ -1399,6 +784,7 @@
         }
 
         function toggleMute(event) {
+            const video = document.getElementById('bgVideo');
             if(!video) return;
             video.muted = !video.muted;
             event.target.innerText = video.muted ? "🔇 تشغيل الصوت" : "🔊 كتم الصوت";
@@ -1409,7 +795,6 @@
             document.getElementById('sidebarOverlay').classList.toggle('show');
         }
 
-        /* فتح/قفل القائمة الفرعية للإدارة والماليات */
         function toggleAdminSubmenu() {
             const submenu = document.getElementById('adminSubmenu');
             const arrow = document.getElementById('adminArrow');
@@ -1421,7 +806,7 @@
             document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active-page'));
             document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
             document.querySelectorAll('.submenu li').forEach(li => li.classList.remove('active'));
-
+            
             if (pageName === 'home') {
                 document.getElementById('page-home').classList.add('active-page');
                 document.getElementById('menu-home').classList.add('active');
@@ -1434,7 +819,7 @@
                 document.getElementById('page-history').classList.add('active-page');
                 document.getElementById('menu-history').classList.add('active');
                 document.getElementById('pageMainTitle').innerText = "المركز الإيطالي للأسنان - سجل الأرشيف التاريخي";
-                renderHistoryDOM(); 
+                renderHistoryDOM();
             } else if (pageName === 'lab') {
                 document.getElementById('page-lab').classList.add('active-page');
                 document.getElementById('menu-lab').classList.add('active');
@@ -1456,11 +841,11 @@
         }
 
         function updateStatsDOM() {
-            document.getElementById('count-waiting').innerText = stats.waiting;
-            document.getElementById('count-unconfirmed').innerText = stats.unconfirmed;
-            document.getElementById('count-confirmed').innerText = stats.confirmed;
-            document.getElementById('count-canceled').innerText = stats.canceled;
-            document.getElementById('count-lost').innerText = stats.lost;
+            document.getElementById('count-waiting').innerText = stats.waiting >= 0 ? stats.waiting : 0;
+            document.getElementById('count-unconfirmed').innerText = stats.unconfirmed >= 0 ? stats.unconfirmed : 0;
+            document.getElementById('count-confirmed').innerText = stats.confirmed >= 0 ? stats.confirmed : 0;
+            document.getElementById('count-canceled').innerText = stats.canceled >= 0 ? stats.canceled : 0;
+            document.getElementById('count-lost').innerText = stats.lost >= 0 ? stats.lost : 0;
         }
 
         function toggleDropdown(e, rowId) {
@@ -1468,13 +853,11 @@
             document.querySelectorAll('.status-dropdown, .lab-dropdown').forEach(menu => {
                 if (menu.id !== `drop_${rowId}` && menu.id !== `labDrop_${rowId}`) menu.classList.remove('show-menu');
             });
-
             const targetMenu = document.getElementById(`drop_${rowId}`) || document.getElementById(`labDrop_${rowId}`);
             if (targetMenu) {
                 targetMenu.classList.toggle('show-menu');
                 const rect = e.target.getBoundingClientRect();
                 const containerRect = e.target.closest('.table-container').getBoundingClientRect();
-                
                 targetMenu.style.top = (rect.bottom - containerRect.top + 5) + 'px';
                 targetMenu.style.right = (containerRect.right - rect.right) + 'px';
             }
@@ -1487,15 +870,17 @@
         function changePatientStatus(rowId, newStatus) {
             const patient = patientDataMap[rowId];
             if (!patient) return;
-
             const oldStatus = patient.status;
-            if (oldStatus) stats[oldStatus]--;
+            
+            if (oldStatus === newStatus) return; 
+            
+            if (oldStatus && stats[oldStatus] > 0) stats[oldStatus]--;
             stats[newStatus]++;
             patient.status = newStatus;
+            
             updateStatsDOM();
-
             pushToArchive(patient);
-            saveDataToStorage(); 
+            saveDataToStorage();
             rebuildCurrentVisitsTables();
         }
 
@@ -1503,16 +888,13 @@
             longPressTimer = setTimeout(function() {
                 const patient = patientDataMap[rowId];
                 if (!patient) return;
-
                 const newTimeInput = prompt(`تعديل بيانات المريض: ${patient.name}\n\n1) الوقت الجديد:`, patient.time);
                 if (newTimeInput === null) return;
-
                 const newClinicInput = prompt(`تعديل بيانات المريض: ${patient.name}\n\n2) العيادة الجديدة:`, patient.clinic || '');
                 if (newClinicInput === null) return;
-
                 const newDoctorInput = prompt(`تعديل بيانات المريض: ${patient.name}\n\n3) الطبيب الجديد:`, patient.doctor || '');
                 if (newDoctorInput === null) return;
-
+                
                 if (newTimeInput.trim() !== "") patient.time = newTimeInput.trim();
                 if (newClinicInput.trim() !== "") patient.clinic = newClinicInput.trim();
                 if (newDoctorInput.trim() !== "") patient.doctor = newDoctorInput.trim();
@@ -1523,7 +905,6 @@
                     archivePatientsMap[uniqueKey].visits[rowId].clinic = patient.clinic;
                     archivePatientsMap[uniqueKey].visits[rowId].doctor = patient.doctor;
                 }
-                
                 saveDataToStorage();
                 rebuildCurrentVisitsTables();
                 alert("تم تحديث البيانات بنجاح!");
@@ -1537,44 +918,33 @@
         function rebuildCurrentVisitsTables() {
             const upcomingBody = document.getElementById('upcomingVisitsBody');
             const lateBody = document.getElementById('lateVisitsBody');
-
             if(!upcomingBody || !lateBody) return;
-
+            
             upcomingBody.innerHTML = `<tr id="noUpcomingRow"><td colspan="4" class="no-data">لا توجد زيارات قادمة اليوم</td></tr>`;
             lateBody.innerHTML = `<tr id="noLateRow"><td colspan="4" class="no-data">لا توجد زيارات متأخرة حالياً</td></tr>`;
-
+            
             Object.keys(patientDataMap).forEach(rowId => {
                 const patient = patientDataMap[rowId];
                 const newStatus = patient.status;
-
                 let badgeHTML = '';
                 if (newStatus === 'waiting') badgeHTML = `<span class="status-badge badge-waiting">منتظر</span>`;
                 if (newStatus === 'unconfirmed') badgeHTML = `<span class="status-badge badge-unconfirmed">غير مؤكد</span>`;
                 if (newStatus === 'confirmed') badgeHTML = `<span class="status-badge badge-confirmed">مؤكد</span>`;
                 if (newStatus === 'canceled') badgeHTML = `<span class="status-badge badge-canceled">تم إلغاؤه</span>`;
                 if (newStatus === 'lost') badgeHTML = `<span class="status-badge badge-lost">فقد</span>`;
-
+                
                 let targetTbodyId = 'upcomingVisitsBody';
                 let isLateTable = false;
                 if (newStatus === 'lost' || newStatus === 'canceled') {
                     targetTbodyId = 'lateVisitsBody';
                     isLateTable = true;
                 }
-
                 const targetTbody = document.getElementById(targetTbodyId);
                 const newRow = document.createElement('tr');
                 newRow.setAttribute('id', rowId);
-
                 const timeColor = isLateTable ? 'style="color: #b91c1c;"' : '';
-
-                const longPressEvents = `
-                    onmousedown="handleLongPressStart('${rowId}')" 
-                    onmouseup="handleLongPressEnd()" 
-                    onmouseleave="handleLongPressEnd()"
-                    ontouchstart="handleLongPressStart('${rowId}')" 
-                    ontouchend="handleLongPressEnd()"
-                `;
-
+                const longPressEvents = ` onmousedown="handleLongPressStart('${rowId}')" onmouseup="handleLongPressEnd()" onmouseleave="handleLongPressEnd()" ontouchstart="handleLongPressStart('${rowId}')" ontouchend="handleLongPressEnd()" `;
+                
                 newRow.innerHTML = `
                     <td ${timeColor}>${patient.time}</td>
                     <td style="position: static;">
@@ -1584,7 +954,6 @@
                             ${badgeHTML}
                             <span class="note-badge">${patient.note}</span>
                         </div>
-
                         <div class="status-dropdown" id="drop_${rowId}">
                             <div onclick="changePatientStatus('${rowId}', 'waiting')">⏳ منتظر</div>
                             <div onclick="changePatientStatus('${rowId}', 'unconfirmed')">⚪ غير مؤكد</div>
@@ -1596,10 +965,8 @@
                     <td>${patient.clinic || 'غير محدد'}</td>
                     <td>${patient.doctor || 'غير محدد'}</td>
                 `;
-
                 targetTbody.appendChild(newRow);
             });
-
             checkTableEmptyState('upcomingVisitsBody', 'noUpcomingRow');
             checkTableEmptyState('lateVisitsBody', 'noLateRow');
         }
@@ -1607,20 +974,10 @@
         function pushToArchive(patient) {
             const uniqueKey = patient.code.trim();
             if (!archivePatientsMap[uniqueKey]) {
-                archivePatientsMap[uniqueKey] = {
-                    name: patient.name,
-                    phone: patient.phone,
-                    code: patient.code,
-                    visits: {}
-                };
+                archivePatientsMap[uniqueKey] = { name: patient.name, phone: patient.phone, code: patient.code, visits: {} };
             }
             archivePatientsMap[uniqueKey].visits[patient.id] = {
-                date: patient.date,
-                time: patient.time,
-                clinic: patient.clinic,
-                doctor: patient.doctor,
-                note: patient.note,
-                status: patient.status
+                date: patient.date, time: patient.time, clinic: patient.clinic, doctor: patient.doctor, note: patient.note, status: patient.status
             };
         }
 
@@ -1632,30 +989,20 @@
             const doc = document.getElementById('labDoctor').value;
             const exitDateRaw = document.getElementById('labExitDate').value;
             const delDateRaw = document.getElementById('labDeliveryDate').value;
-
+            
             const eDateObj = new Date(exitDateRaw);
             const formattedExitDate = `${String(eDateObj.getDate()).padStart(2, '0')}/${String(eDateObj.getMonth() + 1).padStart(2, '0')}/${eDateObj.getFullYear()}`;
-
             const dDateObj = new Date(delDateRaw);
             const formattedDelDate = `${String(dDateObj.getDate()).padStart(2, '0')}/${String(dDateObj.getMonth() + 1).padStart(2, '0')}/${dDateObj.getFullYear()}`;
-
+            
             const labId = 'lab_' + Date.now();
             labDataList.push({
-                id: labId,
-                patientName: pName,
-                labName: lName,
-                workType: wType,
-                doctor: doc,
-                exitDate: formattedExitDate,
-                deliveryDate: formattedDelDate,
-                rawDeliveryDate: delDateRaw, 
-                status: 'making'
+                id: labId, patientName: pName, labName: lName, workType: wType, doctor: doc, exitDate: formattedExitDate, deliveryDate: formattedDelDate, rawDeliveryDate: delDateRaw, status: 'making'
             });
-
             saveDataToStorage();
             rebuildLabTable();
             document.getElementById('labForm').reset();
-            alert('تم تسجيل طلب المعمل وتواريخ الإرسال والاستلام بنجاح!');
+            alert('تم تسجيل طلب المعمل بنجاح!');
         });
 
         function changeLabStatus(labId, newStatus) {
@@ -1671,13 +1018,13 @@
             const tbody = document.getElementById('labTableBody');
             if (!tbody) return;
             tbody.innerHTML = `<tr id="noLabRow"><td colspan="6" class="no-data">لا توجد طلبات معمل مسجلة حالياً</td></tr>`;
-
+            
             labDataList.forEach(item => {
                 let badgeHTML = '';
                 if (item.status === 'making') badgeHTML = `<span class="status-badge badge-lab-making">⏳ تحت التصنيع</span>`;
                 if (item.status === 'ready') badgeHTML = `<span class="status-badge badge-lab-ready">🔵 جاهز بالمعمل</span>`;
                 if (item.status === 'done') badgeHTML = `<span class="status-badge badge-lab-done">✅ تم الاستلام بالعيادة</span>`;
-
+                
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td><strong>${item.patientName}</strong></td>
@@ -1699,43 +1046,32 @@
             checkTableEmptyState('labTableBody', 'noLabRow');
         }
 
-        /* --- الأكواد البرمجية الخاصة بقسم الحسابات --- */
         document.getElementById('financeForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const type = document.getElementById('finType').value;
             const amount = parseFloat(document.getElementById('finAmount').value);
             const statement = document.getElementById('finStatement').value;
-
             const now = new Date();
             const timestamp = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-
-            financeTransactions.push({
-                dateTime: timestamp,
-                type: type,
-                amount: amount,
-                statement: statement
-            });
-
+            
+            financeTransactions.push({ dateTime: timestamp, type: type, amount: amount, statement: statement });
             saveDataToStorage();
             rebuildFinanceDOM();
             document.getElementById('financeForm').reset();
-            alert('تم تسجيل العملية المالية وتقييدها بالدفاتر بنجاح!');
+            alert('تم تسجيل العملية المالية بنجاح!');
         });
 
         function rebuildFinanceDOM() {
             const tbody = document.getElementById('financeTableBody');
             if(!tbody) return;
-
             tbody.innerHTML = `<tr id="noFinanceRow"><td colspan="4" class="no-data">لم يتم تقييد عمليات مالية لليوم حتى الآن</td></tr>`;
-
+            
             let totalIncome = 0;
             let totalExpenses = 0;
-
             financeTransactions.forEach(trans => {
                 const row = document.createElement('tr');
                 let typeText = '';
                 let amountStyle = '';
-
                 if (trans.type === 'income') {
                     totalIncome += trans.amount;
                     typeText = '📈 إيرادات';
@@ -1745,7 +1081,6 @@
                     typeText = '📉 مصروفات';
                     amountStyle = 'style="color: #ef4444; font-weight: bold;"';
                 }
-
                 row.innerHTML = `
                     <td>${trans.dateTime}</td>
                     <td>${typeText}</td>
@@ -1754,32 +1089,26 @@
                 `;
                 tbody.appendChild(row);
             });
-
             const netProfit = totalIncome - totalExpenses;
-
             document.getElementById('total-income').innerText = `${totalIncome.toFixed(2)} EGP`;
             document.getElementById('total-expenses').innerText = `${totalExpenses.toFixed(2)} EGP`;
             document.getElementById('total-net').innerText = `${netProfit.toFixed(2)} EGP`;
-
             checkTableEmptyState('financeTableBody', 'noFinanceRow');
         }
 
         function renderHistoryDOM() {
             const tbody = document.getElementById('historyTableBody');
             if(!tbody) return;
-            tbody.innerHTML = ''; 
+            tbody.innerHTML = '';
             const keys = Object.keys(archivePatientsMap);
-
             if (keys.length === 0) {
                 tbody.innerHTML = `<tr id="noHistoryRow"><td colspan="3" class="no-data">السجل فارغ حالياً</td></tr>`;
                 return;
             }
-
             keys.forEach(key => {
                 const p = archivePatientsMap[key];
                 const visitIds = Object.keys(p.visits);
                 const visitCount = visitIds.length;
-
                 let subTableRowsHTML = '';
                 visitIds.forEach(id => {
                     const v = p.visits[id];
@@ -1789,25 +1118,17 @@
                     if (v.status === 'confirmed') statusText = '🔵 مؤكد وبانتظار الإتمام';
                     if (v.status === 'canceled') statusText = '❌ تم إلغاؤه';
                     if (v.status === 'lost') statusText = '⚠️ فقد';
-
                     subTableRowsHTML += `
                         <tr>
-                            <td>${v.date}</td>
-                            <td>${v.time}</td>
-                            <td>${v.clinic || 'غير محدد'}</td>
-                            <td>${v.doctor || 'غير محدد'}</td>
-                            <td><strong style="color: #16a34a;">${v.note}</strong></td>
-                            <td>${statusText}</td>
+                            <td>${v.date}</td><td>${v.time}</td><td>${v.clinic || 'غير محدد'}</td><td>${v.doctor || 'غير محدد'}</td><td><strong style="color: #16a34a;">${v.note}</strong></td><td>${statusText}</td>
                         </tr>
                     `;
                 });
-
                 const row = document.createElement('tr');
                 row.className = 'history-item-row';
                 row.setAttribute('data-name', p.name.toLowerCase());
                 row.setAttribute('data-phone', p.phone);
                 row.setAttribute('data-code', p.code);
-
                 row.innerHTML = `
                     <td>
                         <strong>${p.name}</strong>
@@ -1820,12 +1141,7 @@
                             <table class="history-sub-table">
                                 <thead>
                                     <tr>
-                                        <th>التاريخ</th>
-                                        <th>الوقت</th>
-                                        <th>العيادة</th>
-                                        <th>الطبيب</th>
-                                        <th>الملاحظات</th>
-                                        <th>الحالة</th>
+                                        <th>التاريخ</th><th>الوقت</th><th>العيادة</th><th>الطبيب</th><th>الملاحظات</th><th>الحالة</th>
                                     </tr>
                                 </thead>
                                 <tbody>${subTableRowsHTML}</tbody>
@@ -1841,12 +1157,10 @@
             const query = document.getElementById('historySearchInput').value.toLowerCase().trim();
             const rows = document.querySelectorAll('.history-item-row');
             let hasResults = false;
-
             rows.forEach(row => {
                 const name = row.getAttribute('data-name');
                 const phone = row.getAttribute('data-phone');
                 const code = row.getAttribute('data-code');
-
                 if (name.includes(query) || phone.includes(query) || code.includes(query)) {
                     row.style.display = 'table-row';
                     hasResults = true;
@@ -1854,7 +1168,6 @@
                     row.style.display = 'none';
                 }
             });
-
             const noRow = document.getElementById('noHistoryRow');
             if (!hasResults) {
                 if (!noRow) {
@@ -1883,7 +1196,7 @@
         }
 
         function logoutSystem() {
-            saveDataToStorage(); 
+            saveDataToStorage();
             if (currentSessionId) {
                 sessionsRef.child(currentSessionId).remove();
                 if (sessionListenerRef) sessionListenerRef.off();
@@ -1906,22 +1219,21 @@
             e.preventDefault();
             const name = document.getElementById('patientName').value;
             const phone = document.getElementById('patientPhone').value;
-            const rawDate = document.getElementById('appointmentDate').value; 
-            const rawTime = document.getElementById('appointmentTime').value; 
+            const rawDate = document.getElementById('appointmentDate').value;
+            const rawTime = document.getElementById('appointmentTime').value;
             const clinic = document.getElementById('appointmentClinic').value;
             const doctor = document.getElementById('appointmentDoctor').value;
             const code = document.getElementById('appointmentCode').value;
-            const note = document.getElementById('appointmentNote').value || "حشو فحص عام"; 
-
+            const note = document.getElementById('appointmentNote').value || "فحص عام";
+            
             const dateObj = new Date(rawDate);
             const formattedDate = `${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth() + 1).padStart(2, '0')}/${dateObj.getFullYear()}`;
             const timeStr = formatTime12Hour(rawTime);
             const rowId = 'row_' + Date.now();
-
+            
             patientDataMap[rowId] = {
                 id: rowId, name: name, phone: phone, date: formattedDate, code: code, note: note, time: timeStr, clinic: clinic, doctor: doctor, status: null
             };
-
             changePatientStatus(rowId, 'waiting');
             document.getElementById('appointmentForm').reset();
             alert('تم حجز الموعد بنجاح!');
@@ -1944,8 +1256,6 @@
         const today = new Date();
         const dateEl = document.getElementById('currentDate');
         if(dateEl) dateEl.innerText = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
-
-        window.onload = loadSavedData;
     </script>
 </body>
 </html>
