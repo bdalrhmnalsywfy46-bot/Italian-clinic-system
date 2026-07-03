@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Italian Dental Center</title>
+    <!-- Firebase SDK (compat) لتتبع الأجهزة وتسجيل الخروج عن بُعد -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -213,6 +217,7 @@
             z-index: 90;
             transition: 0.3s ease;
             padding: 80px 20px 20px 20px;
+            overflow-y: auto;
         }
 
         .sidebar.open {
@@ -236,6 +241,41 @@
         .sidebar-menu li:hover, .sidebar-menu li.active {
             background: #f8fafc;
             color: #0284c7;
+        }
+
+        .menu-parent-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .menu-arrow {
+            display: inline-block;
+            transition: transform 0.25s ease;
+            font-size: 12px;
+        }
+
+        .menu-arrow.rotated {
+            transform: rotate(180deg);
+        }
+
+        .submenu {
+            list-style: none;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.25s ease;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .submenu.open {
+            max-height: 200px;
+        }
+
+        .submenu li {
+            padding: 12px 20px !important;
+            font-size: 14px !important;
+            border-bottom: 1px solid #eef2f7 !important;
         }
 
         .sidebar-overlay {
@@ -370,6 +410,7 @@
         .bg-purple { background: #6366f1; }
         .bg-teal { background: #0d9488; }
         .bg-dark-blue { background: #1e293b; }
+        .bg-slate { background: #475569; }
 
         table {
             width: 100%;
@@ -594,6 +635,15 @@
             border-bottom: 1px solid #e2e8f0;
         }
 
+        .empty-management {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            color: #94a3b8;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
         @media (max-width: 480px) {
             .form-row-2 {
                 flex-direction: column;
@@ -626,14 +676,15 @@
 
             <form id="loginForm" class="form-container">
                 <div class="input-group">
-                    <label>اسم المستخدم:</label>
-                    <input type="text" id="userInput" required placeholder="Italian dental center">
+                    <label>البريد الإلكتروني:</label>
+                    <input type="email" id="userInput" required placeholder="اكتب بريدك الإلكتروني">
                 </div>
                 <div class="input-group">
                     <label>كلمة المرور:</label>
                     <input type="password" id="passInput" required placeholder="••••••••">
                 </div>
                 <button type="submit" class="login-btn">دخول</button>
+                <div id="loginErrorMsg" style="color:#b91c1c; font-size:14px; font-weight:bold; text-align:center; margin-top:12px; display:none;"></div>
             </form>
 
             <div class="footer-address">
@@ -646,14 +697,23 @@
     <div id="dashboard">
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-        <!-- القائمة الجانبية المحدثة بقسم الإدارة -->
+        <!-- القائمة الجانبية المحدثة بقسم الإدارة والحسابات المنفصلين -->
         <div class="sidebar" id="sidebar">
             <ul class="sidebar-menu">
                 <li id="menu-home" class="active" onclick="switchPage('home')">الرئيسية</li>
                 <li id="menu-add" onclick="switchPage('add')">إضافة موعد جديد</li>
                 <li id="menu-history" onclick="switchPage('history')">سجل المرضى</li>
                 <li id="menu-lab" onclick="switchPage('lab')">المعامل والتركيبات</li>
-                <li id="menu-admin" onclick="verifyAdminAccess()">الإدارة والماليات 🔐</li>
+
+                <li id="menu-admin-parent" class="menu-parent-item" onclick="toggleAdminSubmenu()" style="display:none;">
+                    <span>الإدارة والماليات 🔐</span>
+                    <span class="menu-arrow" id="adminArrow">▼</span>
+                </li>
+                <ul class="submenu" id="adminSubmenu" style="display:none;">
+                    <li id="menu-finance" onclick="switchPage('finance')">💰 الحسابات</li>
+                    <li id="menu-management" onclick="switchPage('management')">🗂️ الإدارة</li>
+                </ul>
+
                 <li onclick="logoutSystem()" style="color: #b91c1c;">تسجيل الخروج</li>
             </ul>
         </div>
@@ -865,8 +925,8 @@
             </div>
         </div>
 
-        <!-- ================= صفحة الإدارة والماليات (الجديدة المحمية) ================= -->
-        <div id="page-admin" class="page-section">
+        <!-- ================= صفحة الحسابات (الماليات فقط) ================= -->
+        <div id="page-finance" class="page-section">
             <!-- كروت الملخص المالي السريع -->
             <div class="finance-cards-grid">
                 <div class="fin-card fin-inc">
@@ -933,9 +993,356 @@
             </div>
         </div>
 
+        <!-- ================= صفحة الإدارة (منفصلة عن الحسابات) ================= -->
+        <div id="page-management" class="page-section">
+            <div class="table-container">
+                <div class="table-header bg-slate">الأجهزة المسجلة دخول حالياً على النظام</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 35%;">الجهاز</th>
+                            <th style="width: 25%;">وقت الدخول</th>
+                            <th style="width: 20%;">الحالة</th>
+                            <th style="width: 20%;">إجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sessionsTableBody">
+                        <tr id="noSessionsRow">
+                            <td colspan="4" class="no-data">جاري تحميل الأجهزة المتصلة...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <br>
+
+            <div class="form-card">
+                <h3>إضافة / تعديل صلاحية مستخدم</h3>
+                <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:8px; padding:12px; margin-bottom:20px; font-size:13px; color:#0369a1; line-height:1.8;">
+                    ℹ️ الخطوات: روح على Firebase Console ← Authentication ← Add user (بريد إلكتروني وكلمة مرور)، هيديك UID للمستخدم، انسخه وحطه هنا مع تحديد الدور.
+                </div>
+                <form id="roleAssignForm">
+                    <div class="custom-form-group">
+                        <label for="roleUid">UID الخاص بالمستخدم (من Firebase Authentication):</label>
+                        <input type="text" id="roleUid" placeholder="مثال: aB12cD34eF..." required>
+                    </div>
+                    <div class="custom-form-group">
+                        <label for="roleName">اسم المستخدم:</label>
+                        <input type="text" id="roleName" placeholder="مثال: أ. محمد الاستقبال" required>
+                    </div>
+                    <div class="custom-form-group">
+                        <label for="roleEmail">البريد الإلكتروني (نفس بريد الحساب):</label>
+                        <input type="email" id="roleEmail" placeholder="user@example.com" required>
+                    </div>
+                    <div class="custom-form-group">
+                        <label for="roleSelect">الدور / الصلاحية:</label>
+                        <select id="roleSelect" required>
+                            <option value="admin">🔐 أدمن (صلاحية كاملة على كل شيء)</option>
+                            <option value="reception">🗓️ استقبال (المواعيد والمرضى والمعامل فقط)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="submit-appointment-btn" style="background:#475569;">حفظ الصلاحية</button>
+                </form>
+            </div>
+
+            <br>
+
+            <div class="table-container">
+                <div class="table-header bg-dark-blue">المستخدمون وصلاحياتهم</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">الاسم</th>
+                            <th style="width: 30%;">البريد الإلكتروني</th>
+                            <th style="width: 25%;">الدور</th>
+                            <th style="width: 20%;">إجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rolesTableBody">
+                        <tr id="noRolesRow">
+                            <td colspan="4" class="no-data">جاري التحميل...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
     <script>
+        /* ==================== إعداد Firebase (تتبع الأجهزة وتسجيل الخروج عن بُعد) ==================== */
+        const firebaseConfig = {
+            apiKey: "AIzaSyC027Mk4HYklJwWVe5qexV8eYXVVEZ8euE",
+            authDomain: "italian-dental-center.firebaseapp.com",
+            databaseURL: "https://italian-dental-center-default-rtdb.firebaseio.com/",
+            projectId: "italian-dental-center",
+            storageBucket: "italian-dental-center.firebasestorage.app",
+            messagingSenderId: "165569762130",
+            appId: "1:165569762130:web:41bb5c411bb7cd2cd5e08b"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const sessionsRef = firebase.database().ref('sessions');
+        const userRolesRef = firebase.database().ref('userRoles');
+
+        let currentSessionId = null;
+        let sessionListenerRef = null;
+        let currentUserUid = null;
+        let currentUserEmail = null;
+        let currentUserRole = null;
+        let currentUserName = null;
+
+        /* أسماء الأدوار بالعربي */
+        const ROLE_LABELS = {
+            admin: 'أدمن (صلاحية كاملة)',
+            reception: 'استقبال'
+        };
+
+        /* التعرف على نوع ونظام ومتصفح الجهاز الحالي */
+        function getDeviceInfo() {
+            const ua = navigator.userAgent;
+
+            let type = '💻 كمبيوتر';
+            if (/iPad|Tablet/i.test(ua)) type = '📱 تابلت';
+            else if (/Mobi|Android/i.test(ua)) type = '📱 موبايل';
+
+            let os = 'غير معروف';
+            if (/Windows/i.test(ua)) os = 'Windows';
+            else if (/Android/i.test(ua)) os = 'Android';
+            else if (/iPhone|iPad|iPod/i.test(ua)) os = 'iOS';
+            else if (/Mac OS/i.test(ua)) os = 'MacOS';
+            else if (/Linux/i.test(ua)) os = 'Linux';
+
+            let browser = 'غير معروف';
+            if (/Edg/i.test(ua)) browser = 'Edge';
+            else if (/OPR|Opera/i.test(ua)) browser = 'Opera';
+            else if (/Chrome/i.test(ua)) browser = 'Chrome';
+            else if (/Firefox/i.test(ua)) browser = 'Firefox';
+            else if (/Safari/i.test(ua)) browser = 'Safari';
+
+            return { type: type, label: `${type} - ${os} - ${browser}` };
+        }
+
+        /* تسجيل الدخول الحقيقي عبر Firebase Authentication */
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('userInput').value.trim();
+            const pass = document.getElementById('passInput').value;
+            const errorBox = document.getElementById('loginErrorMsg');
+            errorBox.style.display = 'none';
+
+            firebase.auth().signInWithEmailAndPassword(email, pass)
+                .catch(function(err) {
+                    errorBox.innerText = "❌ البريد الإلكتروني أو كلمة المرور غير صحيحة!";
+                    errorBox.style.display = 'block';
+                });
+        });
+
+        /* مراقبة حالة تسجيل الدخول تلقائياً (تفتح الداشبورد أو شاشة الدخول) */
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                checkUserRoleAndEnter(user);
+            } else {
+                document.getElementById('loginScreen').style.display = 'flex';
+                document.getElementById('dashboard').style.display = 'none';
+                currentUserUid = null;
+                currentUserEmail = null;
+                currentUserRole = null;
+            }
+        });
+
+        /* بعد الدخول: جلب صلاحية المستخدم من قاعدة البيانات وفتح الداشبورد بناءً عليها */
+        function checkUserRoleAndEnter(user) {
+            currentUserUid = user.uid;
+            currentUserEmail = user.email;
+
+            userRolesRef.child(user.uid).once('value').then(function(snapshot) {
+                const data = snapshot.val();
+
+                if (!data || !data.role) {
+                    alert('⚠️ لم يتم تحديد صلاحية لحسابك بعد. برجاء التواصل مع الأدمن لتفعيل صلاحيتك.');
+                    firebase.auth().signOut();
+                    return;
+                }
+
+                currentUserRole = data.role;
+                currentUserName = data.name || user.email;
+
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                if (video) video.pause();
+
+                applyRoleUI();
+                checkLabDeadlines();
+
+                const existingSessionId = sessionStorage.getItem('italian_clinic_session_id');
+                if (existingSessionId) {
+                    currentSessionId = existingSessionId;
+                    attachSessionListener(existingSessionId);
+                } else {
+                    registerLoginSession();
+                }
+            });
+        }
+
+        /* إظهار/إخفاء قسم الإدارة والماليات حسب الصلاحية */
+        function applyRoleUI() {
+            const adminParent = document.getElementById('menu-admin-parent');
+            const adminSubmenu = document.getElementById('adminSubmenu');
+            if (currentUserRole === 'admin') {
+                adminParent.style.display = '';
+                adminSubmenu.style.display = '';
+            } else {
+                adminParent.style.display = 'none';
+                adminSubmenu.style.display = 'none';
+            }
+        }
+
+        /* تسجيل جلسة الدخول الحالية في Firebase (مربوطة بالمستخدم الحقيقي) */
+        function registerLoginSession() {
+            const info = getDeviceInfo();
+            const sessionId = 'session_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+
+            const sessionData = {
+                deviceLabel: info.label,
+                deviceType: info.type,
+                loginTime: new Date().toLocaleString('ar-EG'),
+                status: 'active',
+                userEmail: currentUserEmail,
+                userName: currentUserName,
+                userRole: ROLE_LABELS[currentUserRole] || currentUserRole
+            };
+
+            sessionsRef.child(sessionId).set(sessionData);
+            sessionStorage.setItem('italian_clinic_session_id', sessionId);
+            currentSessionId = sessionId;
+            attachSessionListener(sessionId);
+        }
+
+        /* مراقبة الجلسة الحالية: لو الأدمن عمل تسجيل خروج عن بُعد، الجهاز يخرج فوراً */
+        function attachSessionListener(sessionId) {
+            if (sessionListenerRef) sessionListenerRef.off();
+            sessionListenerRef = sessionsRef.child(sessionId);
+            sessionListenerRef.on('value', function(snapshot) {
+                const val = snapshot.val();
+                if (val && val.status === 'loggedout') {
+                    alert('🚪 تم تسجيل خروجك من هذا الجهاز بواسطة الإدارة.');
+                    forceLocalLogout();
+                }
+            });
+        }
+
+        /* تسجيل خروج محلي (بدون إعادة الكتابة على Firebase لأنه أُلغي بالفعل من هناك) */
+        function forceLocalLogout() {
+            if (sessionListenerRef) sessionListenerRef.off();
+            sessionStorage.removeItem('italian_clinic_session_id');
+            firebase.auth().signOut();
+        }
+
+        /* بناء جدول الأجهزة المتصلة في صفحة الإدارة (تحديث لحظي) */
+        function listenToAllSessions() {
+            sessionsRef.on('value', function(snapshot) {
+                const tbody = document.getElementById('sessionsTableBody');
+                if (!tbody) return;
+
+                tbody.innerHTML = '';
+                const sessions = snapshot.val();
+
+                if (!sessions) {
+                    tbody.innerHTML = `<tr id="noSessionsRow"><td colspan="4" class="no-data">لا توجد أجهزة مسجلة دخول حالياً</td></tr>`;
+                    return;
+                }
+
+                Object.keys(sessions).forEach(function(sid) {
+                    const s = sessions[sid];
+                    if (s.status === 'loggedout') return; 
+
+                    const row = document.createElement('tr');
+                    const isThisDevice = (sid === currentSessionId);
+
+                    row.innerHTML = `
+                        <td>
+                            <strong>${s.userName || 'غير معروف'}</strong>${isThisDevice ? ' <span class="note-badge">هذا الجهاز</span>' : ''}
+                            <div style="font-size:12px; color:#64748b; margin-top:3px;">${s.userEmail || ''} — ${s.userRole || ''}</div>
+                            <div style="font-size:12px; color:#94a3b8; margin-top:2px;">${s.deviceLabel}</div>
+                        </td>
+                        <td>${s.loginTime}</td>
+                        <td><span class="status-badge badge-confirmed">🟢 متصل الآن</span></td>
+                        <td>
+                            <button onclick="remoteLogoutDevice('${sid}')" style="padding:6px 12px; background:#b91c1c; color:#fff; border:none; border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer;">تسجيل خروج</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                if (tbody.children.length === 0) {
+                    tbody.innerHTML = `<tr id="noSessionsRow"><td colspan="4" class="no-data">لا توجد أجهزة مسجلة دخول حالياً</td></tr>`;
+                }
+            });
+        }
+
+        /* تسجيل خروج جهاز معين عن بُعد من صفحة الإدارة */
+        function remoteLogoutDevice(sid) {
+            if (!confirm('هل أنت متأكد من تسجيل خروج هذا الجهاز؟')) return;
+            sessionsRef.child(sid).update({ status: 'loggedout' });
+            setTimeout(() => { sessionsRef.child(sid).remove(); }, 3000);
+        }
+
+        /* ==================== إدارة صلاحيات المستخدمين (للأدمن فقط) ==================== */
+        function listenToUserRoles() {
+            userRolesRef.on('value', function(snapshot) {
+                const tbody = document.getElementById('rolesTableBody');
+                if (!tbody) return;
+
+                tbody.innerHTML = '';
+                const roles = snapshot.val();
+
+                if (!roles) {
+                    tbody.innerHTML = `<tr id="noRolesRow"><td colspan="4" class="no-data">لا يوجد مستخدمون مسجلون بعد</td></tr>`;
+                    return;
+                }
+
+                Object.keys(roles).forEach(function(uid) {
+                    const r = roles[uid];
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><strong>${r.name || '—'}</strong></td>
+                        <td>${r.email || '—'}</td>
+                        <td>${ROLE_LABELS[r.role] || r.role}</td>
+                        <td>
+                            <button onclick="deleteUserRole('${uid}')" style="padding:6px 12px; background:#b91c1c; color:#fff; border:none; border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer;">حذف الصلاحية</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                if (tbody.children.length === 0) {
+                    tbody.innerHTML = `<tr id="noRolesRow"><td colspan="4" class="no-data">لا يوجد مستخدمون مسجلون بعد</td></tr>`;
+                }
+            });
+        }
+
+        document.getElementById('roleAssignForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const uid = document.getElementById('roleUid').value.trim();
+            const name = document.getElementById('roleName').value.trim();
+            const email = document.getElementById('roleEmail').value.trim();
+            const role = document.getElementById('roleSelect').value;
+
+            userRolesRef.child(uid).set({ name: name, email: email, role: role })
+                .then(function() {
+                    alert('✅ تم حفظ صلاحية المستخدم بنجاح!');
+                    document.getElementById('roleAssignForm').reset();
+                })
+                .catch(function(err) {
+                    alert('❌ حدث خطأ أثناء الحفظ: ' + err.message);
+                });
+        });
+
+        function deleteUserRole(uid) {
+            if (!confirm('هل أنت متأكد من حذف صلاحية هذا المستخدم؟ لن يستطيع الدخول للنظام بعدها.')) return;
+            userRolesRef.child(uid).remove();
+        }
+
         const video = document.getElementById('bgVideo');
 
         let stats = { waiting: 0, unconfirmed: 0, confirmed: 0, canceled: 0, lost: 0 };
@@ -953,20 +1360,12 @@
             const savedArchive = localStorage.getItem('italian_clinic_archive');
             const savedLab = localStorage.getItem('italian_clinic_lab');
             const savedFinance = localStorage.getItem('italian_clinic_finance');
-            const savedLoginStatus = localStorage.getItem('italian_clinic_logged_in');
 
             if (savedStats) stats = JSON.parse(savedStats);
             if (savedPatients) patientDataMap = JSON.parse(savedPatients);
             if (savedArchive) archivePatientsMap = JSON.parse(savedArchive);
             if (savedLab) labDataList = JSON.parse(savedLab);
             if (savedFinance) financeTransactions = JSON.parse(savedFinance);
-
-            if (savedLoginStatus === 'true') {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'block';
-                if(video) video.pause();
-                checkLabDeadlines(); 
-            }
 
             updateStatsDOM();
             rebuildCurrentVisitsTables();
@@ -1010,19 +1409,18 @@
             document.getElementById('sidebarOverlay').classList.toggle('show');
         }
 
-        /* حماية قسم الإدارة بكلمة مرور مشفرة */
-        function verifyAdminAccess() {
-            const entry = prompt("🔒 يرجى إدخال كلمة مرور الإدارة والماليات للدخول:");
-            if (entry === "$$ OMAR ELSIOFY") {
-                switchPage('admin');
-            } else if (entry !== null) {
-                alert("❌ كلمة المرور غير صحيحة! الدخول مرفوض.");
-            }
+        /* فتح/قفل القائمة الفرعية للإدارة والماليات */
+        function toggleAdminSubmenu() {
+            const submenu = document.getElementById('adminSubmenu');
+            const arrow = document.getElementById('adminArrow');
+            submenu.classList.toggle('open');
+            arrow.classList.toggle('rotated');
         }
 
         function switchPage(pageName) {
             document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active-page'));
             document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
+            document.querySelectorAll('.submenu li').forEach(li => li.classList.remove('active'));
 
             if (pageName === 'home') {
                 document.getElementById('page-home').classList.add('active-page');
@@ -1042,11 +1440,17 @@
                 document.getElementById('menu-lab').classList.add('active');
                 document.getElementById('pageMainTitle').innerText = "المركز الإيطالي للأسنان - المعامل والتركيبات";
                 rebuildLabTable();
-            } else if (pageName === 'admin') {
-                document.getElementById('page-admin').classList.add('active-page');
-                document.getElementById('menu-admin').classList.add('active');
-                document.getElementById('pageMainTitle').innerText = "المركز الإيطالي للأسنان - الإدارة والماليات العامة";
+            } else if (pageName === 'finance') {
+                document.getElementById('page-finance').classList.add('active-page');
+                document.getElementById('menu-finance').classList.add('active');
+                document.getElementById('pageMainTitle').innerText = "المركز الإيطالي للأسنان - الحسابات";
                 rebuildFinanceDOM();
+            } else if (pageName === 'management') {
+                document.getElementById('page-management').classList.add('active-page');
+                document.getElementById('menu-management').classList.add('active');
+                document.getElementById('pageMainTitle').innerText = "المركز الإيطالي للأسنان - الإدارة";
+                listenToAllSessions();
+                listenToUserRoles();
             }
             toggleSidebar();
         }
@@ -1295,7 +1699,7 @@
             checkTableEmptyState('labTableBody', 'noLabRow');
         }
 
-        /* --- الأكواد البرمجية المضافة لقسم الماليات الجديد --- */
+        /* --- الأكواد البرمجية الخاصة بقسم الحسابات --- */
         document.getElementById('financeForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const type = document.getElementById('finType').value;
@@ -1480,8 +1884,12 @@
 
         function logoutSystem() {
             saveDataToStorage(); 
-            localStorage.setItem('italian_clinic_logged_in', 'false'); 
-            location.reload(); 
+            if (currentSessionId) {
+                sessionsRef.child(currentSessionId).remove();
+                if (sessionListenerRef) sessionListenerRef.off();
+            }
+            sessionStorage.removeItem('italian_clinic_session_id');
+            firebase.auth().signOut();
         }
 
         function formatTime12Hour(timeString) {
@@ -1536,22 +1944,6 @@
         const today = new Date();
         const dateEl = document.getElementById('currentDate');
         if(dateEl) dateEl.innerText = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
-
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const user = document.getElementById('userInput').value;
-            const pass = document.getElementById('passInput').value;
-
-            if (user === "Italian dental center" && pass === "Italian 712554") {
-                localStorage.setItem('italian_clinic_logged_in', 'true'); 
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'block';
-                if(video) video.pause();
-                checkLabDeadlines(); 
-            } else {
-                alert("اسم المستخدم أو كلمة المرور غير صحيحة!");
-            }
-        });
 
         window.onload = loadSavedData;
     </script>
