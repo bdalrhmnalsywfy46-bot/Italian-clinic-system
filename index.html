@@ -382,7 +382,7 @@
             font-weight: bold;
             display: inline-block;
             transition: color 0.2s;
-            user-select: none; /* لمنع تحديد النص أثناء الضغط المطول */
+            user-select: none;
             -webkit-user-select: none;
         }
         .patient-name-click:hover {
@@ -642,7 +642,7 @@
                         <tr>
                             <th style="width: 20%;">الوقت المحدد</th>
                             <th style="width: 40%;">المريض</th>
-                            <th style="width: 20%;">الغرفة</th>
+                            <th style="width: 20%;">الغرفة / العيادة</th>
                             <th style="width: 20%;">الطبيب</th>
                         </tr>
                     </thead>
@@ -662,7 +662,7 @@
                         <tr>
                             <th style="width: 20%;">الوقت المحدد</th>
                             <th style="width: 40%;">المريض</th>
-                            <th style="width: 20%;">الغرفة</th>
+                            <th style="width: 20%;">الغرفة / العيادة</th>
                             <th style="width: 20%;">الطبيب</th>
                         </tr>
                     </thead>
@@ -701,6 +701,16 @@
                     </div>
 
                     <div class="custom-form-group">
+                        <label for="appointmentClinic">رقم أو اسم العيادة (الغرفة):</label>
+                        <input type="text" id="appointmentClinic" placeholder="مثال: عيادة 1، الغرفة الكبرى..." required>
+                    </div>
+
+                    <div class="custom-form-group">
+                        <label for="appointmentDoctor">اسم الطبيب المعالج:</label>
+                        <input type="text" id="appointmentDoctor" placeholder="أدخل اسم الطبيب" required>
+                    </div>
+
+                    <div class="custom-form-group">
                         <label for="appointmentCode">الكود (رقم):</label>
                         <input type="number" id="appointmentCode" placeholder="أدخل رقم الكود الخاص بالمريض" required>
                     </div>
@@ -727,8 +737,8 @@
                     <thead>
                         <tr>
                             <th style="width: 25%;">المريض الأساسي</th>
-                            <th style="width: 15%;">عدد المرات</th>
-                            <th style="width: 60%;">التفاصيل وجدول الزيارات والملاحظات السابقة</th>
+                            <th style="width: 10%;">عدد المرات</th>
+                            <th style="width: 65%;">التفاصيل وجدول الزيارات والملاحظات السابقة</th>
                         </tr>
                     </thead>
                     <tbody id="historyTableBody">
@@ -749,9 +759,8 @@
         let patientDataMap = {}; 
         let archivePatientsMap = {}; 
 
-        // متغيرات للتحكم بالضغط المطول
         let longPressTimer;
-        const longPressDuration = 1000; // ثانية واحدة
+        const longPressDuration = 1000; 
 
         function loadSavedData() {
             const savedStats = localStorage.getItem('italian_clinic_stats');
@@ -855,19 +864,16 @@
             rebuildCurrentVisitsTables();
         }
 
-        // دالة تفعيل الضغط المطول لتعديل وقت الزيارات المتأخرة
         function handleLongPressStart(rowId) {
             longPressTimer = setTimeout(function() {
                 const patient = patientDataMap[rowId];
                 if (!patient) return;
 
-                // إظهار نافذة لإدخال الوقت الجديد يدوياً بصيغة سهلة
                 const newTimeInput = prompt(`تعديل موعد المريض: ${patient.name}\nأدخل الوقت الجديد (مثال: 07:30 م أو 11:15 ص):`, patient.time);
                 
                 if (newTimeInput !== null && newTimeInput.trim() !== "") {
                     patient.time = newTimeInput.trim();
                     
-                    // تحديث الوقت داخل السجل الأرشيفي أيضاً
                     const uniqueKey = patient.code.trim();
                     if (archivePatientsMap[uniqueKey] && archivePatientsMap[uniqueKey].visits[rowId]) {
                         archivePatientsMap[uniqueKey].visits[rowId].time = newTimeInput.trim();
@@ -915,7 +921,6 @@
 
                 const timeColor = isLateTable ? 'style="color: #b91c1c;"' : '';
 
-                // هنا قمنا بإضافة أحداث الـ Long Press (ماوس وتاتش موبايل) فقط إذا كان المريض في جدول المتأخرات
                 const longPressEvents = isLateTable ? `
                     onmousedown="handleLongPressStart('${rowId}')" 
                     onmouseup="handleLongPressEnd()" 
@@ -942,8 +947,8 @@
                             <div onclick="changePatientStatus('${rowId}', 'lost')">⚠️ فقد</div>
                         </div>
                     </td>
-                    <td>Clinic 1</td>
-                    <td>دكتور العيادة</td>
+                    <td>${patient.clinic || 'غير محدد'}</td>
+                    <td>${patient.doctor || 'غير محدد'}</td>
                 `;
 
                 targetTbody.appendChild(newRow);
@@ -966,6 +971,8 @@
             archivePatientsMap[uniqueKey].visits[patient.id] = {
                 date: patient.date,
                 time: patient.time,
+                clinic: patient.clinic,
+                doctor: patient.doctor,
                 note: patient.note,
                 status: patient.status
             };
@@ -1001,6 +1008,8 @@
                         <tr>
                             <td>${v.date}</td>
                             <td>${v.time}</td>
+                            <td>${v.clinic || 'غير محدد'}</td>
+                            <td>${v.doctor || 'غير محدد'}</td>
                             <td><strong style="color: #16a34a;">${v.note}</strong></td>
                             <td>${statusText}</td>
                         </tr>
@@ -1027,9 +1036,11 @@
                             <thead>
                                 <tr>
                                     <th>التاريخ</th>
-                                    <th>الوقت المحدد</th>
+                                    <th>الوقت</th>
+                                    <th>العيادة</th>
+                                    <th>الطبيب</th>
                                     <th>الملاحظات / نوع العمل</th>
-                                    <th>حالة الموعد الحالية</th>
+                                    <th>الحالة</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -1109,6 +1120,8 @@
             const phone = document.getElementById('patientPhone').value;
             const rawDate = document.getElementById('appointmentDate').value; 
             const rawTime = document.getElementById('appointmentTime').value; 
+            const clinic = document.getElementById('appointmentClinic').value;
+            const doctor = document.getElementById('appointmentDoctor').value;
             const code = document.getElementById('appointmentCode').value;
             const note = document.getElementById('appointmentNote').value || "حشو فحص عام"; 
 
@@ -1127,13 +1140,15 @@
                 code: code,
                 note: note,
                 time: timeStr,
+                clinic: clinic,
+                doctor: doctor,
                 status: null
             };
 
             changePatientStatus(rowId, 'waiting');
 
             document.getElementById('appointmentForm').reset();
-            alert('تم حجز الموعد بنجاح بالساعة المحددة وحفظه تلقائياً في السجل التاريخي!');
+            alert('تم حجز الموعد بنجاح وتعيين الطبيب والعيادة وحفظهم تلقائياً!');
             switchPage('home');
         });
 
