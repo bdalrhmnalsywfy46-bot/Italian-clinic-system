@@ -382,6 +382,8 @@
             font-weight: bold;
             display: inline-block;
             transition: color 0.2s;
+            user-select: none; /* لمنع تحديد النص أثناء الضغط المطول */
+            -webkit-user-select: none;
         }
         .patient-name-click:hover {
             color: #0284c7;
@@ -553,6 +555,7 @@
 </head>
 <body>
 
+    <!-- الواجهة الأولى: تسجيل الدخول بالفيديو والأصوات -->
     <div id="loginScreen">
         <video class="video-bg" id="bgVideo" autoplay playsinline muted loop>
             <source src="intro.mp4" type="video/mp4">
@@ -586,9 +589,11 @@
         </div>
     </div>
 
+    <!-- الواجهة الثانية: لوحة التحكم الديناميكية الشاملة -->
     <div id="dashboard">
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
+        <!-- القائمة الجانبية -->
         <div class="sidebar" id="sidebar">
             <ul class="sidebar-menu">
                 <li id="menu-home" class="active" onclick="switchPage('home')">الرئيسية</li>
@@ -608,6 +613,7 @@
             <div class="dash-title" id="pageMainTitle">المركز الإيطالي للأسنان - الرئيسية</div>
         </div>
 
+        <!-- ================= صفحة الرئيسية (المواعيد الحالية) ================= -->
         <div id="page-home" class="page-section active-page">
             <div class="stats-card">
                 <div class="stats-left">
@@ -628,8 +634,9 @@
                 <div class="live-clock" id="liveClock">--:-- --</div>
             </div>
 
+            <!-- جدول الزيارات المتأخرة (البرتقالي) -->
             <div class="table-container" id="lateTableContainer">
-                <div class="table-header bg-orange">الزيارات المتأخرة</div>
+                <div class="table-header bg-orange">الزيارات المتأخرة (اضغط ضغطة مطولة لتعديل الوقت)</div>
                 <table>
                     <thead>
                         <tr>
@@ -647,6 +654,7 @@
                 </table>
             </div>
 
+            <!-- جدول الزيارات القادمة (الأزرق) -->
             <div class="table-container" id="upcomingTableContainer">
                 <div class="table-header bg-blue">الزيارات القادمة</div>
                 <table>
@@ -667,6 +675,7 @@
             </div>
         </div>
 
+        <!-- ================= صفحة إضافة موعد جديد ================= -->
         <div id="page-add" class="page-section">
             <div class="form-card">
                 <h3>حجز موعد عيادة جديد</h3>
@@ -706,6 +715,7 @@
             </div>
         </div>
 
+        <!-- ================= صفحة سجل المرضى المطور والبحث التفاعلي الشامل ================= -->
         <div id="page-history" class="page-section">
             <div class="search-wrapper">
                 <input type="text" id="historySearchInput" class="search-input" oninput="filterHistory()" placeholder="🔍 ابحث عن مريض بالاسم، رقم الهاتف، أو الكود الفردي...">
@@ -738,6 +748,10 @@
         let stats = { waiting: 0, unconfirmed: 0, confirmed: 0, canceled: 0, lost: 0 };
         let patientDataMap = {}; 
         let archivePatientsMap = {}; 
+
+        // متغيرات للتحكم بالضغط المطول
+        let longPressTimer;
+        const longPressDuration = 1000; // ثانية واحدة
 
         function loadSavedData() {
             const savedStats = localStorage.getItem('italian_clinic_stats');
@@ -841,6 +855,35 @@
             rebuildCurrentVisitsTables();
         }
 
+        // دالة تفعيل الضغط المطول لتعديل وقت الزيارات المتأخرة
+        function handleLongPressStart(rowId) {
+            longPressTimer = setTimeout(function() {
+                const patient = patientDataMap[rowId];
+                if (!patient) return;
+
+                // إظهار نافذة لإدخال الوقت الجديد يدوياً بصيغة سهلة
+                const newTimeInput = prompt(`تعديل موعد المريض: ${patient.name}\nأدخل الوقت الجديد (مثال: 07:30 م أو 11:15 ص):`, patient.time);
+                
+                if (newTimeInput !== null && newTimeInput.trim() !== "") {
+                    patient.time = newTimeInput.trim();
+                    
+                    // تحديث الوقت داخل السجل الأرشيفي أيضاً
+                    const uniqueKey = patient.code.trim();
+                    if (archivePatientsMap[uniqueKey] && archivePatientsMap[uniqueKey].visits[rowId]) {
+                        archivePatientsMap[uniqueKey].visits[rowId].time = newTimeInput.trim();
+                    }
+                    
+                    saveDataToStorage();
+                    rebuildCurrentVisitsTables();
+                    alert("تم تحديث وقت الموعد بنجاح!");
+                }
+            }, longPressDuration);
+        }
+
+        function handleLongPressEnd() {
+            clearTimeout(longPressTimer);
+        }
+
         function rebuildCurrentVisitsTables() {
             const upcomingBody = document.getElementById('upcomingVisitsBody');
             const lateBody = document.getElementById('lateVisitsBody');
@@ -860,20 +903,31 @@
                 if (newStatus === 'lost') badgeHTML = `<span class="status-badge badge-lost">فقد</span>`;
 
                 let targetTbodyId = 'upcomingVisitsBody';
+                let isLateTable = false;
                 if (newStatus === 'lost' || newStatus === 'canceled') {
                     targetTbodyId = 'lateVisitsBody';
+                    isLateTable = true;
                 }
 
                 const targetTbody = document.getElementById(targetTbodyId);
                 const newRow = document.createElement('tr');
                 newRow.setAttribute('id', rowId);
 
-                const timeColor = (targetTbodyId === 'lateVisitsBody') ? 'style="color: #b91c1c;"' : '';
+                const timeColor = isLateTable ? 'style="color: #b91c1c;"' : '';
+
+                // هنا قمنا بإضافة أحداث الـ Long Press (ماوس وتاتش موبايل) فقط إذا كان المريض في جدول المتأخرات
+                const longPressEvents = isLateTable ? `
+                    onmousedown="handleLongPressStart('${rowId}')" 
+                    onmouseup="handleLongPressEnd()" 
+                    onmouseleave="handleLongPressEnd()"
+                    ontouchstart="handleLongPressStart('${rowId}')" 
+                    ontouchend="handleLongPressEnd()"
+                ` : '';
 
                 newRow.innerHTML = `
                     <td ${timeColor}>${patient.time}</td>
                     <td style="position: static;">
-                        <div class="patient-name-click" onclick="toggleDropdown(event, '${rowId}')">${patient.name}</div>
+                        <div class="patient-name-click" onclick="toggleDropdown(event, '${rowId}')" ${longPressEvents}>${patient.name}</div>
                         <small style="color:#64748b; font-size:12px; display:block; margin-top:2px;">كود: ${patient.code} | ت: ${patient.phone}</small>
                         <div style="margin-top: 5px;">
                             ${badgeHTML}
@@ -1038,7 +1092,6 @@
             location.reload(); 
         }
 
-        // تحويل الساعة من نظام 24 ساعة المخرج من الـ Input إلى نظام 12 ساعة (ص/م) المألوف للعيادة
         function formatTime12Hour(timeString) {
             if (!timeString) return '--:--';
             const [sHours, sMinutes] = timeString.split(':');
@@ -1055,14 +1108,13 @@
             const name = document.getElementById('patientName').value;
             const phone = document.getElementById('patientPhone').value;
             const rawDate = document.getElementById('appointmentDate').value; 
-            const rawTime = document.getElementById('appointmentTime').value; // جلب قيمة حقل الساعة الجديد
+            const rawTime = document.getElementById('appointmentTime').value; 
             const code = document.getElementById('appointmentCode').value;
             const note = document.getElementById('appointmentNote').value || "حشو فحص عام"; 
 
             const dateObj = new Date(rawDate);
             const formattedDate = `${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth() + 1).padStart(2, '0')}/${dateObj.getFullYear()}`;
             
-            // تحويل الوقت المدخل يدوياً بصيغة مريحة
             const timeStr = formatTime12Hour(rawTime);
 
             const rowId = 'row_' + Date.now();
