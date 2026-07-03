@@ -235,15 +235,12 @@
 </head>
 <body>
 
-    <!-- ================= شاشة الدخول ================= -->
     <div class="login-screen" id="loginScreen">
-        <!-- زر تشغيل الصوت في حال كتمه المتصفح تلقائياً -->
         <button class="audio-btn" onclick="toggleMute(event)">🔊 كتم الصوت</button>
         <video class="video-bg" id="bgVideo" autoplay loop playsinline>
             <source src="https://assets.mixkit.co/videos/preview/mixkit-dentist-checking-the-teeth-of-a-patient-42352-large.mp4" type="video/mp4">
         </video>
 
-        <!-- كارت الفورم الموحد (دخول) -->
         <div class="login-card" id="unifiedLoginForm" style="display: block;">
             <h2 style="margin-bottom: 8px; color: #1e1b4b; font-size: 22px;">المركز الإيطالي للأسنان</h2>
             <p style="color: #475569; font-size: 13px; margin-bottom: 25px;">تسجيل الدخول إلى نظام العيادة الذكي</p>
@@ -263,7 +260,6 @@
             </p>
         </div>
 
-        <!-- كارت الفورم الموحد (تسجيل موظف جديد بانتظار الموافقة) -->
         <div class="login-card" id="employeeRegisterForm" style="display: none;">
             <h2 style="margin-bottom: 8px; color: #1e1b4b; font-size: 20px;">طلب انضمام طاقم العمل</h2>
             <p style="color: #475569; font-size: 13px; margin-bottom: 20px;">سيتم مراجعة طلبك فوراً من قِبل الإدارة</p>
@@ -293,10 +289,8 @@
     </div>
 
 
-    <!-- ================= لوحة تحكم النظام الأساسية ================= -->
     <div class="dashboard-layout" id="dashboard">
         
-        <!-- الهيدر العلوي المستقر -->
         <header class="main-header">
             <div style="display: flex; align-items: center; gap: 15px;">
                 <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
@@ -308,7 +302,6 @@
             </div>
         </header>
 
-        <!-- القائمة الجانبية المنسدلة -->
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
         <aside class="sidebar" id="sidebar">
             <div class="user-profile-box">
@@ -327,12 +320,9 @@
             </ul>
         </aside>
 
-        <!-- المحتوى والمشاهد الأساسية للسيستم -->
         <main class="main-content">
 
-            <!-- 1. واجهة الصفحة الرئيسية (الزيارات اليومية) -->
             <div id="page-home" class="page-section active-page">
-                <!-- شريط الإحصائيات العلوي السريع -->
                 <div class="stats-grid">
                     <div class="stat-card card-w"><h3>⏳ منتظر</h3><div class="num" id="count-waiting">0</div></div>
                     <div class="stat-card card-u"><h3>⚪ غير مؤكد</h3><div class="num" id="count-unconfirmed">0</div></div>
@@ -376,10 +366,9 @@
                 </div>
             </div>
 
-            <!-- 2. واجهة إضافة موعد جديد -->
             <div id="page-add" class="page-section">
                 <div class="form-card">
-                    <h3 style="margin-bottom: 20px; text-align: center; color: var(--primary);">حجز وتقييد موعد زيارة مريض</h3>
+                    <h3 style="margin-bottom: 20px; text-align: center; color: var(--primary);">حجز بتقييد موعد زيارة مريض</h3>
                     <form id="appointmentForm">
                         <div class="form-grid">
                             <div class="form-group">
@@ -430,7 +419,6 @@
                 </div>
             </div>
 
-            <!-- 3. واجهة المعامل والتركيبات الخارجية -->
             <div id="page-lab" class="page-section">
                 <div class="form-card" style="max-width: 100%; margin-bottom: 25px;">
                     <h3 style="margin-bottom: 15px; color: var(--accent);">تسجيل طلب إرسال واستلام معمل تركيبات</h3>
@@ -485,7 +473,6 @@
                 </div>
             </div>
 
-            <!-- 4. واجهة الأقسام والتخصصات -->
             <div id="page-categories" class="page-section">
                 <div class="form-card" style="max-width: 100%; margin-bottom: 25px;">
                     <h3 style="margin-bottom: 15px; color: #4338ca;">إضافة تخصص أو قسم عيادة جديد</h3>
@@ -520,7 +507,6 @@
                 </div>
             </div>
 
-            <!-- 5. سجل الأرشيف التاريخي الشامل للبحث -->
             <div id="page-history" class="page-section">
                 <div class="search-box">
                     <span>🔍</span>
@@ -544,7 +530,6 @@
                 </div>
             </div>
 
-            <!-- 6. واجهة المخزن واللوازم والأدوات (مخصص للأدمن) -->
             <div id="page-inventory" class="page-section">
                 <div class="form-card" style="max-width: 100%; margin-bottom: 25px;">
                     <h3 style="margin-bottom: 15px; color: #b45309;">إضافة وتوريد مستلزمات طبية للمخزن</h3>
@@ -586,7 +571,6 @@
                 </div>
             </div>
 
-            <!-- 7. واجهة معالجة طلبات توظيف الموظفين المعلقة (مخصص للأدمن) -->
             <div id="page-requests" class="page-section">
                 <h3 class="section-title" style="color: var(--danger);">👥 طلبات الانضمام المعلقة من طاقم الاستقبال الجديد</h3>
                 <div class="table-container">
@@ -606,9 +590,7 @@
                 </div>
             </div>
 
-            <!-- 8. واجهة الإدارة والتقارير والماليات والمنصرفات (مخصص للأدمن) -->
             <div id="page-admin" class="page-section">
-                <!-- شريط كروت التقرير المالي التراكمي التلقائي اليومي -->
                 <div class="admin-cards-grid">
                     <div class="fin-card" style="border-right: 5px solid var(--success);">
                         <h4>📈 إجمالي الإيرادات المسجلة اليوم</h4>
@@ -669,7 +651,6 @@
         </main>
     </div>
 
-    <!-- ================= الـ JavaScript المنظم والمعدل بالكامل لتلافي الكاش ================= -->
     <script>
         const video = document.getElementById('bgVideo');
 
