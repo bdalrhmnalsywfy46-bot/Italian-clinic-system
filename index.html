@@ -9,23 +9,9 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
-        :root {
-            --primary-color: #5a0614;
-            --admin-color: #dc3545;
-            --secretary-color: #007bff;
-        }
-
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-            background-color: #000;
-        }
-
-        /* الفيديو والخلفية القديمة بالملي */
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: sans-serif; }
+        
+        /* الفيديو الخلفية */
         .video-background {
             position: fixed;
             right: 0;
@@ -34,492 +20,80 @@
             min-height: 100%;
             width: auto;
             height: auto;
-            z-index: -100;
-            background-size: cover;
+            z-index: -1;
             object-fit: cover;
         }
 
-        .audio-control {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1000;
-            background: rgba(0, 0, 0, 0.6);
-            color: white;
-            border: 1px solid #ffffff40;
-            padding: 8px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.15);
-            z-index: -99;
-        }
-
-        /* الكارت الأبيض القديم والتنسيق الأصلي للشاشة */
+        /* الكارت الأبيض (الواجهة القديمة) */
         .login-wrapper {
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            width: 100%;
-            box-sizing: border-box;
-            padding: 20px;
+            height: 100vh;
         }
 
         .login-card {
             background: rgba(255, 255, 255, 0.95);
-            padding: 40px 30px;
-            border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            width: 100%;
-            max-width: 420px;
-            text-align: center;
-            box-sizing: border-box;
-        }
-
-        .main-title {
-            font-size: 32px;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin: 0;
-        }
-
-        .sub-title {
-            font-size: 20px;
-            color: #444444;
-            margin-top: 5px;
-            margin-bottom: 30px;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 14px 20px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 12px;
-            box-sizing: border-box;
-            font-size: 16px;
-            text-align: right;
-            background: #ffffff;
-            color: #000;
-        }
-
-        .btn-submit {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 18px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-top: 10px;
-            transition: background 0.3s;
-        }
-
-        .btn-submit:hover {
-            background-color: #3d040d;
-        }
-
-        .location-footer {
-            margin-top: 30px;
-            font-size: 14px;
-            color: #333333;
-            line-height: 1.6;
-            font-weight: 500;
-        }
-
-        /* لوحة التحكم والجدول الداخلي */
-        .dashboard-container {
-            display: none;
-            background: #ffffff;
-            width: 95%;
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            box-sizing: border-box;
-            color: #000;
-        }
-
-        .header-dash {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-        }
-
-        .user-badge {
-            padding: 6px 16px;
+            padding: 40px;
             border-radius: 20px;
-            font-weight: bold;
-            color: white;
-            font-size: 14px;
-        }
-        .role-admin { background-color: var(--admin-color); }
-        .role-secretary { background-color: var(--secretary-color); }
-
-        .main-layout {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 25px;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        @media (max-width: 768px) {
-            .main-layout { grid-template-columns: 1fr; }
+        .input-field { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; text-align: right; }
+        
+        .btn-submit { 
+            width: 100%; 
+            padding: 12px; 
+            background-color: #7a0014; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
         }
 
-        .panel-box {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid #e3e6f0;
-        }
-
-        .panel-box h3 { margin-top: 0; color: #333; }
-
-        .panel-box input, .panel-box select {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 12px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-sizing: border-box;
-        }
-
-        .table-box {
-            background: white;
-            border: 1px solid #e3e6f0;
-            border-radius: 12px;
-            padding: 20px;
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: right;
-        }
-
-        table th, table td {
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-        }
-
-        table th { background-color: #f1f1f1; color: #333; }
-
-        .admin-security-box {
-            background: #fff3f3;
-            border: 1px solid #f5c6cb;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
+        .location-text { margin-top: 20px; font-size: 14px; color: #555; }
     </style>
 </head>
 <body>
 
-    <button class="audio-control" onclick="toggleAudio()">
-        <span id="audioIcon">🔇</span> <span id="audioText">تشغيل الصوت</span>
-    </button>
-
-    <video autoplay loop muted playsinline id="bgVideo" class="video-background">
+    <video autoplay loop muted playsinline class="video-background">
         <source src="intro.mp4" type="video/mp4">
-        Your browser does not support the video tag.
     </video>
-    <div class="overlay" id="videoOverlay"></div>
 
-    <div id="loginScreen" class="login-wrapper">
+    <div class="login-wrapper">
         <div class="login-card">
-            <h1 class="main-title">المركز الإيطالي</h1>
-            <h2 class="sub-title">لتجميل وزراعة الأسنان</h2>
-            
-            <input type="email" id="loginEmail" class="input-field" placeholder="البريد الإلكتروني">
-            <input type="password" id="loginPassword" class="input-field" placeholder="كلمة المرور">
-            
-            <button class="btn-submit" onclick="handleLogin()">دخول للسيستم</button>
-
-            <div class="location-footer">
-                7 القضاة - شارع الطاقة - النادي الأهلي<br>
-                مدينة نصر - القاهرة
-            </div>
-        </div>
-    </div>
-
-    <div id="dashboardScreen" class="dashboard-container">
-        <div class="header-dash">
-            <h2>لوحة إدارة العيادة والمواعيد الرئيسية</h2>
-            <div>
-                <span id="userBadge" class="user-badge"></span>
-                <button onclick="handleLogout()" style="margin-right:15px; padding:6px 15px; cursor:pointer; background:#555; color:white; border:none; border-radius:6px; font-weight:bold;">خروج</button>
-            </div>
-        </div>
-
-        <div class="main-layout">
-            <div class="panel-box">
-                <h3>🗓️ تسجيل حجز مريض جديد</h3>
-                <input type="text" id="patientName" placeholder="اسم المريض بالكامل">
-                <input type="tel" id="patientPhone" placeholder="رقم الهاتف">
-                <input type="text" id="patientCase" placeholder="الحالة الطبية والتشخيص">
-                <input type="datetime-local" id="appointmentTime">
-                <button class="btn-submit" style="background-color: #28a745; margin-top:0;" onclick="saveAppointment()">حفظ الحجز بالمنظومة 💾</button>
-                
-                <div id="adminOnlySection" style="display: none;" class="admin-security-box">
-                    <h4 style="margin-top:0; color: var(--admin-color);">🔐 إدارة وتفعيل صلاحيات الحسابات الجديدة</h4>
-                    <p style="font-size:13px; color:#555;">أدخل الـ UID الخاص بالحساب لتفعيله وتحديد وظيفته بالسيستم:</p>
-                    <input type="text" id="roleUid" placeholder="الـ UID الخاص بالمستخدم">
-                    <input type="text" id="roleName" placeholder="اسم الموظف">
-                    <select id="roleSelect">
-                        <option value="reception">سكرتارية / استقبال (🔵)</option>
-                        <option value="admin">مدير / أدمن (🔴)</option>
-                    </select>
-                    <button onclick="saveUserRole()" style="background: var(--admin-color); color:white; border:none; padding:10px; width:100%; border-radius:6px; cursor:pointer; font-weight:bold;">تفعيل الحساب والـ Role</button>
-                </div>
-            </div>
-
-            <div class="table-box">
-                <h3>📂 المواعيد الحالية المسجلة بالعيادة</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>اسم المريض</th>
-                            <th>رقم الهاتف</th>
-                            <th>التشخيص / الحالة</th>
-                            <th>الموعد والتاريخ</th>
-                            <th>بواسطة</th>
-                        </tr>
-                    </thead>
-                    <tbody id="appointmentsTableBody">
-                    </tbody>
-                </table>
-            </div>
+            <h1>المركز الإيطالي</h1>
+            <p>لتجميل وزراعة الأسنان</p>
+            <input type="email" id="email" class="input-field" placeholder="البريد الإلكتروني">
+            <input type="password" id="password" class="input-field" placeholder="كلمة المرور">
+            <button class="btn-submit" onclick="login()">دخول</button>
+            <div class="location-text">7 القضاة - شارع الطاقة - النادي الأهلي<br>مدينة نصر - القاهرة</div>
         </div>
     </div>
 
     <script>
-        // 🚨 حط الـ Config الحقيقي الخاص بمشروعك هنا عشان يشتغل فوراً ويربط
+        // إعدادات Firebase (ضع بياناتك هنا)
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
             databaseURL: "YOUR_DATABASE_URL",
             projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "YOUR_ID",
             appId: "YOUR_APP_ID"
         };
-        
-        // فحص مبدئي لبيانات التهيئة
-        if (firebaseConfig.apiKey === "YOUR_API_KEY") {
-            console.error("Firebase API Key is default. Please replace it.");
-        }
+        firebase.initializeApp(firebaseConfig);
 
-        try {
-            firebase.initializeApp(firebaseConfig);
-        } catch (e) {
-            console.error("Firebase Initialization Error:", e);
-        }
-        
-        const database = firebase.database();
-        const auth = firebase.auth();
-
-        let currentUserUid = "";
-        let currentUserRole = "";
-        let cachedUserName = "";
-
-        // دالة التحكم في الصوت القديمة
-        function toggleAudio() {
-            const video = document.getElementById('bgVideo');
-            const icon = document.getElementById('audioIcon');
-            const text = document.getElementById('audioText');
-            
-            if (video.muted) {
-                video.muted = false;
-                icon.innerText = "🔊";
-                text.innerText = "كتم الصوت";
-                
-                video.onended = function() {
-                    video.muted = true;
-                    icon.innerText = "🔇";
-                    text.innerText = "تشغيل الصوت";
-                    video.onended = null; 
-                };
-            } else {
-                video.muted = true;
-                icon.innerText = "🔇";
-                text.innerText = "تشغيل الصوت";
-            }
-        }
-
-        // كود معالجة تسجيل الدخول الآمن والربط
-        function handleLogin() {
-            const email = document.getElementById('loginEmail').value.trim();
-            const pass = document.getElementById('loginPassword').value.trim();
-
-            if(!email || !pass) { 
-                alert("يرجى إدخال البريد الإلكتروني وكلمة المرور!"); 
-                return; 
-            }
-
-            if (firebaseConfig.apiKey === "YOUR_API_KEY") {
-                alert("🚨 تنبيه: يجب وضع كود الـ Firebase Config الخاص بك في ملف الكود لكي يعمل السيستم بنجاح!");
-                return;
-            }
-
-            auth.signInWithEmailAndPassword(email, pass)
-            .then((userCredential) => { 
-                checkUserRoleAndEnter(userCredential.user); 
-            })
-            .catch((error) => { 
-                alert("خطأ في بيانات الدخول: " + error.message); 
-            });
-        }
-
-        // فحص صلاحيات المستخدم عند تسجيل الدخول
-        function checkUserRoleAndEnter(user) {
-            currentUserUid = user.uid;
-
-            database.ref('userRoles').child(user.uid).once('value').then((snapshot) => {
-                const data = snapshot.val();
-
-                if (data && data.role) {
-                    currentUserRole = data.role;
-                    cachedUserName = data.name || user.email;
-                    
-                    // إخفاء عناصر شاشة الدخول والخلفية لفتح لوحة الإدارة
-                    document.getElementById('loginScreen').style.display = 'none';
-                    document.getElementById('bgVideo').style.display = 'none';
-                    document.getElementById('videoOverlay').style.display = 'none';
-                    document.querySelector('.audio-control').style.display = 'none';
-                    document.getElementById('dashboardScreen').style.display = 'block';
-                    
-                    applyRoleUI(cachedUserName);
-                    loadAppointments(); 
-
-                    if(currentUserRole === 'admin') { 
-                        listenToActivationRequests(); 
-                    }
-                } else {
-                    // حساب استقبال جديد -> يرفع طلب لايف للأدمن ويخرج
-                    database.ref('activationRequests').child(user.uid).set({
-                        uid: user.uid,
-                        email: user.email,
-                        requestTime: new Date().toLocaleString('ar-EG'),
-                        status: 'pending'
-                    }).then(() => {
-                        alert('⏳ هذا أول تسجيل دخول لك. تم إرسال طلب تفعيل فوري للدكتور (الأدمن).. يرجى انتظاره للموافقة وتفعيل صلاحية حسابك.');
-                        auth.signOut();
-                    });
-                }
-            });
-        }
-
-        function applyRoleUI(name) {
-            const badge = document.getElementById('userBadge');
-            const adminSection = document.getElementById('adminOnlySection');
-            
-            if (currentUserRole === "admin") {
-                badge.innerText = "🔴 دكتور (Admin): " + name;
-                badge.className = "user-badge role-admin";
-                adminSection.style.display = "block";
-            } else {
-                badge.innerText = "🔵 سكرتارية: " + name;
-                badge.className = "user-badge role-secretary";
-                adminSection.style.display = "none";
-            }
-        }
-
-        // مراقبة طلبات التفعيل لايف (شغل الأدمن)
-        function listenToActivationRequests() {
-            database.ref('activationRequests').on('child_added', (snapshot) => {
-                const request = snapshot.val();
-                if (request && request.status === 'pending') {
-                    const approve = confirm(`🚨 إشعار أمان: حساب موظف جديد يحاول تسجيل الدخول!\n\nالبريد: ${request.email}\n\nهل تريد جلب بياناته لتفعيل صلاحياته الآن؟`);
-                    if (approve) {
-                        document.getElementById('roleUid').value = request.uid;
-                        document.getElementById('roleName').value = "موظف استقبال جديد";
-                        database.ref('activationRequests').child(request.uid).update({ status: 'reviewed' });
-                    }
-                }
-            });
-        }
-
-        // تفعيل وحفظ الرول في قاعدة البيانات
-        function saveUserRole() {
-            const uid = document.getElementById('roleUid').value.trim();
-            const name = document.getElementById('roleName').value.trim();
-            const role = document.getElementById('roleSelect').value;
-
-            if(!uid || !name) { alert("يرجى إدخال البيانات كاملة!"); return; }
-
-            database.ref('userRoles').child(uid).set({ name: name, role: role }).then(() => {
-                alert("✅ تم تفعيل حساب الموظف بنجاح وتأمين صلاحياته بالسيستم!");
-                document.getElementById('roleUid').value = "";
-                document.getElementById('roleName').value = "";
-            });
-        }
-
-        // حفظ حجز جديد بالعيادة
-        function saveAppointment() {
-            const name = document.getElementById('patientName').value.trim();
-            const phone = document.getElementById('patientPhone').value.trim();
-            const caseText = document.getElementById('patientCase').value.trim();
-            const time = document.getElementById('appointmentTime').value;
-
-            if(!name || !phone || !time) { alert("يرجى ملء كافة البيانات الأساسية للحجز!"); return; }
-
-            database.ref('appointments').push({
-                patientName: name,
-                patientPhone: phone,
-                patientCase: caseText || 'كشف عام',
-                appointmentTime: time,
-                createdBy: cachedUserName
-            }).then(() => {
-                alert("✅ تم حفظ الحجز بنجاح وتأمين البيانات!");
-                document.getElementById('patientName').value = "";
-                document.getElementById('patientPhone').value = "";
-                document.getElementById('patientCase').value = "";
-                document.getElementById('appointmentTime').value = "";
-            });
-        }
-
-        // جلب المواعيد واستعراضها لايف بالجدول
-        function loadAppointments() {
-            database.ref('appointments').on('value', (snapshot) => {
-                const tbody = document.getElementById('appointmentsTableBody');
-                tbody.innerHTML = "";
-                snapshot.forEach((childSnapshot) => {
-                    const apt = childSnapshot.val();
-                    const row = `<tr>
-                        <td>${apt.patientName}</td>
-                        <td>${apt.patientPhone}</td>
-                        <td>${apt.patientCase}</td>
-                        <td>${apt.appointmentTime.replace('T', ' ')}</td>
-                        <td>${apt.createdBy}</td>
-                    </tr>`;
-                    tbody.innerHTML += row;
-                });
-            });
-        }
-
-        // تسجيل خروج آمن
-        function handleLogout() {
-            auth.signOut().then(() => { location.reload(); });
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            firebase.auth().signInWithEmailAndPassword(email, password)
+            .then(() => { window.location.href = "dashboard.html"; })
+            .catch((error) => { alert("خطأ في البيانات: " + error.message); });
         }
     </script>
 </body>
