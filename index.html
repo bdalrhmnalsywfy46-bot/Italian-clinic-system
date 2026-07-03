@@ -343,6 +343,7 @@
         .bg-orange { background: #f59e0b; }
         .bg-blue { background: #38bdf8; }
         .bg-purple { background: #6366f1; }
+        .bg-teal { background: #0d9488; }
 
         table {
             width: 100%;
@@ -390,7 +391,7 @@
             text-decoration: underline;
         }
 
-        .status-dropdown {
+        .status-dropdown, .lab-dropdown {
             display: none;
             position: absolute;
             background: #ffffff;
@@ -398,13 +399,13 @@
             border-radius: 8px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             z-index: 99999 !important;
-            width: 150px;
+            width: 160px;
             overflow: hidden;
         }
-        .status-dropdown.show-menu {
+        .status-dropdown.show-menu, .lab-dropdown.show-menu {
             display: block;
         }
-        .status-dropdown div {
+        .status-dropdown div, .lab-dropdown div {
             padding: 10px 12px;
             font-size: 14px;
             font-weight: bold;
@@ -413,7 +414,7 @@
             transition: background 0.2s;
             text-align: right;
         }
-        .status-dropdown div:hover {
+        .status-dropdown div:hover, .lab-dropdown div:hover {
             background: #f1f5f9;
             color: #0284c7;
         }
@@ -432,6 +433,10 @@
         .badge-canceled { background: #fee2e2; color: #b91c1c; }
         .badge-lost { background: #ffedd5; color: #ea580c; }
         
+        .badge-lab-making { background: #fef3c7; color: #d97706; }
+        .badge-lab-ready { background: #e0f2fe; color: #0369a1; }
+        .badge-lab-done { background: #dcfce7; color: #15803d; }
+
         .note-badge {
             display: inline-block; 
             margin-top: 5px; 
@@ -473,7 +478,7 @@
             color: #475569;
         }
 
-        .custom-form-group input {
+        .custom-form-group input, .custom-form-group select {
             width: 100%;
             padding: 12px;
             font-size: 15px;
@@ -484,10 +489,19 @@
             transition: 0.3s;
         }
 
-        .custom-form-group input:focus {
+        .custom-form-group input:focus, .custom-form-group select:focus {
             border-color: #0284c7;
             background-color: #ffffff;
             box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+        }
+
+        .form-row-2 {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row-2 .custom-form-group {
+            flex: 1;
         }
 
         .submit-appointment-btn {
@@ -599,7 +613,7 @@
                 <li id="menu-home" class="active" onclick="switchPage('home')">الرئيسية</li>
                 <li id="menu-add" onclick="switchPage('add')">إضافة موعد جديد</li>
                 <li id="menu-history" onclick="switchPage('history')">سجل المرضى</li>
-                <li>التقارير والإحصائيات</li>
+                <li id="menu-lab" onclick="switchPage('lab')">المعامل والتركيبات</li>
                 <li onclick="logoutSystem()" style="color: #b91c1c;">تسجيل الخروج</li>
             </ul>
         </div>
@@ -634,9 +648,9 @@
                 <div class="live-clock" id="liveClock">--:-- --</div>
             </div>
 
-            <!-- جدول الزيارات المتأخرة (البرتقالي) -->
+            <!-- جدول الزيارات المتأخرة -->
             <div class="table-container" id="lateTableContainer">
-                <div class="table-header bg-orange">الزيارات المتأخرة (اضغط ضغطة مطولة لتعديل الوقت)</div>
+                <div class="table-header bg-orange">الزيارات المتأخرة (اضغط ضغطة مطولة لتعديل الزيارة)</div>
                 <table>
                     <thead>
                         <tr>
@@ -654,7 +668,7 @@
                 </table>
             </div>
 
-            <!-- جدول الزيارات القادمة (الأزرق) -->
+            <!-- جدول الزيارات القادمة -->
             <div class="table-container" id="upcomingTableContainer">
                 <div class="table-header bg-blue">الزيارات القادمة</div>
                 <table>
@@ -696,13 +710,13 @@
                     </div>
 
                     <div class="custom-form-group">
-                        <label for="appointmentTime">ساعة الموعد (الوقت المحدد للحجز):</label>
+                        <label for="appointmentTime">ساعة الموعد:</label>
                         <input type="time" id="appointmentTime" required>
                     </div>
 
                     <div class="custom-form-group">
                         <label for="appointmentClinic">رقم أو اسم العيادة (الغرفة):</label>
-                        <input type="text" id="appointmentClinic" placeholder="مثال: عيادة 1، الغرفة الكبرى..." required>
+                        <input type="text" id="appointmentClinic" placeholder="عيادة 1..." required>
                     </div>
 
                     <div class="custom-form-group">
@@ -717,7 +731,7 @@
 
                     <div class="custom-form-group">
                         <label for="appointmentNote">نوع الزيارة / الملاحظات:</label>
-                        <input type="text" id="appointmentNote" placeholder="مثال: حشو عصب، خلع، زراعة، مقاس بروفة...">
+                        <input type="text" id="appointmentNote" placeholder="مثال: حشو عصب، زراعة...">
                     </div>
 
                     <button type="submit" class="submit-appointment-btn">حفظ وتأكيد الموعد</button>
@@ -725,10 +739,10 @@
             </div>
         </div>
 
-        <!-- ================= صفحة سجل المرضى المطور والبحث التفاعلي الشامل ================= -->
+        <!-- ================= صفحة سجل المرضى ================= -->
         <div id="page-history" class="page-section">
             <div class="search-wrapper">
-                <input type="text" id="historySearchInput" class="search-input" oninput="filterHistory()" placeholder="🔍 ابحث عن مريض بالاسم، رقم الهاتف، أو الكود الفردي...">
+                <input type="text" id="historySearchInput" class="search-input" oninput="filterHistory()" placeholder="🔍 ابحث عن مريض بالاسم، رقم الهاتف، أو الكود...">
             </div>
 
             <div class="table-container">
@@ -743,7 +757,69 @@
                     </thead>
                     <tbody id="historyTableBody">
                         <tr id="noHistoryRow">
-                            <td colspan="3" class="no-data">السجل فارغ حالياً، قم بإضافة مواعيد لعرض الأرشيف</td>
+                            <td colspan="3" class="no-data">السجل فارغ حالياً</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ================= صفحة المعامل والتركيبات المحدثة بالتواريخ ================= -->
+        <div id="page-lab" class="page-section">
+            <div class="form-card">
+                <h3>إرسال حالة جديدة للمعمل</h3>
+                <form id="labForm">
+                    <div class="custom-form-group">
+                        <label for="labPatientName">اسم المريض:</label>
+                        <input type="text" id="labPatientName" placeholder="أدخل اسم المريض" required>
+                    </div>
+                    <div class="custom-form-group">
+                        <label for="labName">اسم المعمل:</label>
+                        <input type="text" id="labName" placeholder="مثال: معمل الحرمين..." required>
+                    </div>
+                    <div class="custom-form-group">
+                        <label for="labWorkType">نوع التركيبة / الشغل المطلوبة:</label>
+                        <input type="text" id="labWorkType" placeholder="مثال: كراون زيركون..." required>
+                    </div>
+                    <div class="custom-form-group">
+                        <label for="labDoctor">الطبيب المسؤول:</label>
+                        <input type="text" id="labDoctor" placeholder="اسم الدكتور المشرف" required>
+                    </div>
+                    
+                    <!-- صف التواريخ الجديد للمعمل -->
+                    <div class="form-row-2">
+                        <div class="custom-form-group">
+                            <label for="labExitDate">تاريخ خروج الشغل (الإرسال):</label>
+                            <input type="date" id="labExitDate" required>
+                        </div>
+                        <div class="custom-form-group">
+                            <label for="labDeliveryDate">تاريخ الاستلام المتوقع:</label>
+                            <input type="date" id="labDeliveryDate" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="submit-appointment-btn" style="background: #0d9488;">إرسال وتسجيل للمعمل</button>
+                </form>
+            </div>
+
+            <br>
+
+            <div class="table-container">
+                <div class="table-header bg-teal">حالات المعمل والتركيبات الحالية</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 20%;">المريض</th>
+                            <th style="width: 15%;">المعمل</th>
+                            <th style="width: 25%;">نوع التركيبة والشغل</th>
+                            <th style="width: 13%;">تاريخ الخروج</th>
+                            <th style="width: 13%;">تاريخ الاستلام</th>
+                            <th style="width: 14%;">الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="labTableBody">
+                        <tr id="noLabRow">
+                            <td colspan="6" class="no-data">لا توجد طلبات معمل مسجلة حالياً</td>
                         </tr>
                     </tbody>
                 </table>
@@ -758,6 +834,7 @@
         let stats = { waiting: 0, unconfirmed: 0, confirmed: 0, canceled: 0, lost: 0 };
         let patientDataMap = {}; 
         let archivePatientsMap = {}; 
+        let labDataList = []; 
 
         let longPressTimer;
         const longPressDuration = 1000; 
@@ -766,26 +843,50 @@
             const savedStats = localStorage.getItem('italian_clinic_stats');
             const savedPatients = localStorage.getItem('italian_clinic_patients');
             const savedArchive = localStorage.getItem('italian_clinic_archive');
+            const savedLab = localStorage.getItem('italian_clinic_lab');
             const savedLoginStatus = localStorage.getItem('italian_clinic_logged_in');
 
             if (savedStats) stats = JSON.parse(savedStats);
             if (savedPatients) patientDataMap = JSON.parse(savedPatients);
             if (savedArchive) archivePatientsMap = JSON.parse(savedArchive);
+            if (savedLab) labDataList = JSON.parse(savedLab);
 
             if (savedLoginStatus === 'true') {
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
                 video.pause();
+                checkLabDeadlines(); // تشغيل فحص الإشعارات عند الدخول مباشرة
             }
 
             updateStatsDOM();
             rebuildCurrentVisitsTables();
+            rebuildLabTable();
+        }
+
+        // دالة فحص المواعيد لإطلاق الإشعارات للحالات المطلوبة
+        function checkLabDeadlines() {
+            const todayStr = new Date().toISOString().split('T')[0]; // صيغة YYYY-MM-DD المطابقة لقيم الـ Input
+            let alertsMessage = "";
+
+            labDataList.forEach(item => {
+                // لو الحالة لسه مخلصتش (تحت التصنيع أو جاهز بالمعمل) وتاريخ استلامها جه أو عدى
+                if (item.status !== 'done' && item.rawDeliveryDate <= todayStr) {
+                    alertsMessage += `⚠️ الحالة: ${item.patientName} - شغل: ${item.workType} (تاريخ استلامها: ${item.deliveryDate})\n`;
+                }
+            });
+
+            if (alertsMessage !== "") {
+                setTimeout(() => {
+                    alert(`🚨 تنبيه حالات المعمل المطلوبة اليوم:\n\n${alertsMessage}\nيرجى مراجعة المعمل واستلام الشغل المتبقي!`);
+                }, 800);
+            }
         }
 
         function saveDataToStorage() {
             localStorage.setItem('italian_clinic_stats', JSON.stringify(stats));
             localStorage.setItem('italian_clinic_patients', JSON.stringify(patientDataMap));
             localStorage.setItem('italian_clinic_archive', JSON.stringify(archivePatientsMap));
+            localStorage.setItem('italian_clinic_lab', JSON.stringify(labDataList));
         }
 
         function toggleMute(event) {
@@ -815,6 +916,11 @@
                 document.getElementById('menu-history').classList.add('active');
                 document.getElementById('pageMainTitle').innerText = "المركز الإيطالي للأسنان - سجل الأرشيف التاريخي";
                 renderHistoryDOM(); 
+            } else if (pageName === 'lab') {
+                document.getElementById('page-lab').classList.add('active-page');
+                document.getElementById('menu-lab').classList.add('active');
+                document.getElementById('pageMainTitle').innerText = "المركز الإيطالي للأسنان - المعامل والتركيبات";
+                rebuildLabTable();
             }
             toggleSidebar();
         }
@@ -829,11 +935,11 @@
 
         function toggleDropdown(e, rowId) {
             e.stopPropagation();
-            document.querySelectorAll('.status-dropdown').forEach(menu => {
-                if (menu.id !== `drop_${rowId}`) menu.classList.remove('show-menu');
+            document.querySelectorAll('.status-dropdown, .lab-dropdown').forEach(menu => {
+                if (menu.id !== `drop_${rowId}` && menu.id !== `labDrop_${rowId}`) menu.classList.remove('show-menu');
             });
 
-            const targetMenu = document.getElementById(`drop_${rowId}`);
+            const targetMenu = document.getElementById(`drop_${rowId}`) || document.getElementById(`labDrop_${rowId}`);
             if (targetMenu) {
                 targetMenu.classList.toggle('show-menu');
                 const rect = e.target.getBoundingClientRect();
@@ -845,7 +951,7 @@
         }
 
         document.addEventListener('click', function() {
-            document.querySelectorAll('.status-dropdown').forEach(menu => menu.classList.remove('show-menu'));
+            document.querySelectorAll('.status-dropdown, .lab-dropdown').forEach(menu => menu.classList.remove('show-menu'));
         });
 
         function changePatientStatus(rowId, newStatus) {
@@ -860,7 +966,6 @@
 
             pushToArchive(patient);
             saveDataToStorage(); 
-
             rebuildCurrentVisitsTables();
         }
 
@@ -869,20 +974,29 @@
                 const patient = patientDataMap[rowId];
                 if (!patient) return;
 
-                const newTimeInput = prompt(`تعديل موعد المريض: ${patient.name}\nأدخل الوقت الجديد (مثال: 07:30 م أو 11:15 ص):`, patient.time);
+                const newTimeInput = prompt(`تعديل بيانات المريض: ${patient.name}\n\n1) الوقت الجديد:`, patient.time);
+                if (newTimeInput === null) return;
+
+                const newClinicInput = prompt(`تعديل بيانات المريض: ${patient.name}\n\n2) العيادة الجديدة:`, patient.clinic || '');
+                if (newClinicInput === null) return;
+
+                const newDoctorInput = prompt(`تعديل بيانات المريض: ${patient.name}\n\n3) الطبيب الجديد:`, patient.doctor || '');
+                if (newDoctorInput === null) return;
+
+                if (newTimeInput.trim() !== "") patient.time = newTimeInput.trim();
+                if (newClinicInput.trim() !== "") patient.clinic = newClinicInput.trim();
+                if (newDoctorInput.trim() !== "") patient.doctor = newDoctorInput.trim();
                 
-                if (newTimeInput !== null && newTimeInput.trim() !== "") {
-                    patient.time = newTimeInput.trim();
-                    
-                    const uniqueKey = patient.code.trim();
-                    if (archivePatientsMap[uniqueKey] && archivePatientsMap[uniqueKey].visits[rowId]) {
-                        archivePatientsMap[uniqueKey].visits[rowId].time = newTimeInput.trim();
-                    }
-                    
-                    saveDataToStorage();
-                    rebuildCurrentVisitsTables();
-                    alert("تم تحديث وقت الموعد بنجاح!");
+                const uniqueKey = patient.code.trim();
+                if (archivePatientsMap[uniqueKey] && archivePatientsMap[uniqueKey].visits[rowId]) {
+                    archivePatientsMap[uniqueKey].visits[rowId].time = patient.time;
+                    archivePatientsMap[uniqueKey].visits[rowId].clinic = patient.clinic;
+                    archivePatientsMap[uniqueKey].visits[rowId].doctor = patient.doctor;
                 }
+                
+                saveDataToStorage();
+                rebuildCurrentVisitsTables();
+                alert("تم تحديث البيانات بنجاح!");
             }, longPressDuration);
         }
 
@@ -921,13 +1035,13 @@
 
                 const timeColor = isLateTable ? 'style="color: #b91c1c;"' : '';
 
-                const longPressEvents = isLateTable ? `
+                const longPressEvents = `
                     onmousedown="handleLongPressStart('${rowId}')" 
                     onmouseup="handleLongPressEnd()" 
                     onmouseleave="handleLongPressEnd()"
                     ontouchstart="handleLongPressStart('${rowId}')" 
                     ontouchend="handleLongPressEnd()"
-                ` : '';
+                `;
 
                 newRow.innerHTML = `
                     <td ${timeColor}>${patient.time}</td>
@@ -978,14 +1092,89 @@
             };
         }
 
+        // ================= حفظ ومعالجة قسم المعمل بالتواريخ الجديدة =================
+        document.getElementById('labForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const pName = document.getElementById('labPatientName').value;
+            const lName = document.getElementById('labName').value;
+            const wType = document.getElementById('labWorkType').value;
+            const doc = document.getElementById('labDoctor').value;
+            const exitDateRaw = document.getElementById('labExitDate').value;
+            const delDateRaw = document.getElementById('labDeliveryDate').value;
+
+            const eDateObj = new Date(exitDateRaw);
+            const formattedExitDate = `${String(eDateObj.getDate()).padStart(2, '0')}/${String(eDateObj.getMonth() + 1).padStart(2, '0')}/${eDateObj.getFullYear()}`;
+
+            const dDateObj = new Date(delDateRaw);
+            const formattedDelDate = `${String(dDateObj.getDate()).padStart(2, '0')}/${String(dDateObj.getMonth() + 1).padStart(2, '0')}/${dDateObj.getFullYear()}`;
+
+            const labId = 'lab_' + Date.now();
+            labDataList.push({
+                id: labId,
+                patientName: pName,
+                labName: lName,
+                workType: wType,
+                doctor: doc,
+                exitDate: formattedExitDate,
+                deliveryDate: formattedDelDate,
+                rawDeliveryDate: delDateRaw, // حفظ الصيغة الخام للمقارنة البرمجية بالإشعار
+                status: 'making'
+            });
+
+            saveDataToStorage();
+            rebuildLabTable();
+            document.getElementById('labForm').reset();
+            alert('تم تسجيل طلب المعمل وتواريخ الإرسال والاستلام بنجاح!');
+        });
+
+        function changeLabStatus(labId, newStatus) {
+            const item = labDataList.find(l => l.id === labId);
+            if (item) {
+                item.status = newStatus;
+                saveDataToStorage();
+                rebuildLabTable();
+            }
+        }
+
+        function rebuildLabTable() {
+            const tbody = document.getElementById('labTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = `<tr id="noLabRow"><td colspan="6" class="no-data">لا توجد طلبات معمل مسجلة حالياً</td></tr>`;
+
+            labDataList.forEach(item => {
+                let badgeHTML = '';
+                if (item.status === 'making') badgeHTML = `<span class="status-badge badge-lab-making">⏳ تحت التصنيع</span>`;
+                if (item.status === 'ready') badgeHTML = `<span class="status-badge badge-lab-ready">🔵 جاهز بالمعمل</span>`;
+                if (item.status === 'done') badgeHTML = `<span class="status-badge badge-lab-done">✅ تم الاستلام بالعيادة</span>`;
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${item.patientName}</strong></td>
+                    <td>${item.labName}</td>
+                    <td>${item.workType} <br><small style="color:#64748b;">د/ ${item.doctor}</small></td>
+                    <td>${item.exitDate}</td>
+                    <td style="color:#0d9488;"><strong>${item.deliveryDate}</strong></td>
+                    <td style="position: relative;">
+                        <div class="patient-name-click" onclick="toggleDropdown(event, '${item.id}')">${badgeHTML}</div>
+                        <div class="lab-dropdown" id="labDrop_${item.id}">
+                            <div onclick="changeLabStatus('${item.id}', 'making')">⏳ تحت التصنيع</div>
+                            <div onclick="changeLabStatus('${item.id}', 'ready')">🔵 جاهز بالمعمل</div>
+                            <div onclick="changeLabStatus('${item.id}', 'done')">✅ تم الاستلام</div>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            checkTableEmptyState('labTableBody', 'noLabRow');
+        }
+
         function renderHistoryDOM() {
             const tbody = document.getElementById('historyTableBody');
             tbody.innerHTML = ''; 
-
             const keys = Object.keys(archivePatientsMap);
 
             if (keys.length === 0) {
-                tbody.innerHTML = `<tr id="noHistoryRow"><td colspan="3" class="no-data">السجل فارغ حالياً، قم بإضافة مواعيد لعرض الأرشيف</td></tr>`;
+                tbody.innerHTML = `<tr id="noHistoryRow"><td colspan="3" class="no-data">السجل فارغ حالياً</td></tr>`;
                 return;
             }
 
@@ -1028,9 +1217,7 @@
                         <div style="font-size: 12px; color: #64748b; margin-top: 4px;">الكود: ${p.code}</div>
                         <div style="font-size: 12px; color: #64748b;">الهاتف: ${p.phone}</div>
                     </td>
-                    <td style="text-align: center; font-size: 18px; color: #6366f1; font-weight: bold;">
-                        ${visitCount}
-                    </td>
+                    <td style="text-align: center; font-size: 18px; color: #6366f1; font-weight: bold;">${visitCount}</td>
                     <td>
                         <table class="history-sub-table">
                             <thead>
@@ -1039,13 +1226,11 @@
                                     <th>الوقت</th>
                                     <th>العيادة</th>
                                     <th>الطبيب</th>
-                                    <th>الملاحظات / نوع العمل</th>
+                                    <th>الملاحظات</th>
                                     <th>الحالة</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                ${subTableRowsHTML}
-                            </tbody>
+                            <tbody>${subTableRowsHTML}</tbody>
                         </table>
                     </td>
                 `;
@@ -1077,7 +1262,7 @@
                     const tbody = document.getElementById('historyTableBody');
                     const emptyRow = document.createElement('tr');
                     emptyRow.id = 'noHistoryRow';
-                    emptyRow.innerHTML = `<td colspan="3" class="no-data">عذراً، لم يتم العثور على نتائج مطابقة لبحثك!</td>`;
+                    emptyRow.innerHTML = `<td colspan="3" class="no-data">عذراً، لم يتم العثور على نتائج!</td>`;
                     tbody.appendChild(emptyRow);
                 } else {
                     noRow.style.display = 'table-row';
@@ -1090,6 +1275,7 @@
         function checkTableEmptyState(tbodyId, noDataRowId) {
             const tbody = document.getElementById(tbodyId);
             const placeholder = document.getElementById(noDataRowId);
+            if (!tbody || !placeholder) return;
             let visibleRows = 0;
             for (let child of tbody.children) {
                 if (child.id !== noDataRowId) visibleRows++;
@@ -1115,7 +1301,6 @@
 
         document.getElementById('appointmentForm').addEventListener('submit', function(e) {
             e.preventDefault();
-
             const name = document.getElementById('patientName').value;
             const phone = document.getElementById('patientPhone').value;
             const rawDate = document.getElementById('appointmentDate').value; 
@@ -1127,28 +1312,16 @@
 
             const dateObj = new Date(rawDate);
             const formattedDate = `${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth() + 1).padStart(2, '0')}/${dateObj.getFullYear()}`;
-            
             const timeStr = formatTime12Hour(rawTime);
-
             const rowId = 'row_' + Date.now();
 
             patientDataMap[rowId] = {
-                id: rowId,
-                name: name,
-                phone: phone,
-                date: formattedDate,
-                code: code,
-                note: note,
-                time: timeStr,
-                clinic: clinic,
-                doctor: doctor,
-                status: null
+                id: rowId, name: name, phone: phone, date: formattedDate, code: code, note: note, time: timeStr, clinic: clinic, doctor: doctor, status: null
             };
 
             changePatientStatus(rowId, 'waiting');
-
             document.getElementById('appointmentForm').reset();
-            alert('تم حجز الموعد بنجاح وتعيين الطبيب والعيادة وحفظهم تلقائياً!');
+            alert('تم حجز الموعد بنجاح!');
             switchPage('home');
         });
 
@@ -1176,6 +1349,7 @@
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
                 video.pause();
+                checkLabDeadlines(); // تشغيل الفحص فور تسجيل الدخول الناجح
             } else {
                 alert("اسم المستخدم أو كلمة المرور غير صحيحة!");
             }
