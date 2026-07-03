@@ -261,7 +261,7 @@
             display: block;
         }
 
-        /* كارت الإحصائيات الأخضر */
+        /* كروت الإحصائيات */
         .stats-card {
             background: #4caf50;
             color: white;
@@ -304,6 +304,27 @@
             font-weight: bold;
         }
 
+        /* كروت المنيو المالي الصغير */
+        .finance-cards-grid {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .fin-card {
+            flex: 1;
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .fin-inc { background: #10b981; }
+        .fin-exp { background: #ef4444; }
+        .fin-net { background: #3b82f6; }
+        .fin-card h4 { font-size: 14px; margin-bottom: 5px; opacity: 0.9; }
+        .fin-card div { font-size: 20px; font-weight: 900; }
+
         .room-section {
             text-align: center;
             margin-bottom: 25px;
@@ -328,6 +349,8 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             margin-bottom: 25px;
             position: relative;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .table-header {
@@ -338,17 +361,21 @@
             text-align: right;
             border-top-left-radius: 12px;
             border-top-right-radius: 12px;
+            position: sticky;
+            left: 0;
         }
 
         .bg-orange { background: #f59e0b; }
         .bg-blue { background: #38bdf8; }
         .bg-purple { background: #6366f1; }
         .bg-teal { background: #0d9488; }
+        .bg-dark-blue { background: #1e293b; }
 
         table {
             width: 100%;
             border-collapse: collapse;
             text-align: right;
+            min-width: 750px;
         }
 
         th {
@@ -551,6 +578,7 @@
             margin-top: 8px;
             background: #f8fafc;
             border-radius: 6px;
+            min-width: 600px;
         }
 
         .history-sub-table th {
@@ -564,6 +592,17 @@
             padding: 8px;
             font-size: 13px;
             border-bottom: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 480px) {
+            .form-row-2 {
+                flex-direction: column;
+                gap: 0;
+            }
+            .finance-cards-grid {
+                flex-direction: column;
+                gap: 10px;
+            }
         }
     </style>
 </head>
@@ -607,13 +646,14 @@
     <div id="dashboard">
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-        <!-- القائمة الجانبية -->
+        <!-- القائمة الجانبية المحدثة بقسم الإدارة -->
         <div class="sidebar" id="sidebar">
             <ul class="sidebar-menu">
                 <li id="menu-home" class="active" onclick="switchPage('home')">الرئيسية</li>
                 <li id="menu-add" onclick="switchPage('add')">إضافة موعد جديد</li>
                 <li id="menu-history" onclick="switchPage('history')">سجل المرضى</li>
                 <li id="menu-lab" onclick="switchPage('lab')">المعامل والتركيبات</li>
+                <li id="menu-admin" onclick="verifyAdminAccess()">الإدارة والماليات 🔐</li>
                 <li onclick="logoutSystem()" style="color: #b91c1c;">تسجيل الخروج</li>
             </ul>
         </div>
@@ -764,7 +804,7 @@
             </div>
         </div>
 
-        <!-- ================= صفحة المعامل والتركيبات المحدثة بالتواريخ ================= -->
+        <!-- ================= صفحة المعامل والتركيبات ================= -->
         <div id="page-lab" class="page-section">
             <div class="form-card">
                 <h3>إرسال حالة جديدة للمعمل</h3>
@@ -786,7 +826,6 @@
                         <input type="text" id="labDoctor" placeholder="اسم الدكتور المشرف" required>
                     </div>
                     
-                    <!-- صف التواريخ الجديد للمعمل -->
                     <div class="form-row-2">
                         <div class="custom-form-group">
                             <label for="labExitDate">تاريخ خروج الشغل (الإرسال):</label>
@@ -826,6 +865,74 @@
             </div>
         </div>
 
+        <!-- ================= صفحة الإدارة والماليات (الجديدة المحمية) ================= -->
+        <div id="page-admin" class="page-section">
+            <!-- كروت الملخص المالي السريع -->
+            <div class="finance-cards-grid">
+                <div class="fin-card fin-inc">
+                    <h4>إجمالي الإيرادات</h4>
+                    <div id="total-income">0 EGP</div>
+                </div>
+                <div class="fin-card fin-exp">
+                    <h4>إجمالي المصروفات</h4>
+                    <div id="total-expenses">0 EGP</div>
+                </div>
+                <div class="fin-card fin-net">
+                    <h4>صافي الأرباح</h4>
+                    <div id="total-net">0 EGP</div>
+                </div>
+            </div>
+
+            <!-- نموذج إضافة عملية مالية -->
+            <div class="form-card">
+                <h3>تسجيل حركة مالية جديدة (حسابات المركز)</h3>
+                <form id="financeForm">
+                    <div class="form-row-2">
+                        <div class="custom-form-group">
+                            <label for="finType">نوع المعاملة:</label>
+                            <select id="finType" required>
+                                <option value="income">📈 إيرادات (مستلم من مريض / كشف / علاج)</option>
+                                <option value="expense">📉 مصروفات (خامات / معامل / فواتير / كهرباء)</option>
+                            </select>
+                        </div>
+                        <div class="custom-form-group">
+                            <label for="finAmount">المبلغ (بالجنيه المصري):</label>
+                            <input type="number" id="finAmount" placeholder="0.00" required>
+                        </div>
+                    </div>
+
+                    <div class="custom-form-group">
+                        <label for="finStatement">البيان / الوصف التفصيلي للعملية:</label>
+                        <input type="text" id="finStatement" placeholder="مثال: قسط زراعة أسنان مريض ممدوح / فاتورة معمل الحرمين" required>
+                    </div>
+
+                    <button type="submit" class="submit-appointment-btn" style="background: #1e293b;">حفظ وتقييد الدفتر المالي</button>
+                </form>
+            </div>
+
+            <br>
+
+            <!-- جدول القيود المالية التقديرية للعيادة -->
+            <div class="table-container">
+                <div class="table-header bg-dark-blue">دفتر الحسابات والتدفقات النقدية العام</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 20%;">التاريخ والوقت</th>
+                            <th style="width: 15%;">النوع</th>
+                            <th style="width: 45%;">البيان / التفاصيل</th>
+                            <th style="width: 20%;">المبلغ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="financeTableBody">
+                        <tr id="noFinanceRow">
+                            <td colspan="4" class="no-data">لم يتم تقييد عمليات مالية لليوم حتى الآن</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -835,6 +942,7 @@
         let patientDataMap = {}; 
         let archivePatientsMap = {}; 
         let labDataList = []; 
+        let financeTransactions = []; // لتخزين الحركات المالية الجديدة
 
         let longPressTimer;
         const longPressDuration = 1000; 
@@ -844,32 +952,33 @@
             const savedPatients = localStorage.getItem('italian_clinic_patients');
             const savedArchive = localStorage.getItem('italian_clinic_archive');
             const savedLab = localStorage.getItem('italian_clinic_lab');
+            const savedFinance = localStorage.getItem('italian_clinic_finance');
             const savedLoginStatus = localStorage.getItem('italian_clinic_logged_in');
 
             if (savedStats) stats = JSON.parse(savedStats);
             if (savedPatients) patientDataMap = JSON.parse(savedPatients);
             if (savedArchive) archivePatientsMap = JSON.parse(savedArchive);
             if (savedLab) labDataList = JSON.parse(savedLab);
+            if (savedFinance) financeTransactions = JSON.parse(savedFinance);
 
             if (savedLoginStatus === 'true') {
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
-                video.pause();
-                checkLabDeadlines(); // تشغيل فحص الإشعارات عند الدخول مباشرة
+                if(video) video.pause();
+                checkLabDeadlines(); 
             }
 
             updateStatsDOM();
             rebuildCurrentVisitsTables();
             rebuildLabTable();
+            rebuildFinanceDOM();
         }
 
-        // دالة فحص المواعيد لإطلاق الإشعارات للحالات المطلوبة
         function checkLabDeadlines() {
-            const todayStr = new Date().toISOString().split('T')[0]; // صيغة YYYY-MM-DD المطابقة لقيم الـ Input
+            const todayStr = new Date().toISOString().split('T')[0]; 
             let alertsMessage = "";
 
             labDataList.forEach(item => {
-                // لو الحالة لسه مخلصتش (تحت التصنيع أو جاهز بالمعمل) وتاريخ استلامها جه أو عدى
                 if (item.status !== 'done' && item.rawDeliveryDate <= todayStr) {
                     alertsMessage += `⚠️ الحالة: ${item.patientName} - شغل: ${item.workType} (تاريخ استلامها: ${item.deliveryDate})\n`;
                 }
@@ -887,9 +996,11 @@
             localStorage.setItem('italian_clinic_patients', JSON.stringify(patientDataMap));
             localStorage.setItem('italian_clinic_archive', JSON.stringify(archivePatientsMap));
             localStorage.setItem('italian_clinic_lab', JSON.stringify(labDataList));
+            localStorage.setItem('italian_clinic_finance', JSON.stringify(financeTransactions));
         }
 
         function toggleMute(event) {
+            if(!video) return;
             video.muted = !video.muted;
             event.target.innerText = video.muted ? "🔇 تشغيل الصوت" : "🔊 كتم الصوت";
         }
@@ -897,6 +1008,16 @@
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
             document.getElementById('sidebarOverlay').classList.toggle('show');
+        }
+
+        /* حماية قسم الإدارة بكلمة مرور مشفرة */
+        function verifyAdminAccess() {
+            const entry = prompt("🔒 يرجى إدخال كلمة مرور الإدارة والماليات للدخول:");
+            if (entry === "$$ OMAR ELSIOFY") {
+                switchPage('admin');
+            } else if (entry !== null) {
+                alert("❌ كلمة المرور غير صحيحة! الدخول مرفوض.");
+            }
         }
 
         function switchPage(pageName) {
@@ -921,6 +1042,11 @@
                 document.getElementById('menu-lab').classList.add('active');
                 document.getElementById('pageMainTitle').innerText = "المركز الإيطالي للأسنان - المعامل والتركيبات";
                 rebuildLabTable();
+            } else if (pageName === 'admin') {
+                document.getElementById('page-admin').classList.add('active-page');
+                document.getElementById('menu-admin').classList.add('active');
+                document.getElementById('pageMainTitle').innerText = "المركز الإيطالي للأسنان - الإدارة والماليات العامة";
+                rebuildFinanceDOM();
             }
             toggleSidebar();
         }
@@ -1008,6 +1134,8 @@
             const upcomingBody = document.getElementById('upcomingVisitsBody');
             const lateBody = document.getElementById('lateVisitsBody');
 
+            if(!upcomingBody || !lateBody) return;
+
             upcomingBody.innerHTML = `<tr id="noUpcomingRow"><td colspan="4" class="no-data">لا توجد زيارات قادمة اليوم</td></tr>`;
             lateBody.innerHTML = `<tr id="noLateRow"><td colspan="4" class="no-data">لا توجد زيارات متأخرة حالياً</td></tr>`;
 
@@ -1092,7 +1220,6 @@
             };
         }
 
-        // ================= حفظ ومعالجة قسم المعمل بالتواريخ الجديدة =================
         document.getElementById('labForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const pName = document.getElementById('labPatientName').value;
@@ -1117,7 +1244,7 @@
                 doctor: doc,
                 exitDate: formattedExitDate,
                 deliveryDate: formattedDelDate,
-                rawDeliveryDate: delDateRaw, // حفظ الصيغة الخام للمقارنة البرمجية بالإشعار
+                rawDeliveryDate: delDateRaw, 
                 status: 'making'
             });
 
@@ -1168,8 +1295,74 @@
             checkTableEmptyState('labTableBody', 'noLabRow');
         }
 
+        /* --- الأكواد البرمجية المضافة لقسم الماليات الجديد --- */
+        document.getElementById('financeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const type = document.getElementById('finType').value;
+            const amount = parseFloat(document.getElementById('finAmount').value);
+            const statement = document.getElementById('finStatement').value;
+
+            const now = new Date();
+            const timestamp = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            financeTransactions.push({
+                dateTime: timestamp,
+                type: type,
+                amount: amount,
+                statement: statement
+            });
+
+            saveDataToStorage();
+            rebuildFinanceDOM();
+            document.getElementById('financeForm').reset();
+            alert('تم تسجيل العملية المالية وتقييدها بالدفاتر بنجاح!');
+        });
+
+        function rebuildFinanceDOM() {
+            const tbody = document.getElementById('financeTableBody');
+            if(!tbody) return;
+
+            tbody.innerHTML = `<tr id="noFinanceRow"><td colspan="4" class="no-data">لم يتم تقييد عمليات مالية لليوم حتى الآن</td></tr>`;
+
+            let totalIncome = 0;
+            let totalExpenses = 0;
+
+            financeTransactions.forEach(trans => {
+                const row = document.createElement('tr');
+                let typeText = '';
+                let amountStyle = '';
+
+                if (trans.type === 'income') {
+                    totalIncome += trans.amount;
+                    typeText = '📈 إيرادات';
+                    amountStyle = 'style="color: #10b981; font-weight: bold;"';
+                } else {
+                    totalExpenses += trans.amount;
+                    typeText = '📉 مصروفات';
+                    amountStyle = 'style="color: #ef4444; font-weight: bold;"';
+                }
+
+                row.innerHTML = `
+                    <td>${trans.dateTime}</td>
+                    <td>${typeText}</td>
+                    <td>${trans.statement}</td>
+                    <td ${amountStyle}>${trans.amount.toFixed(2)} EGP</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            const netProfit = totalIncome - totalExpenses;
+
+            document.getElementById('total-income').innerText = `${totalIncome.toFixed(2)} EGP`;
+            document.getElementById('total-expenses').innerText = `${totalExpenses.toFixed(2)} EGP`;
+            document.getElementById('total-net').innerText = `${netProfit.toFixed(2)} EGP`;
+
+            checkTableEmptyState('financeTableBody', 'noFinanceRow');
+        }
+
         function renderHistoryDOM() {
             const tbody = document.getElementById('historyTableBody');
+            if(!tbody) return;
             tbody.innerHTML = ''; 
             const keys = Object.keys(archivePatientsMap);
 
@@ -1219,19 +1412,21 @@
                     </td>
                     <td style="text-align: center; font-size: 18px; color: #6366f1; font-weight: bold;">${visitCount}</td>
                     <td>
-                        <table class="history-sub-table">
-                            <thead>
-                                <tr>
-                                    <th>التاريخ</th>
-                                    <th>الوقت</th>
-                                    <th>العيادة</th>
-                                    <th>الطبيب</th>
-                                    <th>الملاحظات</th>
-                                    <th>الحالة</th>
-                                </tr>
-                            </thead>
-                            <tbody>${subTableRowsHTML}</tbody>
-                        </table>
+                        <div style="overflow-x: auto;">
+                            <table class="history-sub-table">
+                                <thead>
+                                    <tr>
+                                        <th>التاريخ</th>
+                                        <th>الوقت</th>
+                                        <th>العيادة</th>
+                                        <th>الطبيب</th>
+                                        <th>الملاحظات</th>
+                                        <th>الحالة</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${subTableRowsHTML}</tbody>
+                            </table>
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(row);
@@ -1326,18 +1521,21 @@
         });
 
         function updateClock() {
+            const clockEl = document.getElementById('liveClock');
+            if(!clockEl) return;
             const now = new Date();
             let hours = now.getHours();
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const ampm = hours >= 12 ? 'مساءً' : 'صباحاً';
             hours = hours % 12 || 12;
-            document.getElementById('liveClock').innerText = `${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
+            clockEl.innerText = `${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
         }
         setInterval(updateClock, 1000);
         updateClock();
 
         const today = new Date();
-        document.getElementById('currentDate').innerText = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
+        const dateEl = document.getElementById('currentDate');
+        if(dateEl) dateEl.innerText = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
 
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -1348,8 +1546,8 @@
                 localStorage.setItem('italian_clinic_logged_in', 'true'); 
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
-                video.pause();
-                checkLabDeadlines(); // تشغيل الفحص فور تسجيل الدخول الناجح
+                if(video) video.pause();
+                checkLabDeadlines(); 
             } else {
                 alert("اسم المستخدم أو كلمة المرور غير صحيحة!");
             }
