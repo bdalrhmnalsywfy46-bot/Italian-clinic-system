@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>المركز الإيطالي لتجميل وزراعة الأسنان</title>
+    <!-- مكتبات الفايربيز الأساسية -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -22,6 +23,7 @@
             height: 100%;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow-x: hidden;
+            background-color: #000;
         }
 
         .video-background {
@@ -60,10 +62,11 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.15);
             z-index: -99;
         }
 
+        /* واجهة تسجيل الدخول - الكلام مباشرة على الفيديو بدون أي مربعات بيضاء */
         .login-wrapper {
             display: flex;
             flex-direction: column;
@@ -73,43 +76,43 @@
             width: 100%;
             box-sizing: border-box;
             padding: 20px;
-        }
-
-        .login-card {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 40px 30px;
-            border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            width: 100%;
-            max-width: 420px;
             text-align: center;
-            box-sizing: border-box;
+            z-index: 10;
         }
 
         .main-title {
-            font-size: 32px;
+            font-size: 42px;
             font-weight: bold;
-            color: #000000;
+            color: #ffffff;
             margin: 0;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.9);
         }
 
         .sub-title {
-            font-size: 20px;
-            color: #444444;
-            margin-top: 5px;
-            margin-bottom: 30px;
+            font-size: 24px;
+            color: #f0f0f0;
+            margin-top: 8px;
+            margin-bottom: 35px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.9);
+        }
+
+        .input-container {
+            width: 100%;
+            max-width: 380px;
         }
 
         .input-field {
             width: 100%;
-            padding: 14px 20px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
+            padding: 15px 20px;
+            margin-bottom: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
             border-radius: 12px;
             box-sizing: border-box;
             font-size: 16px;
             text-align: right;
-            background: #ffffff;
+            background: rgba(255, 255, 255, 0.95);
+            color: #000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
         .btn-submit {
@@ -117,13 +120,14 @@
             color: white;
             border: none;
             width: 100%;
-            padding: 14px;
+            padding: 15px;
             border-radius: 12px;
             font-size: 18px;
             cursor: pointer;
             font-weight: bold;
-            margin-top: 10px;
+            margin-top: 5px;
             transition: background 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
         }
 
         .btn-submit:hover {
@@ -131,13 +135,15 @@
         }
 
         .location-footer {
-            margin-top: 30px;
-            font-size: 14px;
-            color: #333333;
+            margin-top: 45px;
+            font-size: 15px;
+            color: #ffffff;
             line-height: 1.6;
             font-weight: 500;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.95);
         }
 
+        /* لوحة التحكم الداخلية المسؤولة عن إدارة المواعيد */
         .dashboard-container {
             display: none;
             background: #ffffff;
@@ -146,8 +152,9 @@
             margin: 30px auto;
             padding: 25px;
             border-radius: 16px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
             box-sizing: border-box;
+            color: #000;
         }
 
         .header-dash {
@@ -229,33 +236,37 @@
 </head>
 <body>
 
+    <!-- 🔊 زر التحكم في الصوت -->
     <button class="audio-control" onclick="toggleAudio()">
         <span id="audioIcon">🔇</span> <span id="audioText">تشغيل الصوت</span>
     </button>
 
+    <!-- 🎥 فيديو الخلفية -->
     <video autoplay loop muted playsinline id="bgVideo" class="video-background">
         <source src="intro.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
     <div class="overlay" id="videoOverlay"></div>
 
+    <!-- 1️⃣ شاشة تسجيل الدخول المفتوحة مباشرة على الفيديو -->
     <div id="loginScreen" class="login-wrapper">
-        <div class="login-card">
-            <h1 class="main-title">المركز الإيطالي</h1>
-            <h2 class="sub-title">لتجميل وزраعة الأسنان</h2>
-            
+        <h1 class="main-title">المركز الإيطالي</h1>
+        <h2 class="sub-title">لتجميل وزراعة الأسنان</h2>
+        
+        <div class="input-container">
             <input type="email" id="loginEmail" class="input-field" placeholder="البريد الإلكتروني">
             <input type="password" id="loginPassword" class="input-field" placeholder="كلمة المرور">
             
             <button class="btn-submit" onclick="handleLogin()">دخول</button>
+        </div>
 
-            <div class="location-footer">
-                7 القضاة - شارع الطاقة - النادي الأهلي<br>
-                مدينة نصر - القاهرة
-            </div>
+        <div class="location-footer">
+            7 القضاة - شارع الطاقة - النادي الأهلي<br>
+            مدينة نصر - القاهرة
         </div>
     </div>
 
+    <!-- 2️⃣ لوحة إدارة العيادة والمواعيد الداخليّة -->
     <div id="dashboardScreen" class="dashboard-container">
         <div class="header-dash">
             <h2>لوحة إدارة العيادة والمواعيد الرئيسية</h2>
@@ -266,6 +277,7 @@
         </div>
 
         <div class="main-layout">
+            <!-- كارت الحجز -->
             <div class="panel-box">
                 <h3>🗓️ تسجيل حجز مريض جديد</h3>
                 <input type="text" id="patientName" placeholder="اسم المريض بالكامل">
@@ -274,6 +286,7 @@
                 <input type="datetime-local" id="appointmentTime">
                 <button class="btn-submit" style="background-color: #28a745; margin-top:0;" onclick="saveAppointment()">حفظ الحجز بالمنظومة 💾</button>
                 
+                <!-- 🔐 كارت الأمان وتفعيل صلاحيات السكرتارية (يظهر للأدمن فقط) -->
                 <div id="adminOnlySection" style="display: none;" class="admin-security-box">
                     <h4 style="margin-top:0; color: var(--admin-color);">🔐 إدارة وتفعيل صلاحيات الحسابات الجديدة</h4>
                     <p style="font-size:13px; color:#555;">أدخل الـ UID الخاص بالحساب لتفعيله وتحديد وظيفته بالسيستم:</p>
@@ -287,6 +300,7 @@
                 </div>
             </div>
 
+            <!-- جدول الحجوزات لايف -->
             <div class="table-box">
                 <h3>📂 المواعيد الحالية المسجلة بالعيادة</h3>
                 <table>
@@ -307,7 +321,7 @@
     </div>
 
     <script>
-        // 🚨 ضع هنا الـ Config الخاصة بمشروع الـ Firebase الخاص بك ليعمل الربط بنجاح
+        // 🚨 ضع هنا الـ Firebase Config الخاص بمشروعك ليعمل زر الدخول والمزامنة فوراً!
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
             authDomain: "YOUR_AUTH_DOMAIN",
@@ -326,7 +340,7 @@
         let currentUserRole = "";
         let cachedUserName = "";
 
-        // 🎵 دالة الصوت المحدثة (تشتغل دورة واحدة فقط أول ما يفتح المتصفح وتنتهي)
+        // دالة التحكم في الصوت المحدثة
         function toggleAudio() {
             const video = document.getElementById('bgVideo');
             const icon = document.getElementById('audioIcon');
@@ -337,7 +351,6 @@
                 icon.innerText = "🔊";
                 text.innerText = "كتم الصوت";
                 
-                // أول ما الفيديو يخلص دورته، بيكتم نفسه تلقائياً
                 video.onended = function() {
                     video.muted = true;
                     icon.innerText = "🔇";
@@ -351,7 +364,7 @@
             }
         }
 
-        // 🔐 كود الأمان - الدخول والفحص والتحقق
+        // كود معالجة تسجيل الدخول والتحقق الآمن
         function handleLogin() {
             const email = document.getElementById('loginEmail').value.trim();
             const pass = document.getElementById('loginPassword').value.trim();
@@ -370,7 +383,7 @@
             });
         }
 
-        // 🛡️ فحص الـ Role والطلب التلقائي للحسابات الجديدة لربط الاستقبال بالأدمن
+        // فحص الـ Role وتوجيه المستخدم أو إرسال طلب التفعيل
         function checkUserRoleAndEnter(user) {
             currentUserUid = user.uid;
 
@@ -381,7 +394,7 @@
                     currentUserRole = data.role;
                     cachedUserName = data.name || user.email;
                     
-                    // إخفاء مؤثرات وعناصر تسجيل الدخول لفتح المنظومة بشكل آمن
+                    // إخفاء عناصر شاشة الدخول والخلفية
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('bgVideo').style.display = 'none';
                     document.getElementById('videoOverlay').style.display = 'none';
@@ -395,7 +408,7 @@
                         listenToActivationRequests(); 
                     }
                 } else {
-                    // حساب جديد كلياً -> يرفع طلب تفعيل فوري وقفل الدخول مؤقتاً
+                    // حساب موظف جديد تماماً -> يرسل طلب تفعيل فوري للأدمن
                     database.ref('activationRequests').child(user.uid).set({
                         uid: user.uid,
                         email: user.email,
@@ -409,7 +422,6 @@
             });
         }
 
-        // إظهار شارات الهوية والـ Role
         function applyRoleUI(name) {
             const badge = document.getElementById('userBadge');
             const adminSection = document.getElementById('adminOnlySection');
@@ -425,7 +437,7 @@
             }
         }
 
-        // مراقبة الطلبات الجديدة لايف من الفايربيز وإظهار الإشعار الفوري للأدمن
+        // مراقبة طلبات التفعيل الجديدة لايف (شغل الأدمن)
         function listenToActivationRequests() {
             database.ref('activationRequests').on('child_added', (snapshot) => {
                 const request = snapshot.val();
@@ -440,7 +452,7 @@
             });
         }
 
-        // حفظ الصلاحيات في الفايربيز وتثبيتها للحساب (وظيفة الأدمن)
+        // حفظ الرول وتثبيته في الفايربيز
         function saveUserRole() {
             const uid = document.getElementById('roleUid').value.trim();
             const name = document.getElementById('roleName').value.trim();
@@ -455,7 +467,7 @@
             });
         }
 
-        // حفظ حجوزات المرضى بالعيادة
+        // حفظ حجز مريض جديد
         function saveAppointment() {
             const name = document.getElementById('patientName').value.trim();
             const phone = document.getElementById('patientPhone').value.trim();
@@ -479,7 +491,7 @@
             });
         }
 
-        // جلب واستعراض المواعيد بالجدول متزامن تلقائياً
+        // جلب المواعيد واستعراضها بالجدول لايف
         function loadAppointments() {
             database.ref('appointments').on('value', (snapshot) => {
                 const tbody = document.getElementById('appointmentsTableBody');
@@ -498,7 +510,7 @@
             });
         }
 
-        // خروج آمن وإعادة تحميل المنظومة
+        // تسجيل الخروج الآمن
         function handleLogout() {
             auth.signOut().then(() => { location.reload(); });
         }
