@@ -476,24 +476,6 @@
             margin-right: 5px;
         }
 
-        .whatsapp-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: #25D366;
-            color: white;
-            text-decoration: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
-            margin-right: 5px;
-            transition: 0.2s;
-        }
-        .whatsapp-btn:hover {
-            background: #128C7E;
-        }
-
         .form-card {
             background: #ffffff;
             border-radius: 12px;
@@ -612,37 +594,12 @@
             border-bottom: 1px solid #e2e8f0;
         }
 
-        /* تنسيقات أزرار النسخ الاحتياطي */
-        .backup-section {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        .btn-backup {
-            flex: 1;
-            padding: 12px;
-            font-size: 14px;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            color: white;
-            transition: 0.3s;
-            text-align: center;
-        }
-        .btn-export { background: #059669; }
-        .btn-import { background: #d97706; }
-
         @media (max-width: 480px) {
             .form-row-2 {
                 flex-direction: column;
                 gap: 0;
             }
             .finance-cards-grid {
-                flex-direction: column;
-                gap: 10px;
-            }
-            .backup-section {
                 flex-direction: column;
                 gap: 10px;
             }
@@ -733,7 +690,7 @@
 
             <!-- جدول الزيارات المتأخرة -->
             <div class="table-container" id="lateTableContainer">
-                <div class="table-header bg-orange">الزيارات المتأخرة (اضغط ضغطة مطولة لتعديل أو حذف الزيارة)</div>
+                <div class="table-header bg-orange">الزيارات المتأخرة (اضغط ضغطة مطولة لتعديل الزيارة)</div>
                 <table>
                     <thead>
                         <tr>
@@ -953,17 +910,6 @@
                 </form>
             </div>
 
-            <!-- لوحة النسخ الاحتياطي وإدارة أمان البيانات -->
-            <div class="form-card">
-                <h3>قاعدة البيانات والنسخ الاحتياطي (Backup)</h3>
-                <p style="font-size: 13px; color: #64748b; margin-bottom: 10px;">قم بتصدير بيانات المركز كملف احتياطي دوري لحمايتها من الحذف المفاجئ للمتصفح، أو استعادتها عند الانتقال لجهاز آخر.</p>
-                <div class="backup-section">
-                    <button class="btn-backup btn-export" onclick="exportSystemData()">📥 تحميل نسخة احتياطية للبيانات</button>
-                    <button class="btn-backup btn-import" onclick="document.getElementById('importFile').click()">📤 استعادة نسخة احتياطية محفوظة</button>
-                    <input type="file" id="importFile" style="display: none;" accept=".json" onchange="importSystemData(event)">
-                </div>
-            </div>
-
             <br>
 
             <!-- جدول القيود المالية التقديرية للعيادة -->
@@ -996,7 +942,7 @@
         let patientDataMap = {}; 
         let archivePatientsMap = {}; 
         let labDataList = []; 
-        let financeTransactions = []; 
+        let financeTransactions = []; // لتخزين الحركات المالية الجديدة
 
         let longPressTimer;
         const longPressDuration = 1000; 
@@ -1064,6 +1010,7 @@
             document.getElementById('sidebarOverlay').classList.toggle('show');
         }
 
+        /* حماية قسم الإدارة بكلمة مرور مشفرة */
         function verifyAdminAccess() {
             const entry = prompt("🔒 يرجى إدخال كلمة مرور الإدارة والماليات للدخول:");
             if (entry === "$$ OMAR ELSIOFY") {
@@ -1138,7 +1085,7 @@
             if (!patient) return;
 
             const oldStatus = patient.status;
-            if (oldStatus && stats[oldStatus] > 0) stats[oldStatus]--;
+            if (oldStatus) stats[oldStatus]--;
             stats[newStatus]++;
             patient.status = newStatus;
             updateStatsDOM();
@@ -1153,42 +1100,29 @@
                 const patient = patientDataMap[rowId];
                 if (!patient) return;
 
-                const action = confirm(`خيارات المريض: ${patient.name}\n\nاضغط OK لتعديل البيانات، أو Cancel لحذف الزيارة نهائياً من القائمة.`);
+                const newTimeInput = prompt(`تعديل بيانات المريض: ${patient.name}\n\n1) الوقت الجديد:`, patient.time);
+                if (newTimeInput === null) return;
+
+                const newClinicInput = prompt(`تعديل بيانات المريض: ${patient.name}\n\n2) العيادة الجديدة:`, patient.clinic || '');
+                if (newClinicInput === null) return;
+
+                const newDoctorInput = prompt(`تعديل بيانات المريض: ${patient.name}\n\n3) الطبيب الجديد:`, patient.doctor || '');
+                if (newDoctorInput === null) return;
+
+                if (newTimeInput.trim() !== "") patient.time = newTimeInput.trim();
+                if (newClinicInput.trim() !== "") patient.clinic = newClinicInput.trim();
+                if (newDoctorInput.trim() !== "") patient.doctor = newDoctorInput.trim();
                 
-                if (action) {
-                    const newTimeInput = prompt(`1) الوقت الجديد:`, patient.time);
-                    if (newTimeInput === null) return;
-
-                    const newClinicInput = prompt(`2) العيادة الجديدة:`, patient.clinic || '');
-                    if (newClinicInput === null) return;
-
-                    const newDoctorInput = prompt(`3) الطبيب الجديد:`, patient.doctor || '');
-                    if (newDoctorInput === null) return;
-
-                    if (newTimeInput.trim() !== "") patient.time = newTimeInput.trim();
-                    if (newClinicInput.trim() !== "") patient.clinic = newClinicInput.trim();
-                    if (newDoctorInput.trim() !== "") patient.doctor = newDoctorInput.trim();
-                    
-                    const uniqueKey = patient.code.trim();
-                    if (archivePatientsMap[uniqueKey] && archivePatientsMap[uniqueKey].visits[rowId]) {
-                        archivePatientsMap[uniqueKey].visits[rowId].time = patient.time;
-                        archivePatientsMap[uniqueKey].visits[rowId].clinic = patient.clinic;
-                        archivePatientsMap[uniqueKey].visits[rowId].doctor = patient.doctor;
-                    }
-                    alert("تم تحديث البيانات بنجاح!");
-                } else {
-                    const deleteConfirm = confirm("هل أنت متأكد من حذف هذه الزيارة نهائياً من الشاشة الرئيسية؟");
-                    if (deleteConfirm) {
-                        if (patient.status && stats[patient.status] > 0) stats[patient.status]--;
-                        delete patientDataMap[rowId];
-                        updateStatsDOM();
-                    } else {
-                        return;
-                    }
+                const uniqueKey = patient.code.trim();
+                if (archivePatientsMap[uniqueKey] && archivePatientsMap[uniqueKey].visits[rowId]) {
+                    archivePatientsMap[uniqueKey].visits[rowId].time = patient.time;
+                    archivePatientsMap[uniqueKey].visits[rowId].clinic = patient.clinic;
+                    archivePatientsMap[uniqueKey].visits[rowId].doctor = patient.doctor;
                 }
                 
                 saveDataToStorage();
                 rebuildCurrentVisitsTables();
+                alert("تم تحديث البيانات بنجاح!");
             }, longPressDuration);
         }
 
@@ -1237,19 +1171,14 @@
                     ontouchend="handleLongPressEnd()"
                 `;
 
-                // تجهيز رسالة واتساب مخصصة تلقائية للمريض
-                const waMessage = encodeURIComponent(`مرحباً أ/ ${patient.name}، نذكرك بموعدك المحدد اليوم الساعة ${patient.time} بالمركز الإيطالي لزراعة وتجميل الأسنان.`);
-                const whatsappURL = `https://wa.me/2${patient.phone}?text=${waMessage}`;
-
                 newRow.innerHTML = `
                     <td ${timeColor}>${patient.time}</td>
                     <td style="position: static;">
                         <div class="patient-name-click" onclick="toggleDropdown(event, '${rowId}')" ${longPressEvents}>${patient.name}</div>
                         <small style="color:#64748b; font-size:12px; display:block; margin-top:2px;">كود: ${patient.code} | ت: ${patient.phone}</small>
-                        <div style="margin-top: 5px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
+                        <div style="margin-top: 5px;">
                             ${badgeHTML}
                             <span class="note-badge">${patient.note}</span>
-                            <a href="${whatsappURL}" target="_blank" class="whatsapp-btn">💬 واتساب</a>
                         </div>
 
                         <div class="status-dropdown" id="drop_${rowId}">
@@ -1328,14 +1257,7 @@
         function changeLabStatus(labId, newStatus) {
             const item = labDataList.find(l => l.id === labId);
             if (item) {
-                if (newStatus === 'delete') {
-                    const conf = confirm("هل تريد حذف طلب المعمل هذا نهائياً؟");
-                    if (conf) {
-                        labDataList = labDataList.filter(l => l.id !== labId);
-                    }
-                } else {
-                    item.status = newStatus;
-                }
+                item.status = newStatus;
                 saveDataToStorage();
                 rebuildLabTable();
             }
@@ -1365,7 +1287,6 @@
                             <div onclick="changeLabStatus('${item.id}', 'making')">⏳ تحت التصنيع</div>
                             <div onclick="changeLabStatus('${item.id}', 'ready')">🔵 جاهز بالمعمل</div>
                             <div onclick="changeLabStatus('${item.id}', 'done')">✅ تم الاستلام</div>
-                            <div onclick="changeLabStatus('${item.id}', 'delete')" style="color: #b91c1c;">🗑️ حذف الطلب</div>
                         </div>
                     </td>
                 `;
@@ -1374,6 +1295,7 @@
             checkTableEmptyState('labTableBody', 'noLabRow');
         }
 
+        /* --- الأكواد البرمجية المضافة لقسم الماليات الجديد --- */
         document.getElementById('financeForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const type = document.getElementById('finType').value;
@@ -1384,7 +1306,6 @@
             const timestamp = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
             financeTransactions.push({
-                id: 'fin_' + Date.now(),
                 dateTime: timestamp,
                 type: type,
                 amount: amount,
@@ -1397,15 +1318,6 @@
             alert('تم تسجيل العملية المالية وتقييدها بالدفاتر بنجاح!');
         });
 
-        function deleteFinanceTransaction(transId) {
-            const conf = confirm("هل تريد حذف هذا القيد المالي نهائياً من الدفاتر؟");
-            if (conf) {
-                financeTransactions = financeTransactions.filter(t => t.id !== transId);
-                saveDataToStorage();
-                rebuildFinanceDOM();
-            }
-        }
-
         function rebuildFinanceDOM() {
             const tbody = document.getElementById('financeTableBody');
             if(!tbody) return;
@@ -1417,9 +1329,6 @@
 
             financeTransactions.forEach(trans => {
                 const row = document.createElement('tr');
-                row.setAttribute('title', 'اضغط مرتين متتاليتين لحذف المعاملة');
-                row.ondblclick = () => deleteFinanceTransaction(trans.id);
-                
                 let typeText = '';
                 let amountStyle = '';
 
@@ -1436,7 +1345,7 @@
                 row.innerHTML = `
                     <td>${trans.dateTime}</td>
                     <td>${typeText}</td>
-                    <td>${trans.statement} <br><small style="color: #94a3b8; font-size: 11px;">(انقر مزدوجاً للحذف)</small></td>
+                    <td>${trans.statement}</td>
                     <td ${amountStyle}>${trans.amount.toFixed(2)} EGP</td>
                 `;
                 tbody.appendChild(row);
@@ -1564,60 +1473,9 @@
             if (!tbody || !placeholder) return;
             let visibleRows = 0;
             for (let child of tbody.children) {
-                if (child.id !== noDataRowId && child.style.display !== 'none') visibleRows++;
+                if (child.id !== noDataRowId) visibleRows++;
             }
             placeholder.style.display = (visibleRows === 0) ? 'table-row' : 'none';
-        }
-
-        /* --- وظائف التصدير والاستيراد للبيانات (Backup System) --- */
-        function exportSystemData() {
-            const dataDump = {
-                stats: stats,
-                patientDataMap: patientDataMap,
-                archivePatientsMap: archivePatientsMap,
-                labDataList: labDataList,
-                financeTransactions: financeTransactions
-            };
-            
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataDump));
-            const downloadAnchor = document.createElement('a');
-            const fileDate = new Date().toISOString().split('T')[0];
-            
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `Italian_Center_Backup_${fileDate}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
-
-        function importSystemData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const parsedData = JSON.parse(e.target.result);
-                    
-                    if(parsedData.stats) stats = parsedData.stats;
-                    if(parsedData.patientDataMap) patientDataMap = parsedData.patientDataMap;
-                    if(parsedData.archivePatientsMap) archivePatientsMap = parsedData.archivePatientsMap;
-                    if(parsedData.labDataList) labDataList = parsedData.labDataList;
-                    if(parsedData.financeTransactions) financeTransactions = parsedData.financeTransactions;
-                    
-                    saveDataToStorage();
-                    
-                    updateStatsDOM();
-                    rebuildCurrentVisitsTables();
-                    rebuildLabTable();
-                    rebuildFinanceDOM();
-                    
-                    alert("✅ تم استيراد نسخة قاعدة البيانات الاحتياطية بنجاح وتحديث كافة الدفاتر!");
-                } catch(err) {
-                    alert("❌ فشل قراءة الملف! تأكد من اختيار ملف Backup صحيح تم تصديره من السيستم.");
-                }
-            };
-            reader.readAsText(file);
         }
 
         function logoutSystem() {
