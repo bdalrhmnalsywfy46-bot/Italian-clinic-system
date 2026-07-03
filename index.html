@@ -398,6 +398,16 @@
             -webkit-overflow-scrolling: touch;
         }
 
+        .table-container {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            position: relative;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
         .table-header {
             padding: 15px;
             color: white;
@@ -684,9 +694,8 @@
 </head>
 <body>
 
-    <!-- الواجهة الأولى: تسجيل الدخول بالفيديو والأصوات -->
     <div id="loginScreen">
-        <video class="video-bg" id="bgVideo" autoplay playsinline>
+        <video class="video-bg" id="bgVideo" autoplay playsinline loop>
             <source src="intro.mp4" type="video/mp4">
         </video>
         
@@ -702,7 +711,6 @@
 
             <div class="form-container" id="loginArea">
 
-                <!-- فورم دخول موحّد -->
                 <form id="unifiedLoginForm">
                     <div class="input-group">
                         <label>اسم المستخدم / الإيميل:</label>
@@ -718,7 +726,6 @@
                     </div>
                 </form>
 
-                <!-- فورم طلب تسجيل موظف جديد -->
                 <form id="employeeRegisterForm" style="display:none;">
                     <div class="input-group">
                         <label>الاسم بالكامل:</label>
@@ -750,11 +757,9 @@
         </div>
     </div>
 
-    <!-- الواجهة الثانية: لوحة التحكم الديناميكية الشاملة -->
     <div id="dashboard">
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-        <!-- القائمة الجانبية -->
         <div class="sidebar" id="sidebar">
             <ul class="sidebar-menu">
                 <li id="menu-home" class="active" onclick="switchPage('home')">الرئيسية</li>
@@ -779,7 +784,6 @@
             <div class="user-badge" id="currentUserDisplay"></div>
         </div>
 
-        <!-- ================= صفحة الرئيسية ================= -->
         <div id="page-home" class="page-section active-page">
             <div class="stats-card">
                 <div class="stats-left">
@@ -839,7 +843,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة إضافة موعد جديد ================= -->
         <div id="page-add" class="page-section">
             <div class="form-card">
                 <h3>حجز موعد عيادة جديد</h3>
@@ -881,7 +884,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة سجل المرضى ================= -->
         <div id="page-history" class="page-section">
             <div class="search-wrapper">
                 <input type="text" id="historySearchInput" class="search-input" oninput="filterHistory()" placeholder="🔍 ابحث عن مريض بالاسم، رقم الهاتف، أو الكود...">
@@ -905,7 +907,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة المعامل والتركيبات ================= -->
         <div id="page-lab" class="page-section">
             <div class="form-card">
                 <h3>إرسال حالة جديدة للمعمل</h3>
@@ -962,7 +963,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة الأقسام ================= -->
         <div id="page-categories" class="page-section">
             <div class="form-card">
                 <h3>إنشاء قسم عيادة جديد</h3>
@@ -997,7 +997,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة المخزن واللوازم (أدمن فقط) ================= -->
         <div id="page-inventory" class="page-section">
             <div class="form-card">
                 <h3>إضافة خامة / منتج جديد للمخزن</h3>
@@ -1041,7 +1040,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة طلبات الموظفين الجدد (أدمن فقط) ================= -->
         <div id="page-requests" class="page-section">
             <div class="table-container">
                 <div class="table-header bg-purple">طلبات تسجيل الموظفين الجدد (بانتظار الموافقة)</div>
@@ -1063,7 +1061,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة الإدارة والماليات (أدمن فقط) ================= -->
         <div id="page-admin" class="page-section">
             <div class="finance-cards-grid">
                 <div class="fin-card fin-inc">
