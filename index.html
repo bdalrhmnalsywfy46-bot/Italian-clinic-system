@@ -10,9 +10,12 @@
 
     <style>
         :root {
-            --primary-color: #5a0614; /* اللون العنابي الغامق للأزرار */
+            --primary-color: #5a0614; /* العنابي الغامق */
+            --primary-hover: #3d040d;
             --admin-color: #dc3545;
             --secretary-color: #007bff;
+            --bg-color: #f4f6f9;
+            --dark-text: #333333;
         }
 
         body, html {
@@ -21,10 +24,11 @@
             width: 100%;
             height: 100%;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
             overflow-x: hidden;
         }
 
-        /* 🎥 خلفية الفيديو لتغطية الشاشة بالكامل خلف الفورم */
+        /* 🎥 خلفية الفيديو الشاملة للموقع */
         .video-background {
             position: fixed;
             right: 0;
@@ -38,25 +42,6 @@
             object-fit: cover;
         }
 
-        /* 🔇 زرار كتم/تشغيل الصوت في أعلى الشاشة */
-        .audio-control {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1000;
-            background: rgba(0, 0, 0, 0.6);
-            color: white;
-            border: 1px solid #ffffff40;
-            padding: 8px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        /* طبقة حماية داكنة خفيفة فوق الفيديو لزيادة وضوح الكلام */
         .overlay {
             position: fixed;
             top: 0;
@@ -67,179 +52,146 @@
             z-index: -99;
         }
 
-        /* واجهة شاشة تسجيل الدخول المتطابقة مع التصميم */
+        /* 🔇 زرار التحكم بالصوت المطور */
+        .audio-control {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.65);
+            color: white;
+            border: 1px solid #ffffff40;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+        }
+        .audio-control:hover { background: rgba(0, 0, 0, 0.8); }
+
+        /* 🔐 شاشة تسجيل الدخول الاحترافية */
         .login-wrapper {
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             width: 100%;
-            box-sizing: border-box;
             padding: 20px;
+            box-sizing: border-box;
         }
 
         .login-card {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 40px 30px;
-            border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            background: rgba(255, 255, 255, 0.96);
+            padding: 45px 35px;
+            border-radius: 28px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
             width: 100%;
-            max-width: 420px;
+            max-width: 430px;
             text-align: center;
-            box-sizing: border-box;
+            backdrop-filter: blur(5px);
         }
 
-        .main-title {
-            font-size: 32px;
-            font-weight: bold;
-            color: #000000;
-            margin: 0;
-        }
+        .main-title { font-size: 34px; font-weight: 800; color: #000; margin: 0; }
+        .sub-title { font-size: 20px; color: #444; margin-top: 5px; margin-bottom: 35px; }
 
-        .sub-title {
-            font-size: 20px;
-            color: #444444;
-            margin-top: 5px;
-            margin-bottom: 30px;
-        }
-
+        .input-group { position: relative; margin-bottom: 20px; }
         .input-field {
             width: 100%;
-            padding: 14px 20px;
-            margin-bottom: 15px;
+            padding: 15px 20px;
             border: 1px solid #ccc;
-            border-radius: 12px;
+            border-radius: 14px;
             box-sizing: border-box;
             font-size: 16px;
             text-align: right;
             background: #ffffff;
+            transition: all 0.3s;
         }
+        .input-field:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 8px rgba(90, 6, 20, 0.2); }
 
         .btn-submit {
             background-color: var(--primary-color);
             color: white;
             border: none;
             width: 100%;
-            padding: 14px;
-            border-radius: 12px;
+            padding: 15px;
+            border-radius: 14px;
             font-size: 18px;
             cursor: pointer;
             font-weight: bold;
-            margin-top: 10px;
             transition: background 0.3s;
+            box-shadow: 0 4px 12px rgba(90, 6, 20, 0.3);
         }
+        .btn-submit:hover { background-color: var(--primary-hover); }
 
-        .btn-submit:hover {
-            background-color: #3d040d;
-        }
+        .location-footer { margin-top: 35px; font-size: 14px; color: #333; line-height: 1.6; font-weight: 600; }
 
-        .location-footer {
-            margin-top: 30px;
-            font-size: 14px;
-            color: #333333;
-            line-height: 1.6;
-            font-weight: 500;
-        }
-
-        /* 🖥️ لوحة التحكم الشاملة للعيادة */
+        /* 🖥️ لوحة التحكم الكاملة والموسعة (Dashboard) */
         .dashboard-container {
             display: none;
-            background: #ffffff;
-            width: 95%;
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            box-sizing: border-box;
+            min-height: 100vh;
+            background: #f4f6f9;
         }
 
-        .header-dash {
+        /* الشريط العلوي للسيستم */
+        .navbar {
+            background: #ffffff;
+            padding: 15px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
+        .navbar h2 { margin: 0; font-size: 22px; color: #222; }
 
-        .user-badge {
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-weight: bold;
-            color: white;
-            font-size: 14px;
-        }
+        .user-badge { padding: 8px 18px; border-radius: 25px; font-weight: bold; color: white; font-size: 14px; }
         .role-admin { background-color: var(--admin-color); }
         .role-secretary { background-color: var(--secretary-color); }
 
-        .main-layout {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 25px;
-        }
+        .btn-logout { background: #555; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-right: 15px; }
 
-        @media (max-width: 768px) {
-            .main-layout { grid-template-columns: 1fr; }
-        }
+        /* محتوى السيستم الداخلي */
+        .content-wrapper { padding: 30px; max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+        @media (max-width: 992px) { .content-wrapper { grid-template-columns: 1fr; } }
 
-        .panel-box {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid #e3e6f0;
-        }
+        .sidebar-panel { display: flex; flex-direction: column; gap: 25px; }
+        .card-box { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); border: 1px solid #e3e6f0; }
+        .card-box h3 { margin-top: 0; margin-bottom: 20px; color: #222; font-size: 18px; border-bottom: 2px solid #f1f1f1; padding-bottom: 10px; }
 
-        .panel-box h3 { margin-top: 0; color: #333; }
+        .form-control { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 10px; box-sizing: border-box; font-size: 15px; }
+        .form-control:focus { outline: none; border-color: #4f46e5; }
 
-        .panel-box input, .panel-box select {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 12px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-sizing: border-box;
-        }
+        .btn-action-green { background: #22c55e; color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; }
+        .btn-action-green:hover { background: #16a34a; }
 
-        .table-box {
-            background: white;
-            border: 1px solid #e3e6f0;
-            border-radius: 12px;
-            padding: 20px;
-            overflow-x: auto;
-        }
+        /* جدول المواعيد الكبير الاحترافي */
+        .main-panel { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); border: 1px solid #e3e6f0; }
+        .table-responsive { width: 100%; overflow-x: auto; margin-top: 15px; }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: right;
-        }
+        table { width: 100%; border-collapse: collapse; text-align: right; min-width: 600px; }
+        table th { background-color: #f8fafc; color: #64748b; padding: 16px; font-weight: 600; border-bottom: 2px solid #edf2f7; }
+        table td { padding: 16px; border-bottom: 1px solid #f1f5f9; color: #334155; font-size: 15px; }
+        table tr:hover { background-color: #f8fafc; }
 
-        table th, table td {
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-        }
-
-        table th { background-color: #f1f1f1; color: #333; }
-
-        .admin-security-box {
-            background: #fff3f3;
-            border: 1px solid #f5c6cb;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
+        /* لوحة الأمان الحمراء للادمن */
+        .admin-box { background: #fff5f5; border: 1px solid #feb2b2; }
+        .admin-box h3 { color: var(--admin-color); border-bottom-color: #fed7d7; }
+        .btn-admin-save { background: var(--admin-color); color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: bold; cursor: pointer; }
+        .btn-admin-save:hover { background: #c53030; }
     </style>
 </head>
 <body>
 
-    <button class="audio-control" onclick="toggleAudio()">
+    <button id="audioBtn" class="audio-control" onclick="toggleAudio()">
         <span id="audioIcon">🔇</span> <span id="audioText">تشغيل الصوت</span>
     </button>
 
     <video autoplay loop muted playsinline id="bgVideo" class="video-background">
-        <source src="video.mp4" type="video/mp4">
+        <source src="intro.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
     <div class="overlay" id="videoOverlay"></div>
@@ -249,10 +201,14 @@
             <h1 class="main-title">المركز الإيطالي</h1>
             <h2 class="sub-title">لتجميل وزراعة الأسنان</h2>
             
-            <input type="email" id="loginEmail" class="input-field" placeholder="البريد الإلكتروني">
-            <input type="password" id="loginPassword" class="input-field" placeholder="كلمة المرور">
+            <div class="input-group">
+                <input type="email" id="loginEmail" class="input-field" placeholder="البريد الإلكتروني">
+            </div>
+            <div class="input-group">
+                <input type="password" id="loginPassword" class="input-field" placeholder="كلمة المرور">
+            </div>
             
-            <button class="btn-submit" onclick="handleLogin()">دخول</button>
+            <button class="btn-submit" onclick="handleLogin()">دخول للسيستم</button>
 
             <div class="location-footer">
                 7 القضاة - شارع الطاقة - النادي الأهلي<br>
@@ -262,57 +218,63 @@
     </div>
 
     <div id="dashboardScreen" class="dashboard-container">
-        <div class="header-dash">
-            <h2>لوحة إدارة العيادة والمواعيد الرئيسية</h2>
+        <nav class="navbar">
+            <h2>منظومة إدارة العيادة والعمليات اليومية</h2>
             <div>
                 <span id="userBadge" class="user-badge"></span>
-                <button onclick="handleLogout()" style="margin-right:15px; padding:6px 15px; cursor:pointer; background:#555; color:white; border:none; border-radius:6px; font-weight:bold;">خروج</button>
+                <button class="btn-logout" onclick="handleLogout()">خروج آمن</button>
             </div>
-        </div>
+        </nav>
 
-        <div class="main-layout">
-            <div class="panel-box">
-                <h3>🗓️ تسجيل حجز مريض جديد</h3>
-                <input type="text" id="patientName" placeholder="اسم المريض بالكامل">
-                <input type="tel" id="patientPhone" placeholder="رقم الهاتف">
-                <input type="text" id="patientCase" placeholder="الحالة الطبية والتشخيص">
-                <input type="datetime-local" id="appointmentTime">
-                <button class="btn-submit" style="background-color: #28a745; margin-top:0;" onclick="saveAppointment()">حفظ الحجز بالمنظومة 💾</button>
-                
-                <div id="adminOnlySection" style="display: none;" class="admin-security-box">
-                    <h4 style="margin-top:0; color: var(--admin-color);">🔐 إدارة وتفعيل صلاحيات الحسابات الجديدة</h4>
-                    <p style="font-size:13px; color:#555;">أدخل الـ UID الخاص بالحساب لتفعيله وتحديد وظيفته بالسيستم:</p>
-                    <input type="text" id="roleUid" placeholder="الـ UID الخاص بالمستخدم">
-                    <input type="text" id="roleName" placeholder="اسم الموظف">
-                    <select id="roleSelect">
+        <div class="content-wrapper">
+            <div class="sidebar-panel">
+                <div class="card-box">
+                    <h3>🗓️ حجز موعد جديد</h3>
+                    <input type="text" id="patientName" class="form-control" placeholder="اسم المريض بالكامل">
+                    <input type="tel" id="patientPhone" class="form-control" placeholder="رقم هاتف المريض">
+                    <input type="text" id="patientCase" class="form-control" placeholder="حالة الكشف والتشخيص">
+                    <input type="datetime-local" id="appointmentTime" class="form-control">
+                    <button class="btn-action-green" onclick="saveAppointment()">حفظ البيانات بالمساحة 💾</button>
+                </div>
+
+                <div id="adminOnlySection" style="display: none;" class="card-box admin-box">
+                    <h3>🔐 تفعيل الحسابات الجديدة (الأمن)</h3>
+                    <p style="font-size:13px; color:#742a2a; margin-top:0;">تثبيت صلاحية الموظفين الجدد لتفعيل حساباتهم:</p>
+                    <input type="text" id="roleUid" class="form-control" placeholder="الـ UID الخاص بالموظف">
+                    <input type="text" id="roleName" class="form-control" placeholder="اسم الموظف الثنائي">
+                    <select id="roleSelect" class="form-control">
                         <option value="reception">سكرتارية / استقبال (🔵)</option>
                         <option value="admin">مدير / أدمن (🔴)</option>
                     </select>
-                    <button onclick="saveUserRole()" style="background: var(--admin-color); color:white; border:none; padding:10px; width:100%; border-radius:6px; cursor:pointer; font-weight:bold;">تفعيل الحساب والـ Role</button>
+                    <button class="btn-admin-save" onclick="saveUserRole()">تأكيد وتفعيل الصلاحية</button>
                 </div>
             </div>
 
-            <div class="table-box">
-                <h3>📂 المواعيد الحالية المسجلة بالعيادة</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>اسم المريض</th>
-                            <th>رقم الهاتف</th>
-                            <th>التشخيص / الحالة</th>
-                            <th>الموعد والتاريخ</th>
-                            <th>بواسطة</th>
-                        </tr>
-                    </thead>
-                    <tbody id="appointmentsTableBody">
-                        </tbody>
-                </table>
+            <div class="main-panel">
+                <h3>📂 كشف وجدول المواعيد الحية المتزامن</h3>
+                <p style="font-size: 14px; color: #64748b; margin-top:-10px;">يتم التحديث تلقائياً وبشكل فوري عند إضافة أي حجز جديد.</p>
+                
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>اسم المريض</th>
+                                <th>رقم الهاتف</th>
+                                <th>التشخيص / الإجراء</th>
+                                <th>الوقت والتاريخ</th>
+                                <th>الموظف المسؤول</th>
+                            </tr>
+                        </thead>
+                        <tbody id="appointmentsTableBody">
+                            </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // 🚨 استبدل الـ Config دي ببيانات مشروع الـ Firebase الخاص بيك
+        // 🚨 حط هنا الـ Config الخاصة بمشروع الفايربيز بتاعك
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
             authDomain: "YOUR_AUTH_DOMAIN",
@@ -331,7 +293,7 @@
         let currentUserRole = "";
         let cachedUserName = "";
 
-        // 🎵 دالة تشغيل الصوت وكتمه الذكي (يشتغل لمرة واحدة فقط)
+        // 🎵 التحكم بالصوت المطور (دورة واحدة كاملة فقط وينتهي)
         function toggleAudio() {
             const video = document.getElementById('bgVideo');
             const icon = document.getElementById('audioIcon');
@@ -342,12 +304,12 @@
                 icon.innerText = "🔊";
                 text.innerText = "كتم الصوت";
                 
-                // 🛑 الكود المعدّل: أول ما الفيديو يخلص دورته الحالية، يقفل الصوت أوتوماتيك وميشتغلش تاني
+                // أول ما الفيديو يخلص الدورة الأولى، يكتم نفسه تلقائياً لمنع الإزعاج
                 video.onended = function() {
                     video.muted = true;
                     icon.innerText = "🔇";
                     text.innerText = "تشغيل الصوت";
-                    video.onended = null; // إزالة الحدث لعدم التكرار
+                    video.onended = null;
                 };
             } else {
                 video.muted = true;
@@ -356,26 +318,19 @@
             }
         }
 
-        // 🔐 دالة التحقق وتسجيل الدخول بالفايربيز
+        // 🔐 تسجيل الدخول
         function handleLogin() {
             const email = document.getElementById('loginEmail').value.trim();
             const pass = document.getElementById('loginPassword').value.trim();
 
-            if(!email || !pass) { 
-                alert("يرجى إدخال البريد الإلكتروني وكلمة المرور!"); 
-                return; 
-            }
+            if(!email || !pass) { alert("يرجى ملء البيانات كاملة!"); return; }
 
             auth.signInWithEmailAndPassword(email, pass)
-            .then((userCredential) => { 
-                checkUserRoleAndEnter(userCredential.user); 
-            })
-            .catch((error) => { 
-                alert("خطأ في بيانات الدخول: " + error.message); 
-            });
+            .then((userCredential) => { checkUserRoleAndEnter(userCredential.user); })
+            .catch((error) => { alert("خطأ في بيانات الدخول: " + error.message); });
         }
 
-        // 🛡️ فحص صلاحية الحساب والتعامل الذكي مع أول تسجيل دخول
+        // 🛡️ فحص الأمان وتفعيل الحسابات الجديدة لأول مرة
         function checkUserRoleAndEnter(user) {
             currentUserUid = user.uid;
 
@@ -386,35 +341,33 @@
                     currentUserRole = data.role;
                     cachedUserName = data.name || user.email;
                     
-                    // إخفاء شاشة الدخول والخلفية الفيديو تماماً عند نجاح الدخول
+                    // إخفاء شاشات ومؤثرات تسجيل الدخول بالكامل لفتح المنظومة
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('bgVideo').style.display = 'none';
                     document.getElementById('videoOverlay').style.display = 'none';
-                    document.querySelector('.audio-control').style.display = 'none';
+                    document.getElementById('audioBtn').style.display = 'none';
                     document.getElementById('dashboardScreen').style.display = 'block';
                     
                     applyRoleUI(cachedUserName);
-                    loadAppointments(); 
+                    loadAppointments(); // تحميل المواعيد لايف
 
-                    if(currentUserRole === 'admin') { 
-                        listenToActivationRequests(); 
-                    }
+                    if(currentUserRole === 'admin') { listenToActivationRequests(); }
                 } else {
-                    // 🚨 حساب جديد يدخل لأول مرة -> نرفع طلب تفعيل فوري للأدمن
+                    // 🚨 حساب جديد كلياً -> يرسل طلب تفعيل فوري للأدمن
                     database.ref('activationRequests').child(user.uid).set({
                         uid: user.uid,
                         email: user.email,
                         requestTime: new Date().toLocaleString('ar-EG'),
                         status: 'pending'
                     }).then(() => {
-                        alert('⏳ هذا أول تسجيل دخول لك على السيستم. تم إرسال إشعار وطلب تفعيل فوري للدكتور (الأدمن).. يرجى انتظاره للموافقة وتفعيل صلاحية حسابك.');
+                        alert('⏳ هذا أول تسجيل دخول لك بالمنظومة. تم إرسال إشعار وطلب تفعيل فوري للدكتور (الأدمن).. يرجى انتظاره للموافقة وتفعيل صلاحيات حسابك.');
                         auth.signOut();
                     });
                 }
             });
         }
 
-        // 🎨 تنسيق الشارات ولوحة التحكم حسب الوظيفة
+        // 🎨 ضبط شارات الهوية والـ UI
         function applyRoleUI(name) {
             const badge = document.getElementById('userBadge');
             const adminSection = document.getElementById('adminOnlySection');
@@ -430,12 +383,12 @@
             }
         }
 
-        // 📢 مراقبة طلبات تفعيل الحسابات الجديدة لايف (تعمل على شاشة الدكتور)
+        // 📢 استقبال الإشعارات الحية للأدمن عند محاولة دخول موظف جديد
         function listenToActivationRequests() {
             database.ref('activationRequests').on('child_added', (snapshot) => {
                 const request = snapshot.val();
                 if (request && request.status === 'pending') {
-                    const approve = confirm(`🚨 إشعار أمان: حساب موظف جديد يحاول تسجيل الدخول لأول مرة!\n\nالبريد: ${request.email}\nالوقت: ${request.requestTime}\n\nهل تريد جلب بياناته لتفعيل صلاحياته الآن؟`);
+                    const approve = confirm(`🚨 تنبيه أمان: حساب موظف جديد يحاول الدخول لأول مرة بالسيستم!\n\nالبريد: ${request.email}\nالوقت: ${request.requestTime}\n\nهل تريد ملء حقول التفعيل له الآن؟`);
                     if (approve) {
                         document.getElementById('roleUid').value = request.uid;
                         document.getElementById('roleName').value = "موظف استقبال جديد";
@@ -445,29 +398,29 @@
             });
         }
 
-        // 💾 حفظ صلاحية الموظف الجديد (شغل الأدمن)
+        // 💾 حفظ صلاحية الموظف الجديد (الأدمن)
         function saveUserRole() {
             const uid = document.getElementById('roleUid').value.trim();
             const name = document.getElementById('roleName').value.trim();
             const role = document.getElementById('roleSelect').value;
 
-            if(!uid || !name) { alert("يرجى إدخال الـ UID والاسم بالكامل!"); return; }
+            if(!uid || !name) { alert("برجاء ملء البيانات بالكامل!"); return; }
 
             database.ref('userRoles').child(uid).set({ name: name, role: role }).then(() => {
-                alert("✅ تم تفعيل حساب الموظف بنجاح وثبتنا صلاحيته!");
+                alert("✅ تم تفعيل حساب الموظف بنجاح وتثبيت وظيفته بالسيستم!");
                 document.getElementById('roleUid').value = "";
                 document.getElementById('roleName').value = "";
             });
         }
 
-        // 💾 حفظ حجز المرضى في الفايربيز
+        // 💾 حفظ الحجوزات اليومية للمرضى بمساحة العيادة
         function saveAppointment() {
             const name = document.getElementById('patientName').value.trim();
             const phone = document.getElementById('patientPhone').value.trim();
             const caseText = document.getElementById('patientCase').value.trim();
             const time = document.getElementById('appointmentTime').value;
 
-            if(!name || !phone || !time) { alert("يرجى ملء كافة البيانات الأساسية للحجز!"); return; }
+            if(!name || !phone || !time) { alert("يرجى ملء كافة الخانات الأساسية للحجز!"); return; }
 
             database.ref('appointments').push({
                 patientName: name,
@@ -476,7 +429,7 @@
                 appointmentTime: time,
                 createdBy: cachedUserName
             }).then(() => {
-                alert("✅ تم حفظ وتأمين الحجز في قاعدة بيانات العيادة بنجاح!");
+                alert("✅ تم تفعيل وحفظ الحجز بمساحة السيستم بنجاح!");
                 document.getElementById('patientName').value = "";
                 document.getElementById('patientPhone').value = "";
                 document.getElementById('patientCase').value = "";
@@ -484,7 +437,7 @@
             });
         }
 
-        // 📂 جلب واستعراض المواعيد بالجدول لايف
+        // 📂 جلب وعرض البيانات في الجدول لايف وتحديثها لحظياً
         function loadAppointments() {
             database.ref('appointments').on('value', (snapshot) => {
                 const tbody = document.getElementById('appointmentsTableBody');
@@ -492,7 +445,7 @@
                 snapshot.forEach((childSnapshot) => {
                     const apt = childSnapshot.val();
                     const row = `<tr>
-                        <td>${apt.patientName}</td>
+                        <td><strong>${apt.patientName}</strong></td>
                         <td>${apt.patientPhone}</td>
                         <td>${apt.patientCase}</td>
                         <td>${apt.appointmentTime.replace('T', ' ')}</td>
@@ -503,7 +456,7 @@
             });
         }
 
-        // 🚪 خروج آمن
+        // 🚪 تسجيل الخروج الآمن
         function handleLogout() {
             auth.signOut().then(() => { location.reload(); });
         }
