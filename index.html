@@ -3,8 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Italian Dental Center</title>
+    <title>المركز الإيطالي للأسنان - نظام إدارة العيادة</title>
     <style>
+        /* ================= تصميم الواجهة والـ CSS ================= */
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --accent: #0d9488;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -12,1120 +27,653 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        body, html {
-            width: 100%;
-            height: 100%;
+        body {
+            background-color: var(--background);
+            color: var(--text-main);
             overflow-x: hidden;
-            background-color: #f1f5f9;
         }
 
-        /* --- الشاشة الأولى: تسجيل الدخول --- */
-        #loginScreen {
+        /* شاشة الدخول المتقدمة خلفية فيديو */
+        .login-screen {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999; overflow: hidden;
         }
 
         .video-bg {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 50%; left: 50%;
+            min-width: 100%; min-height: 100%;
+            width: auto; height: auto;
+            transform: translate(-50%, -50%);
             object-fit: cover;
-            z-index: 1;
+            filter: brightness(0.4) blur(4px);
         }
 
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+        .login-card {
+            position: relative; z-index: 2;
             background: rgba(255, 255, 255, 0.85);
-            z-index: 2;
-        }
-
-        .login-content {
-            position: relative;
-            z-index: 3;
-            width: 100%;
-            max-width: 420px;
-            height: 100%;
-            padding: 40px 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            overflow-y: auto;
-        }
-
-        .header-brand {
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 2.5rem; border-radius: 24px;
+            width: 100%; max-width: 420px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
             text-align: center;
-            margin-top: 20px;
-            width: 100%;
-        }
-
-        .brand-title {
-            font-size: 38px;
-            font-weight: 900;
-            color: #000000;
-            line-height: 1.2;
-        }
-
-        .brand-sub {
-            font-size: 26px;
-            font-weight: bold;
-            color: #000000;
-            margin-top: 5px;
-        }
-
-        .form-container {
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        .login-tabs {
-            display: flex;
-            gap: 10px;
-            width: 100%;
-            margin-bottom: 25px;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 10px;
-            background: transparent;
-            border: 2px solid #000000;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 14px;
-            color: #000000;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .tab-btn.active {
-            background: #b91c1c;
-            color: #ffffff;
-            border-color: #b91c1c;
-        }
-
-        .link-btn {
-            color: #0284c7;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            text-decoration: underline;
-            display: inline-block;
-        }
-
-        .input-group {
-            margin-bottom: 25px;
-            text-align: right;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 12px;
-            font-size: 20px;
-            font-weight: bold;
-            color: #000000;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 10px;
-            font-size: 18px;
-            border: none;
-            border-bottom: 2px solid #000000;
-            background: transparent;
-            color: #000000;
-            outline: none;
-            text-align: right;
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 14px;
-            background: #b91c1c;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-
-        .footer-address {
-            text-align: center;
-            font-size: 16px;
-            font-weight: bold;
-            color: #000000;
-            line-height: 1.5;
-            margin-bottom: 20px;
-            width: 100%;
+            animation: fadeIn 0.6s ease-out;
         }
 
         .audio-btn {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            z-index: 10;
-            background: rgba(0, 0, 0, 0.7);
-            border: none;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 12px;
+            position: absolute; top: 20px; right: 20px; z-index: 10;
+            background: rgba(0,0,0,0.6); color: #fff; border: none;
+            padding: 8px 14px; border-radius: 30px; cursor: pointer; font-size: 13px;
         }
 
-        /* --- الشاشة الثانية: لوحة التحكم العامة --- */
-        #dashboard {
-            display: none;
-            width: 100%;
-            min-height: 100vh;
-            background: #f4f6f9;
-            padding: 15px;
-            position: relative;
+        /* الهيكل الأساسي للوحة التحكم */
+        .dashboard-layout {
+            display: none; min-height: 100vh; position: relative;
         }
 
-        .dash-header {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            background: #ffffff;
-            padding: 15px 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-            gap: 15px;
+        /* الهيدر العلوي */
+        .main-header {
+            background: var(--surface);
+            height: 70px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; position: fixed; top: 0; left: 0; right: 0; z-index: 100;
         }
 
         .menu-toggle {
-            background: none;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            width: 24px;
-            height: 18px;
-            z-index: 95;
+            background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-main);
         }
 
-        .menu-toggle span {
-            display: block;
-            height: 3px;
-            width: 100%;
-            background-color: #1e293b;
-            border-radius: 3px;
-            transition: 0.3s;
-        }
+        .header-title { font-size: 1.25rem; font-weight: bold; color: var(--primary); }
+        .live-clock { font-weight: bold; font-size: 14px; background: #e0e7ff; color: var(--primary); padding: 6px 12px; border-radius: 20px; }
 
-        .dash-title {
-            color: #1e293b;
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .user-badge {
-            margin-right: auto;
-            font-size: 13px;
-            color: #64748b;
-            font-weight: bold;
-            white-space: nowrap;
-        }
-
+        /* القائمة الجانبية */
         .sidebar {
-            position: fixed;
-            top: 0;
-            right: -280px;
-            width: 280px;
-            height: 100%;
-            background: #ffffff;
-            box-shadow: -4px 0 15px rgba(0,0,0,0.1);
-            z-index: 90;
-            transition: 0.3s ease;
-            padding: 80px 20px 20px 20px;
-            overflow-y: auto;
+            position: fixed; top: 70px; right: -280px; width: 280px; height: calc(100vh - 70px);
+            background: var(--surface); border-left: 1px solid var(--border);
+            z-index: 99; transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto; padding: 20px 0;
         }
 
-        .sidebar.open {
-            right: 0;
-        }
-
-        .sidebar-menu {
-            list-style: none;
-        }
-
-        .sidebar-menu li {
-            padding: 12px 10px;
-            border-bottom: 1px solid #f1f5f9;
-            font-size: 16px;
-            font-weight: bold;
-            color: #334155;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .sidebar-menu li:hover, .sidebar-menu li.active {
-            background: #f8fafc;
-            color: #0284c7;
-        }
+        .sidebar.open { right: 0; }
 
         .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.3);
-            z-index: 80;
+            position: fixed; top: 70px; left: 0; width: 100%; height: calc(100vh - 70px);
+            background: rgba(0,0,0,0.3); z-index: 98; display: none; backdrop-filter: blur(2px);
         }
 
-        .sidebar-overlay.show {
-            display: block;
+        .sidebar-overlay.show { display: block; }
+
+        .user-profile-box {
+            padding: 0 20px 20px 20px; border-bottom: 1px solid var(--border); margin-bottom: 15px;
         }
 
-        .page-section {
-            display: none;
+        .user-label { font-weight: bold; color: var(--text-main); margin-bottom: 4px; }
+        .current-date { font-size: 12px; color: var(--text-muted); }
+
+        .sidebar-menu { list-style: none; }
+        .sidebar-menu li {
+            padding: 14px 20px; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+            transition: all 0.2s; color: var(--text-main); font-weight: 500;
         }
+
+        .sidebar-menu li:hover { background: #f1f5f9; color: var(--primary); }
+        .sidebar-menu li.active { background: #eef2ff; color: var(--primary); border-right: 4px solid var(--primary); }
+        .badge-count { background: var(--danger); color: white; padding: 2px 7px; border-radius: 10px; font-size: 11px; }
+
+        /* المحتوى الرئيسي */
+        .main-content { padding: 90px 20px 30px 20px; max-width: 1300px; margin: 0 auto; }
+        .page-section { display: none; animation: fadeIn 0.4s ease; }
+        .page-section.active-page { display: block; }
+
+        /* الإحصائيات شريط أفقي */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: var(--surface); padding: 15px; border-radius: 16px; border: 1px solid var(--border);
+            text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .stat-card h3 { font-size: 12px; color: var(--text-muted); margin-bottom: 5px; }
+        .stat-card .num { font-size: 22px; font-weight: 800; color: var(--text-main); }
+        .card-w { border-bottom: 4px solid var(--warning); }
+        .card-u { border-bottom: 4px solid var(--text-muted); }
+        .card-c { border-bottom: 4px solid var(--primary); }
+        .card-x { border-bottom: 4px solid var(--danger); }
+        .card-l { border-bottom: 4px solid #b91c1c; }
+
+        /* الجداول وتصميم الزيارات */
+        .section-title { font-size: 16px; font-weight: bold; margin: 20px 0 12px 0; color: #334155; display: flex; align-items: center; gap: 8px; }
+        .table-container { background: var(--surface); border-radius: 16px; border: 1px solid var(--border); overflow-x: auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01); margin-bottom: 25px; }
         
-        .page-section.active-page {
-            display: block;
-        }
+        table { width: 100%; border-collapse: collapse; text-align: right; font-size: 14px; }
+        th { background: #f8fafc; padding: 14px; color: #475569; font-weight: 600; border-bottom: 1px solid var(--border); }
+        td { padding: 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
 
-        /* كروت الإحصائيات */
-        .stats-card {
-            background: #4caf50;
-            color: white;
-            border-radius: 12px;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
-        }
-
-        .stats-left {
-            flex: 1;
-            padding-right: 20px;
-        }
-
-        .stats-right {
-            text-align: center;
-            flex: 1;
-            border-left: 1px solid rgba(255,255,255,0.3);
-        }
-
-        .stats-right .date-label {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .stats-right .date-val {
-            font-size: 22px;
-            font-weight: 900;
-        }
-
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 16px;
-            margin-bottom: 6px;
-            font-weight: bold;
-        }
-
-        /* كروت المنيو المالي الصغير */
-        .finance-cards-grid {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        .fin-card {
-            flex: 1;
-            padding: 15px;
-            border-radius: 10px;
-            color: white;
-            text-align: center;
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        .fin-inc { background: #10b981; }
-        .fin-exp { background: #ef4444; }
-        .fin-net { background: #3b82f6; }
-        .fin-card h4 { font-size: 14px; margin-bottom: 5px; opacity: 0.9; }
-        .fin-card div { font-size: 20px; font-weight: 900; }
-
-        .room-section {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .room-title {
-            font-size: 18px;
-            color: #64748b;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .live-clock {
-            font-size: 42px;
-            font-weight: 900;
-            color: #1e293b;
-        }
-
-        .table-container {
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
-            position: relative;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .table-container {
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
-            position: relative;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .table-header {
-            padding: 15px;
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
-            text-align: right;
-            border-top-left-radius: 12px;
-            border-top-right-radius: 12px;
-            position: sticky;
-            left: 0;
-        }
-
-        .bg-orange { background: #f59e0b; }
-        .bg-blue { background: #38bdf8; }
-        .bg-purple { background: #6366f1; }
-        .bg-teal { background: #0d9488; }
-        .bg-dark-blue { background: #1e293b; }
-        .bg-magenta { background: #d946ef; }
-        .bg-emerald { background: #10b981; }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: right;
-            min-width: 750px;
-        }
-
-        th {
-            background: #f8fafc;
-            color: #64748b;
-            padding: 12px;
-            font-size: 14px;
-            font-weight: bold;
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        td {
-            padding: 14px 12px;
-            font-size: 15px;
-            color: #334155;
-            border-bottom: 1px solid #f1f5f9;
-            font-weight: 600;
-            vertical-align: middle;
-        }
-
-        .no-data {
-            text-align: center;
-            color: #94a3b8;
-            font-size: 14px;
-            padding: 30px 10px;
-            font-weight: normal;
-        }
-
-        .patient-name-click {
-            cursor: pointer;
-            color: #1e293b;
-            font-weight: bold;
-            display: inline-block;
-            transition: color 0.2s;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        .patient-name-click:hover {
-            color: #0284c7;
-            text-decoration: underline;
-        }
-
+        .patient-name-click { font-weight: bold; color: var(--primary); cursor: pointer; display: inline-block; transition: color 0.2s; -webkit-user-select: none; user-select: none; }
+        .patient-name-click:hover { color: var(--primary-dark); text-decoration: underline; }
+        
+        /* القائمة المنسدلة الذكية لتغيير الحالة */
         .status-dropdown, .lab-dropdown {
-            display: none;
-            position: absolute;
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            z-index: 99999 !important;
-            width: 160px;
-            overflow: hidden;
-        }
-        .status-dropdown.show-menu, .lab-dropdown.show-menu {
-            display: block;
-        }
-        .status-dropdown div, .lab-dropdown div {
-            padding: 10px 12px;
-            font-size: 14px;
-            font-weight: bold;
-            color: #334155;
-            cursor: pointer;
-            transition: background 0.2s;
-            text-align: right;
-        }
-        .status-dropdown div:hover, .lab-dropdown div:hover {
-            background: #f1f5f9;
-            color: #0284c7;
+            position: absolute; background: white; border: 1px solid var(--border);
+            border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            z-index: 999; display: none; width: 150px; padding: 6px 0;
         }
 
-        .status-badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
-            margin-top: 5px;
-        }
+        .status-dropdown div, .lab-dropdown div { padding: 10px 14px; cursor: pointer; font-size: 13px; transition: background 0.2s; text-align: right; }
+        .status-dropdown div:hover, .lab-dropdown div:hover { background: #f1f5f9; color: var(--primary); }
+        .show-menu { display: block !important; }
+
+        /* البادجات الملونة */
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; }
         .badge-waiting { background: #fef3c7; color: #d97706; }
-        .badge-unconfirmed { background: #f1f5f9; color: #64748b; }
-        .badge-confirmed { background: #e0f2fe; color: #0369a1; }
-        .badge-canceled { background: #fee2e2; color: #b91c1c; }
-        .badge-lost { background: #ffedd5; color: #ea580c; }
-        
-        .badge-lab-making { background: #fef3c7; color: #d97706; }
+        .badge-unconfirmed { background: #f1f5f9; color: #475569; }
+        .badge-confirmed { background: #dbeafe; color: #2563eb; }
+        .badge-canceled { background: #fee2e2; color: #dc2626; }
+        .badge-lost { background: #fdd8d8; color: #b91c1c; }
+
+        .badge-lab-making { background: #ffedd5; color: #ea580c; }
         .badge-lab-ready { background: #e0f2fe; color: #0369a1; }
-        .badge-lab-done { background: #dcfce7; color: #15803d; }
+        .badge-lab-done { background: #d1fae5; color: #059669; }
 
-        .note-badge {
-            display: inline-block; 
-            margin-top: 5px; 
-            padding: 2px 8px; 
-            background: #f0fdf4; 
-            color: #16a34a; 
-            border-radius: 4px; 
-            font-size: 11px; 
-            font-weight: bold;
-            margin-right: 5px;
+        .note-badge { background: #f0fdfa; color: #0d9488; font-size: 11px; padding: 3px 8px; border-radius: 6px; border: 1px solid #ccfbf1; margin-right: 5px; }
+
+        /* تصاميم الفورم والمدخلات */
+        .form-card { background: var(--surface); border-radius: 20px; border: 1px solid var(--border); padding: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); max-width: 600px; margin: 0 auto; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .full-width { grid-column: span 2; }
+        
+        .form-group { display: flex; flex-direction: column; margin-bottom: 15px; }
+        .form-group label { font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #475569; }
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 11px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; background: #f8fafc; transition: all 0.2s; outline: none;
         }
 
-        .form-card {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            margin-top: 10px;
-        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); background: #ffffff; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        
+        .submit-btn { background: var(--primary); color: white; border: none; padding: 13px; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; transition: background 0.2s; margin-top: 10px; width: 100%; }
+        .submit-btn:hover { background: var(--primary-dark); }
 
-        .form-card h3 {
-            color: #1e293b;
-            font-size: 20px;
-            margin-bottom: 25px;
-            border-bottom: 2px solid #f1f5f9;
-            padding-bottom: 10px;
-        }
+        /* كروت لوحة تحكم الأدمن والماليات */
+        .admin-cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+        .fin-card { background: var(--surface); padding: 20px; border-radius: 16px; border: 1px solid var(--border); text-align: center; }
+        .fin-card h4 { font-size: 13px; color: var(--text-muted); margin-bottom: 5px; }
+        .fin-card .amount { font-size: 20px; font-weight: bold; }
 
-        .custom-form-group {
-            margin-bottom: 20px;
-            text-align: right;
-        }
+        /* البحث في الأرشيف */
+        .search-box { background: var(--surface); border: 1px solid var(--border); padding: 12px 18px; border-radius: 12px; display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+        .search-box input { border: none; outline: none; width: 100%; font-size: 14px; }
 
-        .custom-form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 15px;
-            font-weight: bold;
-            color: #475569;
-        }
+        /* جداول فرعية في سجل الأرشيف */
+        .history-sub-table { width: 100%; margin-top: 8px; background: #f8fafc; border-radius: 8px; overflow: hidden; font-size: 12px; }
+        .history-sub-table th { background: #e2e8f0; padding: 8px; font-size: 11px; }
+        .history-sub-table td { padding: 8px; border-bottom: 1px solid #e2e8f0; }
 
-        .custom-form-group input, .custom-form-group select {
-            width: 100%;
-            padding: 12px;
-            font-size: 15px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            outline: none;
-            background-color: #f8fafc;
-            transition: 0.3s;
-        }
+        /* زري طلبات الموظفين وسحب مخزن */
+        .req-btn { padding: 6px 12px; border: none; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; margin-left: 5px; }
+        .req-accept { background: #d1fae5; color: #065f46; }
+        .req-reject { background: #fee2e2; color: #991b1b; }
+        .stock-alert { background: #fffbeb !important; }
 
-        .custom-form-group input:focus, .custom-form-group select:focus {
-            border-color: #0284c7;
-            background-color: #ffffff;
-            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
-        }
+        .no-data { text-align: center; padding: 30px; color: var(--text-muted); font-style: italic; }
 
-        .form-row-2 {
-            display: flex;
-            gap: 15px;
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        .form-row-2 .custom-form-group {
-            flex: 1;
-        }
-
-        .submit-appointment-btn {
-            width: 100%;
-            padding: 14px;
-            background: #0284c7;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 10px;
-        }
-
-        .submit-appointment-btn:hover {
-            background: #0369a1;
-        }
-
-        .search-wrapper {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 12px 15px;
-            font-size: 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            outline: none;
-            text-align: right;
-            transition: 0.3s;
-        }
-
-        .search-input:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-        }
-
-        .history-sub-table {
-            width: 100%;
-            margin-top: 8px;
-            background: #f8fafc;
-            border-radius: 6px;
-            min-width: 600px;
-        }
-
-        .history-sub-table th {
-            background: #cbd5e1;
-            color: #1e293b;
-            padding: 8px;
-            font-size: 13px;
-        }
-
-        .history-sub-table td {
-            padding: 8px;
-            font-size: 13px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .req-btn {
-            border: none;
-            padding: 8px 14px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 13px;
-            margin-left: 6px;
-            color: #ffffff;
-        }
-        .req-accept { background: #10b981; }
-        .req-reject { background: #ef4444; }
-
-        .req-badge {
-            display: none;
-            background: #ef4444;
-            color: #fff;
-            border-radius: 10px;
-            padding: 2px 8px;
-            font-size: 11px;
-            margin-right: 6px;
-        }
-
-        /* تنبيه المخزن عند نقص الكمية */
-        .stock-alert {
-            background-color: #fee2e2 !important;
-            color: #b91c1c !important;
-        }
-
-        @media (max-width: 480px) {
-            .form-row-2 {
-                flex-direction: column;
-                gap: 0;
-            }
-            .finance-cards-grid {
-                flex-direction: column;
-                gap: 10px;
-            }
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .stats-grid :nth-child(5) { grid-column: span 2; }
+            .form-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+            .admin-cards-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <div id="loginScreen">
-        <video class="video-bg" id="bgVideo" autoplay playsinline loop>
-            <source src="intro.mp4" type="video/mp4">
-        </video>
-        
-        <div class="overlay"></div>
+    <!-- ================= شاشة الدخول ================= -->
+    <div class="login-screen" id="loginScreen">
+        <!-- زر تشغيل الصوت في حال كتمه المتصفح تلقائياً -->
         <button class="audio-btn" onclick="toggleMute(event)">🔊 كتم الصوت</button>
+        <video class="video-bg" id="bgVideo" autoplay loop playsinline>
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-dentist-checking-the-teeth-of-a-patient-42352-large.mp4" type="video/mp4">
+        </video>
 
-        <div class="login-content">
-            <div class="header-brand">
-                <div class="brand-title">المركز</div>
-                <div class="brand-title">الإيطالي</div>
-                <div class="brand-sub">لتجميل وزراعة الأسنان</div>
-            </div>
+        <!-- كارت الفورم الموحد (دخول) -->
+        <div class="login-card" id="unifiedLoginForm" style="display: block;">
+            <h2 style="margin-bottom: 8px; color: #1e1b4b; font-size: 22px;">المركز الإيطالي للأسنان</h2>
+            <p style="color: #475569; font-size: 13px; margin-bottom: 25px;">تسجيل الدخول إلى نظام العيادة الذكي</p>
+            <form>
+                <div class="form-group" style="text-align: right;">
+                    <label>اسم المستخدم أو البريد الإلكتروني</label>
+                    <input type="text" id="unifiedUserInput" placeholder="أدخل بيانات اعتمادك" required>
+                </div>
+                <div class="form-group" style="text-align: right;">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="unifiedPassInput" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="submit-btn" style="margin-top: 15px;">تسجيل الدخول المستقر</button>
+            </form>
+            <p style="margin-top: 20px; font-size: 13px; color: #475569;">
+                موظف جديد؟ <span onclick="showRegisterForm()" style="color: var(--primary); font-weight: bold; cursor: pointer; text-decoration: underline;">إنشاء طلب انضمام</span>
+            </p>
+        </div>
 
-            <div class="form-container" id="loginArea">
-
-                <form id="unifiedLoginForm">
-                    <div class="input-group">
-                        <label>اسم المستخدم / الإيميل:</label>
-                        <input type="text" id="unifiedUserInput" required placeholder="اسم المستخدم أو إيميل الإدارة">
-                    </div>
-                    <div class="input-group">
-                        <label>كلمة المرور:</label>
-                        <input type="password" id="unifiedPassInput" required placeholder="••••••••">
-                    </div>
-                    <button type="submit" class="login-btn">دخول</button>
-                    <div style="text-align:center; margin-top:18px;">
-                        <span class="link-btn" onclick="showRegisterForm()">مستخدم جديد؟ سجّل طلب حساب</span>
-                    </div>
-                </form>
-
-                <form id="employeeRegisterForm" style="display:none;">
-                    <div class="input-group">
-                        <label>الاسم بالكامل:</label>
-                        <input type="text" id="regNameInput" required placeholder="اسمك بالكامل">
-                    </div>
-                    <div class="input-group">
-                        <label>رقم التليفون:</label>
-                        <input type="tel" id="regPhoneInput" required placeholder="رقم تليفونك">
-                    </div>
-                    <div class="input-group">
-                        <label>اسم المستخدم المطلوب:</label>
-                        <input type="text" id="regUserInput" required placeholder="اختر اسم مستخدم">
-                    </div>
-                    <div class="input-group">
-                        <label>كلمة المرور:</label>
-                        <input type="password" id="regPassInput" required placeholder="اختر كلمة مرور">
-                    </div>
-                    <button type="submit" class="login-btn">إرسال طلب التسجيل</button>
-                    <div style="text-align:center; margin-top:18px;">
-                        <span class="link-btn" onclick="showLoginForm()">لديك حساب بالفعل؟ سجّل الدخول</span>
-                    </div>
-                </form>
-
-            </div>
-
-            <div class="footer-address">
-                7 القضاة - شارع الطاقة - النادي الأهلي<br>مدينة نصر - القاهرة
-            </div>
+        <!-- كارت الفورم الموحد (تسجيل موظف جديد بانتظار الموافقة) -->
+        <div class="login-card" id="employeeRegisterForm" style="display: none;">
+            <h2 style="margin-bottom: 8px; color: #1e1b4b; font-size: 20px;">طلب انضمام طاقم العمل</h2>
+            <p style="color: #475569; font-size: 13px; margin-bottom: 20px;">سيتم مراجعة طلبك فوراً من قِبل الإدارة</p>
+            <form>
+                <div class="form-group" style="text-align: right;">
+                    <label>الاسم الكامل</label>
+                    <input type="text" id="regNameInput" placeholder="الاسم ثلاثي" required>
+                </div>
+                <div class="form-group" style="text-align: right;">
+                    <label>رقم الهاتف</label>
+                    <input type="tel" id="regPhoneInput" placeholder="01xxxxxxxxx" required>
+                </div>
+                <div class="form-group" style="text-align: right;">
+                    <label>اسم مستخدم مقترح للولوج</label>
+                    <input type="text" id="regUserInput" placeholder="باللغة الإنجليزية" required>
+                </div>
+                <div class="form-group" style="text-align: right;">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="regPassInput" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="submit-btn">إرسال الطلب للإدارة</button>
+            </form>
+            <p style="margin-top: 15px; font-size: 13px; color: #475569;">
+                لديك حساب بالفعل؟ <span onclick="showLoginForm()" style="color: var(--primary); font-weight: bold; cursor: pointer; text-decoration: underline;">تسجيل الدخول</span>
+            </p>
         </div>
     </div>
 
-    <div id="dashboard">
-        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-        <div class="sidebar" id="sidebar">
-            <ul class="sidebar-menu">
-                <li id="menu-home" class="active" onclick="switchPage('home')">الرئيسية</li>
-                <li id="menu-add" onclick="switchPage('add')">إضافة موعد جديد</li>
-                <li id="menu-history" onclick="switchPage('history')">سجل المرضى</li>
-                <li id="menu-lab" onclick="switchPage('lab')">المعامل والتركيبات</li>
-                <li id="menu-categories" onclick="switchPage('categories')">الأقسام</li>
-                <li id="menu-inventory" onclick="switchPage('inventory')" style="display:none;">المخزن واللوازم 🔐</li>
-                <li id="menu-requests" onclick="switchPage('requests')" style="display:none;">طلبات الموظفين الجدد <span id="requestsBadge" class="req-badge">0</span></li>
-                <li id="menu-admin" onclick="switchPage('admin')" style="display:none;">الإدارة والماليات 🔐</li>
-                <li onclick="logoutSystem()" style="color: #b91c1c;">تسجيل الخروج</li>
-            </ul>
-        </div>
+    <!-- ================= لوحة تحكم النظام الأساسية ================= -->
+    <div class="dashboard-layout" id="dashboard">
         
-        <div class="dash-header">
-            <button class="menu-toggle" onclick="toggleSidebar()">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <div class="dash-title" id="pageMainTitle">المركز الإيطالي للأسنان - الرئيسية</div>
-            <div class="user-badge" id="currentUserDisplay"></div>
-        </div>
+        <!-- الهيدر العلوي المستقر -->
+        <header class="main-header">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+                <span class="header-title" id="pageMainTitle">المركز الإيطالي للأسنان - الرئيسية</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span class="live-clock" id="liveClock">00:00:00 ص</span>
+                <button onclick="logoutSystem()" class="req-btn req-reject" style="padding: 8px 14px; border-radius: 20px;">تسجيل خروج</button>
+            </div>
+        </header>
 
-        <div id="page-home" class="page-section active-page">
-            <div class="stats-card">
-                <div class="stats-left">
-                    <div class="stat-row"><span>منتظر:</span><span id="count-waiting">0</span></div>
-                    <div class="stat-row"><span>غير مؤكد:</span><span id="count-unconfirmed">0</span></div>
-                    <div class="stat-row"><span>مؤكد:</span><span id="count-confirmed">0</span></div>
-                    <div class="stat-row"><span>تم إلغاءه:</span><span id="count-canceled">0</span></div>
-                    <div class="stat-row"><span>فقد:</span><span id="count-lost">0</span></div>
+        <!-- القائمة الجانبية المنسدلة -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+        <aside class="sidebar" id="sidebar">
+            <div class="user-profile-box">
+                <div class="user-label" id="currentUserDisplay">👤 جاري التحميل...</div>
+                <div class="current-date" id="currentDate">--/--/----</div>
+            </div>
+            <ul class="sidebar-menu">
+                <li id="menu-home" class="active" onclick="switchPage('home')">🏠 الزيارات والحالات اليومية <span></span></li>
+                <li id="menu-add" onclick="switchPage('add')">📅 حجز موعد زيارة جديد <span></span></li>
+                <li id="menu-lab" onclick="switchPage('lab')">🦷 المعامل والتركيبات الخارجية <span></span></li>
+                <li id="menu-categories" onclick="switchPage('categories')">📁 الأقسام والتخصصات <span></span></li>
+                <li id="menu-history" onclick="switchPage('history')">📜 سجل الأرشيف التاريخي <span></span></li>
+                <li id="menu-inventory" onclick="switchPage('inventory')" style="display: none;">📦 المخزن ولوازم العيادة (أدمن) <span></span></li>
+                <li id="menu-requests" onclick="switchPage('requests')" style="display: none;">👥 طلبات الموظفين المعلقة <span class="badge-count" id="requestsBadge" style="display: none;">0</span></li>
+                <li id="menu-admin" onclick="switchPage('admin')" style="display: none;">💼 الإدارة والتقارير المالية (أدمن) <span></span></li>
+            </ul>
+        </aside>
+
+        <!-- المحتوى والمشاهد الأساسية للسيستم -->
+        <main class="main-content">
+
+            <!-- 1. واجهة الصفحة الرئيسية (الزيارات اليومية) -->
+            <div id="page-home" class="page-section active-page">
+                <!-- شريط الإحصائيات العلوي السريع -->
+                <div class="stats-grid">
+                    <div class="stat-card card-w"><h3>⏳ منتظر</h3><div class="num" id="count-waiting">0</div></div>
+                    <div class="stat-card card-u"><h3>⚪ غير مؤكد</h3><div class="num" id="count-unconfirmed">0</div></div>
+                    <div class="stat-card card-c"><h3>🔵 مؤكد</h3><div class="num" id="count-confirmed">0</div></div>
+                    <div class="stat-card card-x"><h3>❌ تم إلغاؤه</h3><div class="num" id="count-canceled">0</div></div>
+                    <div class="stat-card card-l"><h3>⚠️ فقد</h3><div class="num" id="count-lost">0</div></div>
                 </div>
-                <div class="stats-right">
-                    <div class="date-label">اليوم</div>
-                    <div class="date-val" id="currentDate">--/--/----</div>
+
+                <h3 class="section-title">⏱️ جدول الزيارات والانتظار الحالي (اليوم)</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 100px;">الموعد</th>
+                                <th>بيانات المريض الأساسية</th>
+                                <th>العيادة</th>
+                                <th>الطبيب المعالج</th>
+                            </tr>
+                        </thead>
+                        <tbody id="upcomingVisitsBody">
+                            <tr id="noUpcomingRow"><td colspan="4" class="no-data">لا توجد زيارات قادمة اليوم</td></tr>
+                        </tbody>
+                    </table>
                 </div>
-            </div>
 
-            <div class="room-section">
-                <div class="room-title">زيارات الغرف</div>
-                <div class="live-clock" id="liveClock">--:-- --</div>
-            </div>
-
-            <div class="table-container" id="lateTableContainer">
-                <div class="table-header bg-orange">الزيارات المتأخرة (اضغط ضغطة مطولة لتعديل الزيارة)</div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width: 20%;">الوقت المحدد</th>
-                            <th style="width: 40%;">المريض</th>
-                            <th style="width: 20%;">الغرفة / العيادة</th>
-                            <th style="width: 20%;">الطبيب</th>
-                        </tr>
-                    </thead>
-                    <tbody id="lateVisitsBody">
-                        <tr id="noLateRow">
-                            <td colspan="4" class="no-data">لا توجد زيارات متأخرة حالياً</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="table-container" id="upcomingTableContainer">
-                <div class="table-header bg-blue">الزيارات القادمة</div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width: 20%;">الوقت المحدد</th>
-                            <th style="width: 40%;">المريض</th>
-                            <th style="width: 20%;">الغرفة / العيادة</th>
-                            <th style="width: 20%;">الطبيب</th>
-                        </tr>
-                    </thead>
-                    <tbody id="upcomingVisitsBody">
-                        <tr id="noUpcomingRow">
-                            <td colspan="4" class="no-data">لا توجد زيارات قادمة اليوم</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="page-add" class="page-section">
-            <div class="form-card">
-                <h3>حجز موعد عيادة جديد</h3>
-                <form id="appointmentForm">
-                    <div class="custom-form-group">
-                        <label for="patientName">اسم المريض:</label>
-                        <input type="text" id="patientName" placeholder="أدخل اسم المريض الرباعي" required>
-                    </div>
-                    <div class="custom-form-group">
-                        <label for="patientPhone">رقم المريض:</label>
-                        <input type="tel" id="patientPhone" placeholder="أدخل رقم الهاتف" required>
-                    </div>
-                    <div class="custom-form-group">
-                        <label for="appointmentDate">تاريخ الموعد:</label>
-                        <input type="date" id="appointmentDate" required>
-                    </div>
-                    <div class="custom-form-group">
-                        <label for="appointmentTime">ساعة الموعد:</label>
-                        <input type="time" id="appointmentTime" required>
-                    </div>
-                    <div class="custom-form-group">
-                        <label for="appointmentClinic">رقم أو اسم العيادة (الغرفة):</label>
-                        <input type="text" id="appointmentClinic" placeholder="عيادة 1..." required>
-                    </div>
-                    <div class="custom-form-group">
-                        <label for="appointmentDoctor">اسم الطبيب المعالج:</label>
-                        <input type="text" id="appointmentDoctor" placeholder="أدخل اسم الطبيب" required>
-                    </div>
-                    <div class="custom-form-group">
-                        <label for="appointmentCode">الكود (رقم):</label>
-                        <input type="number" id="appointmentCode" placeholder="أدخل رقم الكود الخاص بالمريض" required>
-                    </div>
-                    <div class="custom-form-group">
-                        <label for="appointmentNote">نوع الزيارة / الملاحظات:</label>
-                        <input type="text" id="appointmentNote" placeholder="مثال: حشو عصب، زراعة...">
-                    </div>
-                    <button type="submit" class="submit-appointment-btn">حفظ وتأكيد الموعد</button>
-                </form>
-            </div>
-        </div>
-
-        <div id="page-history" class="page-section">
-            <div class="search-wrapper">
-                <input type="text" id="historySearchInput" class="search-input" oninput="filterHistory()" placeholder="🔍 ابحث عن مريض بالاسم، رقم الهاتف، أو الكود...">
-            </div>
-            <div class="table-container">
-                <div class="table-header bg-purple">سجل الأرشيف التاريخي للمرضى</div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width: 25%;">المريض الأساسي</th>
-                            <th style="width: 10%;">عدد المرات</th>
-                            <th style="width: 65%;">التفاصيلوجدول الزيارات والملاحظات السابقة</th>
-                        </tr>
-                    </thead>
-                    <tbody id="historyTableBody">
-                        <tr id="noHistoryRow">
-                            <td colspan="3" class="no-data">السجل فارغ حالياً</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="page-lab" class="page-section">
-            <div class="form-card">
-                <h3>إرسال حالة جديدة للمعمل</h3>
-                <form id="labForm">
-                    <div class="custom-form-group">
-                        <label for="labPatientName">اسم المريض:</label>
-                        <input type="text" id="labPatientName" placeholder="أدخل اسم المريض" required>
-                    </div>
-                    <div class="custom-form-group">
-                        <label for="labName">اسم المعمل:</label>
-                        <input type="text" id="labName" placeholder="مثال: معمل الحرمين..." required>
-                    </div>
-                    <div class="custom-form-group">
-                        <label for="labWorkType">نوع التركيبة / الشغل المطلوبة:</label>
-                        <input type="text" id="labWorkType" placeholder="مثال: كراون زيركون..." required>
-                    </div>
-                    <div class="custom-form-group">
-                        <label for="labDoctor">الطبيب المسؤول:</label>
-                        <input type="text" id="labDoctor" placeholder="اسم الدكتور المشرف" required>
-                    </div>
-                    <div class="form-row-2">
-                        <div class="custom-form-group">
-                            <label for="labExitDate">تاريخ خروج الشغل (الإرسال):</label>
-                            <input type="date" id="labExitDate" required>
-                        </div>
-                        <div class="custom-form-group">
-                            <label for="labDeliveryDate">تاريخ الاستلام المتوقع:</label>
-                            <input type="date" id="labDeliveryDate" required>
-                        </div>
-                    </div>
-                    <button type="submit" class="submit-appointment-btn" style="background: #0d9488;">إرسال وتسجيل للمعمل</button>
-                </form>
-            </div>
-            <br>
-            <div class="table-container">
-                <div class="table-header bg-teal">حالات المعمل والتركيبات الحالية</div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width: 20%;">المريض</th>
-                            <th style="width: 15%;">المعمل</th>
-                            <th style="width: 25%;">نوع التركيبة والشغل</th>
-                            <th style="width: 13%;">تاريخ الخروج</th>
-                            <th style="width: 13%;">تاريخ الاستلام</th>
-                            <th style="width: 14%;">الحالة</th>
-                        </tr>
-                    </thead>
-                    <tbody id="labTableBody">
-                        <tr id="noLabRow">
-                            <td colspan="6" class="no-data">لا توجد طلبات معمل مسجلة حالياً</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="page-categories" class="page-section">
-            <div class="form-card">
-                <h3>إنشاء قسم عيادة جديد</h3>
-                <form id="categoryForm">
-                    <div class="custom-form-group">
-                        <label for="catName">اسم القسم:</label>
-                        <input type="text" id="catName" placeholder="مثال: عيادة التركيبات، قسم الجراحة والزراعة..." required>
-                    </div>
-                    <div class="custom-form-group">
-                        <label for="catDesc">وصف القسم / ملاحظات:</label>
-                        <input type="text" id="catDesc" placeholder="تفاصيل إضافية عن القسم">
-                    </div>
-                    <button type="submit" class="submit-appointment-btn" style="background: #10b981;">حفظ القسم</button>
-                </form>
-            </div>
-            <br>
-            <div class="table-container">
-                <div class="table-header bg-emerald">أقسام المركز الحالية</div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width: 40%;">اسم القسم</th>
-                            <th style="width: 60%;">الوصف والملاحظات</th>
-                        </tr>
-                    </thead>
-                    <tbody id="categoriesTableBody">
-                        <tr id="noCategoriesRow">
-                            <td colspan="2" class="no-data">لم يتم إضافة أي أقسام حتى الآن</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="page-inventory" class="page-section">
-            <div class="form-card">
-                <h3>إضافة خامة / منتج جديد للمخزن</h3>
-                <form id="inventoryForm">
-                    <div class="custom-form-group">
-                        <label for="itemName">اسم المنتج / الخامة:</label>
-                        <input type="text" id="itemName" placeholder="مثال: مخدر موضعي، مقاسات سيليكون..." required>
-                    </div>
-                    <div class="form-row-2">
-                        <div class="custom-form-group">
-                            <label for="itemQuantity">الكمية الحالية:</label>
-                            <input type="number" id="itemQuantity" placeholder="0" required>
-                        </div>
-                        <div class="custom-form-group">
-                            <label for="itemMinAlert">حد الأمان (التنبيه عند النقص):</label>
-                            <input type="number" id="itemMinAlert" placeholder="مثال: ينبهك لو وصل أقل من 5" required>
-                        </div>
-                    </div>
-                    <button type="submit" class="submit-appointment-btn" style="background: #d946ef;">إضافة للمخزن</button>
-                </form>
-            </div>
-            <br>
-            <div class="table-container">
-                <div class="table-header bg-magenta">جرد خامات ومواد المخزن الحالية</div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>اسم الخامة / المنتج</th>
-                            <th>الكمية المتاحة</th>
-                            <th>حد التنبيه</th>
-                            <th>حالة المخزون</th>
-                            <th>إجراءات السحب</th>
-                        </tr>
-                    </thead>
-                    <tbody id="inventoryTableBody">
-                        <tr id="noInventoryRow">
-                            <td colspan="5" class="no-data">المخزن فارغ حالياً، أضف مواد جديدة</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="page-requests" class="page-section">
-            <div class="table-container">
-                <div class="table-header bg-purple">طلبات تسجيل الموظفين الجدد (بانتظار الموافقة)</div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width: 25%;">الاسم</th>
-                            <th style="width: 20%;">رقم التليفون</th>
-                            <th style="width: 20%;">اسم المستخدم المطلوب</th>
-                            <th style="width: 35%;">إجراء</th>
-                        </tr>
-                    </thead>
-                    <tbody id="requestsTableBody">
-                        <tr id="noRequestsRow">
-                            <td colspan="4" class="no-data">لا توجد طلبات تسجيل جديدة حالياً</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="page-admin" class="page-section">
-            <div class="finance-cards-grid">
-                <div class="fin-card fin-inc">
-                    <h4>إجمالي الإيرادات</h4>
-                    <div id="total-income">0 EGP</div>
-                </div>
-                <div class="fin-card fin-exp">
-                    <h4>إجمالي المصروفات</h4>
-                    <div id="total-expenses">0 EGP</div>
-                </div>
-                <div class="fin-card fin-net">
-                    <h4>صافي الأرباح</h4>
-                    <div id="total-net">0 EGP</div>
+                <h3 class="section-title">📉 حالات تم إلغاؤها أو فُقدت اليوم</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 100px;">الموعد</th>
+                                <th>بيانات المريض</th>
+                                <th>العيادة</th>
+                                <th>الطبيب المعالج</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lateVisitsBody">
+                            <tr id="noLateRow"><td colspan="4" class="no-data">لا توجد زيارات متأخرة حالياً</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            <div class="form-card">
-                <h3>تسجيل حركة مالية جديدة (حسابات المركز)</h3>
-                <form id="financeForm">
-                    <div class="form-row-2">
-                        <div class="custom-form-group">
-                            <label for="finType">نوع المعاملة:</label>
-                            <select id="finType" required>
-                                <option value="income">📈 إيرادات (مستلم من مريض / كشف / علاج)</option>
-                                <option value="expense">📉 مصروفات (خامات / معامل / فواتير / كهرباء)</option>
-                            </select>
+            <!-- 2. واجهة إضافة موعد جديد -->
+            <div id="page-add" class="page-section">
+                <div class="form-card">
+                    <h3 style="margin-bottom: 20px; text-align: center; color: var(--primary);">حجز وتقييد موعد زيارة مريض</h3>
+                    <form id="appointmentForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>اسم المريض الكامل</label>
+                                <input type="text" id="patientName" placeholder="أدخل اسم المريض" required>
+                            </div>
+                            <div class="form-group">
+                                <label>رقم الهاتف</label>
+                                <input type="tel" id="patientPhone" placeholder="01xxxxxxxxx" required>
+                            </div>
+                            <div class="form-group">
+                                <label>تاريخ الزيارة</label>
+                                <input type="date" id="appointmentDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label>وقت الزيارة المحدد</label>
+                                <input type="time" id="appointmentTime" required>
+                            </div>
+                            <div class="form-group">
+                                <label>العيادة التخصصية</label>
+                                <select id="appointmentClinic">
+                                    <option value="عيادة جراحة الفم والأسنان">عيادة جراحة الفم والأسنان</option>
+                                    <option value="عيادة تجميل وزراعة الأسنان">عيادة تجميل وزراعة الأسنان</option>
+                                    <option value="عيادة تقويم الأسنان">عيادة تقويم الأسنان</option>
+                                    <option value="عيادة أسنان الأطفال">عيادة أسنان الأطفال</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>الطبيب المعالج المختص</label>
+                                <select id="appointmentDoctor">
+                                    <option value="عمر السيوفي">دكتور / عمر السيوفي</option>
+                                    <option value="أحمد عاطف">دكتور / أحمد عاطف</option>
+                                    <option value="دينا الجيار">دكتورة / دينا الجيار</option>
+                                    <option value="مريم ممدوح">دكتورة / مريم ممدوح</option>
+                                </select>
+                            </div>
+                            <div class="form-group full-width">
+                                <label>كود المريض الفريد (ID)</label>
+                                <input type="text" id="appointmentCode" placeholder="أدخل كود المريض للربط السجلي التلقائي" required>
+                            </div>
+                            <div class="form-group full-width">
+                                <label>ملاحظات الحالة الطبية أو سبب الحجز</label>
+                                <textarea id="appointmentNote" rows="3" placeholder="مثال: كشف، استكمال عصب، خلع حشو قديم..."></textarea>
+                            </div>
                         </div>
-                        <div class="custom-form-group">
-                            <label for="finAmount">المبلغ (بالجنيه المصري):</label>
-                            <input type="number" id="finAmount" placeholder="0.00" required>
-                        </div>
-                    </div>
-                    <div class="custom-form-group">
-                        <label for="finStatement">البيان / الوصف التفصيلي للعملية:</label>
-                        <input type="text" id="finStatement" placeholder="البيان..." required>
-                    </div>
-                    <button type="submit" class="submit-appointment-btn" style="background: #1e293b;">حفظ وتقييد الدفتر المالي</button>
-                </form>
+                        <button type="submit" class="submit-btn">تثبيت وحفظ الحجز وإدراجه بالجدول</button>
+                    </form>
+                </div>
             </div>
-            <br>
-            <div class="table-container">
-                <div class="table-header bg-dark-blue">دفتر الحسابات والتدفقات النقدية العام</div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width: 20%;">التاريخ والوقت</th>
-                            <th style="width: 15%;">النوع</th>
-                            <th style="width: 45%;">البيان / التفاصيل</th>
-                            <th style="width: 20%;">المبلغ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="financeTableBody">
-                        <tr id="noFinanceRow">
-                            <td colspan="4" class="no-data">لم يتم تقييد عمليات مالية لليوم حتى الآن</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
 
+            <!-- 3. واجهة المعامل والتركيبات الخارجية -->
+            <div id="page-lab" class="page-section">
+                <div class="form-card" style="max-width: 100%; margin-bottom: 25px;">
+                    <h3 style="margin-bottom: 15px; color: var(--accent);">تسجيل طلب إرسال واستلام معمل تركيبات</h3>
+                    <form id="labForm">
+                        <div class="form-grid" style="grid-template-columns: repeat(3, 1fr);">
+                            <div class="form-group">
+                                <label>اسم المريض</label>
+                                <input type="text" id="labPatientName" placeholder="اسم المريض صاحب الحالة" required>
+                            </div>
+                            <div class="form-group">
+                                <label>اسم المعمل المتعاقد معه</label>
+                                <input type="text" id="labName" placeholder="اسم معمل التحضير" required>
+                            </div>
+                            <div class="form-group">
+                                <label>نوع التركيبة أو الشغل المطلوب</label>
+                                <input type="text" id="labWorkType" placeholder="مثال: زركون، بورسلين، طقم متحرك" required>
+                            </div>
+                            <div class="form-group">
+                                <label>الطبيب المتابع للحالة</label>
+                                <input type="text" id="labDoctor" placeholder="اسم الطبيب المسؤول" required>
+                            </div>
+                            <div class="form-group">
+                                <label>تاريخ الخروج والمعاينة</label>
+                                <input type="date" id="labExitDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label>التاريخ المتوقع للاستلام والتركيب</label>
+                                <input type="date" id="labDeliveryDate" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="submit-btn" style="background: var(--accent);">إدراج الشغل في قائمة المتابعة</button>
+                    </form>
+                </div>
+
+                <h3 class="section-title" style="color: var(--accent);">📋 قائمة تتبع المعامل والتركيبات المفتوحة</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>اسم المريض</th>
+                                <th>المعمل</th>
+                                <th>بيانات ومواصفات الشغل الطبية</th>
+                                <th>تاريخ الخروج</th>
+                                <th>موعد الاستلام المحدد</th>
+                                <th>حالة الطلب الحالية</th>
+                            </tr>
+                        </thead>
+                        <tbody id="labTableBody">
+                            <tr id="noLabRow"><td colspan="6" class="no-data">لا توجد طلبات معمل مسجلة حالياً</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 4. واجهة الأقسام والتخصصات -->
+            <div id="page-categories" class="page-section">
+                <div class="form-card" style="max-width: 100%; margin-bottom: 25px;">
+                    <h3 style="margin-bottom: 15px; color: #4338ca;">إضافة تخصص أو قسم عيادة جديد</h3>
+                    <form id="categoryForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>اسم القسم / التخصص</label>
+                                <input type="text" id="catName" placeholder="مثال: زراعة الأسنان الرقمية" required>
+                            </div>
+                            <div class="form-group">
+                                <label>وصف مختصر للقسم أو رقم الغرفة</label>
+                                <input type="text" id="catDesc" placeholder="غرفة رقم 3 - الدور الأرضي">
+                            </div>
+                        </div>
+                        <button type="submit" class="submit-btn" style="background: #4338ca;">حفظ التخصص بالنظام</button>
+                    </form>
+                </div>
+
+                <h3 class="section-title" style="color: #4338ca;">📁 الأقسام الطبية الحالية بالمركز</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>اسم القسم والتخصص</th>
+                                <th>الوصف التفصيلي والموقع</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoriesTableBody">
+                            <tr id="noCategoriesRow"><td colspan="2" class="no-data">لم يتم إضافة أقسام بعد</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 5. سجل الأرشيف التاريخي الشامل للبحث -->
+            <div id="page-history" class="page-section">
+                <div class="search-box">
+                    <span>🔍</span>
+                    <input type="text" id="historySearchInput" oninput="filterHistory()" placeholder="ابحث في ملفات المرضى التاريخية بالاسم بالكامل، رقم الهاتف، أو كود المريض...">
+                </div>
+
+                <h3 class="section-title">📜 الأرشيف التراكمي الشامل لجميع المرضى</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 25%;">بيانات المريض الكلية</th>
+                                <th style="width: 15%; text-align: center;">إجمالي الزيارات</th>
+                                <th style="width: 60%;">سجل ومواعيد الزيارات المفصلة وحالتها السابقة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr id="noHistoryRow"><td colspan="3" class="no-data">السجل فارغ حالياً</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 6. واجهة المخزن واللوازم والأدوات (مخصص للأدمن) -->
+            <div id="page-inventory" class="page-section">
+                <div class="form-card" style="max-width: 100%; margin-bottom: 25px;">
+                    <h3 style="margin-bottom: 15px; color: #b45309;">إضافة وتوريد مستلزمات طبية للمخزن</h3>
+                    <form id="inventoryForm">
+                        <div class="form-grid" style="grid-template-columns: repeat(3, 1fr);">
+                            <div class="form-group">
+                                <label>اسم المادة / الأداة</label>
+                                <input type="text" id="itemName" placeholder="مثال: بنج أسنان، قفازات، حشو ضوئي" required>
+                            </div>
+                            <div class="form-group">
+                                <label>الكمية الحالية الموردة</label>
+                                <input type="number" id="itemQuantity" min="1" placeholder="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label>حد الأمان الأدنى (التنبيه عند الوصول له)</label>
+                                <input type="number" id="itemMinAlert" min="1" placeholder="5" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="submit-btn" style="background: #b45309;">تثبيت وتوريد للمخزون</button>
+                    </form>
+                </div>
+
+                <h3 class="section-title" style="color: #b45309;">📦 جرد المخزن الحالي ونواقص المواد الطبيّة</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>اسم المستلزم الطّبي</th>
+                                <th>الكمية المتاحة</th>
+                                <th>حد التنبيه</th>
+                                <th>حالة المخزون</th>
+                                <th>الإجراء والتحكم</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTableBody">
+                            <tr id="noInventoryRow"><td colspan="5" class="no-data">المخزن فارغ حالياً</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 7. واجهة معالجة طلبات توظيف الموظفين المعلقة (مخصص للأدمن) -->
+            <div id="page-requests" class="page-section">
+                <h3 class="section-title" style="color: var(--danger);">👥 طلبات الانضمام المعلقة من طاقم الاستقبال الجديد</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>اسم الموظف</th>
+                                <th>رقم الهاتف</th>
+                                <th>اسم المستخدم المطلق للتسجيل</th>
+                                <th>التحكم والطلب</th>
+                            </tr>
+                        </thead>
+                        <tbody id="requestsTableBody">
+                            <tr id="noRequestsRow"><td colspan="4" class="no-data">لا توجد طلبات انضمام معلقة حالياً</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 8. واجهة الإدارة والتقارير والماليات والمنصرفات (مخصص للأدمن) -->
+            <div id="page-admin" class="page-section">
+                <!-- شريط كروت التقرير المالي التراكمي التلقائي اليومي -->
+                <div class="admin-cards-grid">
+                    <div class="fin-card" style="border-right: 5px solid var(--success);">
+                        <h4>📈 إجمالي الإيرادات المسجلة اليوم</h4>
+                        <div class="amount" id="total-income" style="color: var(--success);">0.00 EGP</div>
+                    </div>
+                    <div class="fin-card" style="border-right: 5px solid var(--danger);">
+                        <h4>📉 إجمالي المصروفات والتعاملات الخارجة</h4>
+                        <div class="amount" id="total-expenses" style="color: var(--danger);">0.00 EGP</div>
+                    </div>
+                    <div class="fin-card" style="border-right: 5px solid var(--primary);">
+                        <h4>📊 صافي الأرباح والخزينة الحالية</h4>
+                        <div class="amount" id="total-net" style="color: var(--primary);">0.00 EGP</div>
+                    </div>
+                </div>
+
+                <div class="form-card" style="max-width: 100%; margin-bottom: 25px;">
+                    <h3 style="margin-bottom: 15px; color: var(--primary);">تقييد وقيد حركة مالية جديدة في الدفتر الخزني لليوم</h3>
+                    <form id="financeForm">
+                        <div class="form-grid" style="grid-template-columns: repeat(3, 1fr);">
+                            <div class="form-group">
+                                <label>نوع المعاملة المالية</label>
+                                <select id="finType">
+                                    <option value="income">📈 إيراد (دخول كشف، استلام نقدية من مريض)</option>
+                                    <option value="expense">📉 مصروفات (شراء مستلزمات، فواتير، معامل)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>المبلغ (بالجنيه المصري EGP)</label>
+                                <input type="number" id="finAmount" step="0.1" placeholder="0.00" required>
+                            </div>
+                            <div class="form-group">
+                                <label>البيان والوصف التفصيلي للحركة</label>
+                                <input type="text" id="finStatement" placeholder="كشف المريض ... / فاتورة كهرباء" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="submit-btn">تقييد وترحيل المعاملة المالية للخزينة</button>
+                    </form>
+                </div>
+
+                <h3 class="section-title">📋 دفتر قيود اليومية التفصيلي التلقائي للعيادة</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 150px;">التوقيت واللحظة</th>
+                                <th style="width: 120px;">النوع</th>
+                                <th>البيان والتفاصيل الإدارية للمدفوع</th>
+                                <th style="width: 150px;">القيمة المالية</th>
+                            </tr>
+                        </thead>
+                        <tbody id="financeTableBody">
+                            <tr id="noFinanceRow"><td colspan="4" class="no-data">لا توجد عمليات مالية مسجلة لليوم</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
     </div>
 
+    <!-- ================= الـ JavaScript المنظم والمعدل بالكامل لتلافي الكاش ================= -->
     <script>
         const video = document.getElementById('bgVideo');
 
+        // محاولة تشغيل فيديو شاشة الدخول بسلاسة
         if (video) {
             const playPromise = video.play();
             if (playPromise !== undefined) {
@@ -1138,6 +686,7 @@
             }
         }
 
+        // هياكل البيانات الثابتة والافتراضية للسيستم
         let stats = { waiting: 0, unconfirmed: 0, confirmed: 0, canceled: 0, lost: 0 };
         let patientDataMap = {}; 
         let archivePatientsMap = {}; 
@@ -1146,15 +695,17 @@
         let inventoryList = [];
         let categoriesList = [];
 
+        // حسابات الأدمن الافتراضية الثابتة وحساب الموظف المسبق
         let adminAccount = { email: "italian$dental$center", password: "OMAR ELSİOFY $$" };
         let pendingEmployees = [];   
-        let approvedEmployees = [];  
+        let approvedEmployees = [{ username: "Italian dental center", password: "Italian 712554", name: "موظف الاستقبال", phone: "" }];  
         let currentRole = null;      
         let currentUserLabel = "";
 
         let longPressTimer;
-        const longPressDuration = 1000; 
+        const longPressDuration = 1000; // مدة الضغط المطول لتعديل بيانات المريض (ثانية واحدة)
 
+        // دالة تحميل البيانات والتحقق من الكاش لمنع استدعاء مصفوفات تالفة أو قديمة
         function loadSavedData() {
             const savedStats = localStorage.getItem('italian_clinic_stats');
             const savedPatients = localStorage.getItem('italian_clinic_patients');
@@ -1166,7 +717,6 @@
             const savedLoginStatus = localStorage.getItem('italian_clinic_logged_in');
             const savedRole = localStorage.getItem('italian_clinic_role');
             const savedUserLabel = localStorage.getItem('italian_clinic_current_user');
-            const savedAdmin = localStorage.getItem('italian_clinic_admin');
             const savedPending = localStorage.getItem('italian_clinic_pending_employees');
             const savedApproved = localStorage.getItem('italian_clinic_approved_employees');
 
@@ -1178,21 +728,23 @@
             if (savedInventory) inventoryList = JSON.parse(savedInventory);
             if (savedCategories) categoriesList = JSON.parse(savedCategories);
 
-            if (savedAdmin) {
-                adminAccount = JSON.parse(savedAdmin);
-            } else {
-                localStorage.setItem('italian_clinic_admin', JSON.stringify(adminAccount));
-            }
-
+            // تأكيد تسجيل حساب الأدمن والإستقبال بشكل قاطع لمنع تداخل كاش المتصفح القديم
+            localStorage.setItem('italian_clinic_admin', JSON.stringify(adminAccount));
+            
             if (savedPending) pendingEmployees = JSON.parse(savedPending);
 
             if (savedApproved) {
-                approvedEmployees = JSON.parse(savedApproved);
-            } else {
-                approvedEmployees = [{ username: "Italian dental center", password: "Italian 712554", name: "موظف الاستقبال", phone: "" }];
-                localStorage.setItem('italian_clinic_approved_employees', JSON.stringify(approvedEmployees));
+                let currentSaved = JSON.parse(savedApproved);
+                // التثبت التلقائي والكامل من وجود حساب الاستقبال الإجباري داخل مصفوفة الموظفين المصرح لهم
+                const exists = currentSaved.some(emp => emp.username === "Italian dental center");
+                if(!exists) {
+                    currentSaved.push(approvedEmployees[0]);
+                }
+                approvedEmployees = currentSaved;
             }
+            localStorage.setItem('italian_clinic_approved_employees', JSON.stringify(approvedEmployees));
 
+            // تفقد حالة الولوج التلقائية المخزنة بالمتصفح
             if (savedLoginStatus === 'true' && savedRole) {
                 currentRole = savedRole;
                 currentUserLabel = savedUserLabel || "";
@@ -1203,6 +755,7 @@
                 checkLabDeadlines(); 
             }
 
+            // إعادة بناء الجداول والـ DOM بكفاءة
             updateStatsDOM();
             rebuildCurrentVisitsTables();
             rebuildLabTable();
@@ -1211,6 +764,7 @@
             rebuildCategoriesTable();
         }
 
+        // تفقد حالات معامل التركيبات والإنذار إذا وافق تاريخ استلامها اليوم ولم تنته بعد
         function checkLabDeadlines() {
             const todayStr = new Date().toISOString().split('T')[0]; 
             let alertsMessage = "";
@@ -1259,6 +813,7 @@
             document.getElementById('unifiedLoginForm').style.display = 'block';
         }
 
+        // إخفاء وإظهار قوائم الإدارة والتحكم حسب صلاحيات المستخدم الفاتح للسيستم
         function applyRoleToUI() {
             const adminMenu = document.getElementById('menu-admin');
             const requestsMenu = document.getElementById('menu-requests');
@@ -1281,6 +836,7 @@
             }
         }
 
+        // التنقل السلس بين التبويبات الداخلية للنظام
         function switchPage(pageName) {
             if ((pageName === 'admin' || pageName === 'requests' || pageName === 'inventory') && currentRole !== 'admin') {
                 alert('🚫 هذا القسم مخصص للإدارة والأدمن فقط.');
@@ -1328,6 +884,7 @@
             document.getElementById('count-lost').innerText = stats.lost;
         }
 
+        // إظهار وإخفاء القائمة المنسدلة لتغيير حالة المريض
         function toggleDropdown(e, rowId) {
             e.stopPropagation();
             document.querySelectorAll('.status-dropdown, .lab-dropdown').forEach(menu => {
@@ -1349,6 +906,7 @@
             document.querySelectorAll('.status-dropdown, .lab-dropdown').forEach(menu => menu.classList.remove('show-menu'));
         });
 
+        // تغيير حالة موعد المريض وترحيله اتوماتيك للأرشيف وتحديث العدادات الملونة
         function changePatientStatus(rowId, newStatus) {
             const patient = patientDataMap[rowId];
             if (!patient) return;
@@ -1364,6 +922,7 @@
             rebuildCurrentVisitsTables();
         }
 
+        // آلية التعديل السريع لبيانات المريض من خلال الضغط مطولاً على اسم المريض بالجدول
         function handleLongPressStart(rowId) {
             longPressTimer = setTimeout(function() {
                 const patient = patientDataMap[rowId];
@@ -1391,7 +950,7 @@
                 
                 saveDataToStorage();
                 rebuildCurrentVisitsTables();
-                alert("تم تحديث البيانات بنجاج!");
+                alert("تم تحديث البيانات بنجاح!");
             }, longPressDuration);
         }
 
@@ -1399,6 +958,7 @@
             clearTimeout(longPressTimer);
         }
 
+        // بناء وتوزيع جداول الزيارات والحالات بناءً على حالات التواجد أو الإلغاء والفقد
         function rebuildCurrentVisitsTables() {
             const upcomingBody = document.getElementById('upcomingVisitsBody');
             const lateBody = document.getElementById('lateVisitsBody');
@@ -1455,7 +1015,7 @@
                             <div onclick="changePatientStatus('${rowId}', 'lost')">⚠️ فقد</div>
                         </div>
                     </td>
-                    <td>${patient.clinic || 'غير محدد'}</td>
+                    <td>${patient.clinic || 'غير مححدد'}</td>
                     <td>${patient.doctor || 'غير محدد'}</td>
                 `;
                 targetTbody.appendChild(newRow);
@@ -1465,6 +1025,7 @@
             checkTableEmptyState('lateVisitsBody', 'noLateRow');
         }
 
+        // ربط السجل وحقن التاريخ الطبي للمريض في الأرشيف الشامل مع تجميع الحالات تلقائياً بناءً على كود المريض الثابت
         function pushToArchive(patient) {
             const uniqueKey = patient.code.trim();
             if (!archivePatientsMap[uniqueKey]) {
@@ -1477,6 +1038,7 @@
             };
         }
 
+        /* ================= معالجة المعامل والتتبع الخارجي ================= */
         document.getElementById('labForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const pName = document.getElementById('labPatientName').value;
@@ -1543,7 +1105,7 @@
             checkTableEmptyState('labTableBody', 'noLabRow');
         }
 
-        /* ================= المخزن (للأدمن فقط) ================= */
+        /* ================= جرد وإدارة مستلزمات المخزن ================= */
         document.getElementById('inventoryForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const name = document.getElementById('itemName').value;
@@ -1563,7 +1125,7 @@
                 const amount = parseInt(prompt(`كم الكمية المراد سحبها من [ ${item.name} ] ؟`, "1"));
                 if(isNaN(amount) || amount <= 0) return;
                 if(amount > item.qty) {
-                    alert('❌ الكمية المطلوبة غير متوفرة!');
+                    alert('❌ الكمية المطلوبة غير متوفرة أو أكبر من المخزون المتاح حالياً!');
                     return;
                 }
                 item.qty -= amount;
@@ -1573,7 +1135,7 @@
         }
 
         function deleteFromStock(itemId) {
-            if(confirm('حذف هذا المنتج من المخزن؟')) {
+            if(confirm('هل أنت متأكد من حذف هذا المنتج من الجرد والمخزن نهائياً؟')) {
                 inventoryList = inventoryList.filter(i => i.id !== itemId);
                 saveDataToStorage();
                 rebuildInventoryTable();
@@ -1594,9 +1156,9 @@
                     <td><strong>${item.name}</strong></td>
                     <td><b>${item.qty}</b></td>
                     <td>${item.alertMin}</td>
-                    <td>${isAlert ? '⚠️ منخفض' : '✅ آمن'}</td>
+                    <td>${isAlert ? '⚠️ منخفض (طلب توريد)' : '✅ آمن ومستقر'}</td>
                     <td>
-                        <button class="req-btn req-accept" onclick="pullFromStock('${item.id}')">🔻 سحب</button>
+                        <button class="req-btn req-accept" onclick="pullFromStock('${item.id}')">🔻 سحب كمية</button>
                         <button class="req-btn req-reject" onclick="deleteFromStock('${item.id}')">حذف</button>
                     </td>
                 `;
@@ -1605,23 +1167,23 @@
             checkTableEmptyState('inventoryTableBody', 'noInventoryRow');
         }
 
-        /* ================= الأقسام ================= */
+        /* ================= تنظيم وحفظ تخصصات الأقسام ================= */
         document.getElementById('categoryForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const name = document.getElementById('catName').value;
-            const desc = document.getElementById('catDesc').value || 'لا يوجد وصف';
+            const desc = document.getElementById('catDesc').value || 'لا يوجد وصف مضاف';
 
             categoriesList.push({ id: 'cat_' + Date.now(), name: name, desc: desc });
             saveDataToStorage();
             rebuildCategoriesTable();
             document.getElementById('categoryForm').reset();
-            alert('تم الحفظ!');
+            alert('تم حفظ القسم والتخصص بنجاح!');
         });
 
         function rebuildCategoriesTable() {
             const tbody = document.getElementById('categoriesTableBody');
             if(!tbody) return;
-            tbody.innerHTML = `<tr id="noCategoriesRow"><td colspan="2" class="no-data">لم يتم إضافة أقسام بعد</td></tr>`;
+            tbody.innerHTML = `<tr id="noCategoriesRow"><td colspan="2" class="no-data">لم يتم إضافة أقسام طبية بعد</td></tr>`;
 
             categoriesList.forEach(cat => {
                 const row = document.createElement('tr');
@@ -1631,11 +1193,11 @@
             checkTableEmptyState('categoriesTableBody', 'noCategoriesRow');
         }
 
-        /* ================= طلبات التوظيف ================= */
+        /* ================= مراجعة وقبول طلبات انضمام الاستقبال ================= */
         function renderRequestsDOM() {
             const tbody = document.getElementById('requestsTableBody');
             if (!tbody) return;
-            tbody.innerHTML = `<tr id="noRequestsRow"><td colspan="4" class="no-data">لا توجد طلبات حالياً</td></tr>`;
+            tbody.innerHTML = `<tr id="noRequestsRow"><td colspan="4" class="no-data">لا توجد طلبات معلقة حالياً</td></tr>`;
 
             pendingEmployees.forEach(req => {
                 const row = document.createElement('tr');
@@ -1644,7 +1206,7 @@
                     <td>${req.phone}</td>
                     <td>${req.username}</td>
                     <td>
-                        <button class="req-btn req-accept" onclick="acceptEmployee('${req.id}')">✅ قبول</button>
+                        <button class="req-btn req-accept" onclick="acceptEmployee('${req.id}')">✅ قبول الموظف</button>
                         <button class="req-btn req-reject" onclick="rejectEmployee('${req.id}')">❌ رفض</button>
                     </td>
                 `;
@@ -1665,13 +1227,13 @@
             localStorage.setItem('italian_clinic_approved_employees', JSON.stringify(approvedEmployees));
             localStorage.setItem('italian_clinic_pending_employees', JSON.stringify(pendingEmployees));
             renderRequestsDOM();
-            alert(`✅ تم قبول الموظف: ${req.name}`);
+            alert(`✅ تم قبول وتثبيت الموظف الجديد وصلاحية ولوجه بنجاح: ${req.name}`);
         }
 
         function rejectEmployee(id) {
             const idx = pendingEmployees.findIndex(r => r.id === id);
             if (idx === -1) return;
-            if (!confirm(`رفض هذا الطلب؟`)) return;
+            if (!confirm(`هل تود بالتأكيد حذف ورفض طلب الانضمام هذا؟`)) return;
             pendingEmployees.splice(idx, 1);
             localStorage.setItem('italian_clinic_pending_employees', JSON.stringify(pendingEmployees));
             renderRequestsDOM();
@@ -1688,7 +1250,7 @@
             }
         }
 
-        /* ================= الماليات ================= */
+        /* ================= قيد الدفاتر المالية والحسابات اليومية والتقارير التلقائية ================= */
         document.getElementById('financeForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const type = document.getElementById('finType').value;
@@ -1702,13 +1264,13 @@
             saveDataToStorage();
             rebuildFinanceDOM();
             document.getElementById('financeForm').reset();
-            alert('تم التقييد بنجاح!');
+            alert('تم تقييد التقرير وترحيله للخزينة المباشرة!');
         });
 
         function rebuildFinanceDOM() {
             const tbody = document.getElementById('financeTableBody');
             if(!tbody) return;
-            tbody.innerHTML = `<tr id="noFinanceRow"><td colspan="4" class="no-data">لا توجد عمليات مالية مسجلة لليوم</td></tr>`;
+            tbody.innerHTML = `<tr id="noFinanceRow"><td colspan="4" class="no-data">لا توجد عمليات مالية مسجلة لليوم بقائمة المعاملات المباشرة</td></tr>`;
 
             let totalIncome = 0;
             let totalExpenses = 0;
@@ -1732,6 +1294,7 @@
             checkTableEmptyState('financeTableBody', 'noFinanceRow');
         }
 
+        // معالجة وطباعة قائمة سجل الأرشيف المفصل وبناء جدول مصغر لكل زيارات المريض السابقة وحالتها
         function renderHistoryDOM() {
             const tbody = document.getElementById('historyTableBody');
             if(!tbody) return;
@@ -1739,7 +1302,7 @@
             const keys = Object.keys(archivePatientsMap);
 
             if (keys.length === 0) {
-                tbody.innerHTML = `<tr id="noHistoryRow"><td colspan="3" class="no-data">السجل فارغ حالياً</td></tr>`;
+                tbody.innerHTML = `<tr id="noHistoryRow"><td colspan="3" class="no-data">الأرشيف التاريخي لا يحتوي على أي ملفات مرضى حالياً</td></tr>`;
                 return;
             }
 
@@ -1761,7 +1324,7 @@
                 row.setAttribute('data-code', p.code);
 
                 row.innerHTML = `
-                    <td><strong>${p.name}</strong><br><small>كود: ${p.code} | ت: ${p.phone}</small></td>
+                    <td><strong>${p.name}</strong><br><small>كود المريض: ${p.code} | ت: ${p.phone}</small></td>
                     <td style="text-align: center; font-size: 18px; color: #6366f1; font-weight: bold;">${visitIds.length}</td>
                     <td>
                         <div style="overflow-x: auto;">
@@ -1776,6 +1339,7 @@
             });
         }
 
+        // محرك فلترة وبحث الأرشيف الذكي فوري التحديث
         function filterHistory() {
             const query = document.getElementById('historySearchInput').value.toLowerCase().trim();
             const rows = document.querySelectorAll('.history-item-row');
@@ -1793,7 +1357,7 @@
                 if (!noRow) {
                     const emptyRow = document.createElement('tr');
                     emptyRow.id = 'noHistoryRow';
-                    emptyRow.innerHTML = `<td colspan="3" class="no-data">لا توجد نتائج!</td>`;
+                    emptyRow.innerHTML = `<td colspan="3" class="no-data">لا توجد نتائج بحث مطابقة للبيانات المدخلة!</td>`;
                     document.getElementById('historyTableBody').appendChild(emptyRow);
                 } else noRow.style.display = 'table-row';
             } else if (noRow) noRow.remove();
@@ -1808,6 +1372,7 @@
             placeholder.style.display = (visibleRows === 0) ? 'table-row' : 'none';
         }
 
+        // تسجيل الخروج وإعادة تشغيل واجهة الولوج بشكل سليم
         function logoutSystem() {
             saveDataToStorage(); 
             localStorage.setItem('italian_clinic_logged_in', 'false'); 
@@ -1816,6 +1381,7 @@
             location.reload(); 
         }
 
+        // تنسيق توقيت الساعة ليكون بصيغة 12 ساعة المألوفة (صباحاً/مساءً) للموظفين بدل الصيغة العسكرية
         function formatTime12Hour(timeString) {
             if (!timeString) return '--:--';
             const [sHours, sMinutes] = timeString.split(':');
@@ -1825,6 +1391,7 @@
             return `${String(hours).padStart(2, '0')}:${sMinutes} ${ampm}`;
         }
 
+        // تقييد وإضافة زيارة جديدة بالكامل
         document.getElementById('appointmentForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const name = document.getElementById('patientName').value;
@@ -1834,7 +1401,7 @@
             const clinic = document.getElementById('appointmentClinic').value;
             const doctor = document.getElementById('appointmentDoctor').value;
             const code = document.getElementById('appointmentCode').value;
-            const note = document.getElementById('appointmentNote').value || "فحص عام"; 
+            const note = document.getElementById('appointmentNote').value || "فحص طبي عام"; 
 
             const dateObj = new Date(rawDate);
             const formattedDate = `${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth() + 1).padStart(2, '0')}/${dateObj.getFullYear()}`;
@@ -1847,10 +1414,11 @@
 
             changePatientStatus(rowId, 'waiting');
             document.getElementById('appointmentForm').reset();
-            alert('تم حجز الموعد بنجاح!');
+            alert('تم حجز الموعد وإدراجه بقائمة الانتظار بنجاح!');
             switchPage('home');
         });
 
+        // تشغيل الساعة والوقت المباشر في هيدر لوحة التحكم للالتزام بالمواعيد بدقة
         function updateClock() {
             const clockEl = document.getElementById('liveClock');
             if(!clockEl) return;
@@ -1868,11 +1436,13 @@
         const dateEl = document.getElementById('currentDate');
         if(dateEl) dateEl.innerText = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
 
+        // معالجة حدث نموذج الدخول وفحص البيانات الموحد بدقة تامة وبدون تعليق الكاش
         document.getElementById('unifiedLoginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const user = document.getElementById('unifiedUserInput').value.trim();
             const pass = document.getElementById('unifiedPassInput').value;
 
+            // 1. فحص بيانات حساب الأدمن الأساسي والثابت
             if (user === adminAccount.email && pass === adminAccount.password) {
                 currentRole = 'admin';
                 currentUserLabel = 'الإدارة';
@@ -1887,6 +1457,7 @@
                 return;
             }
 
+            // 2. فحص مصفوفة الموظفين المصرح والمقبول لهم الولوج
             const match = approvedEmployees.find(emp => emp.username === user && emp.password === pass);
             if (match) {
                 currentRole = 'employee';
@@ -1901,9 +1472,10 @@
                 checkLabDeadlines();
                 return;
             }
-            alert("بيانات الدخول غير صحيحة!");
+            alert("⚠️ بيانات الدخول غير صحيحة! يرجى التحقق من اسم المستخدم وكلمة المرور.");
         });
 
+        // تسجيل وإرسال طلب موظف جديد لانتظار معالجة الإدارة
         document.getElementById('employeeRegisterForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const name = document.getElementById('regNameInput').value.trim();
@@ -1913,17 +1485,18 @@
 
             const usernameTaken = approvedEmployees.some(emp => emp.username === username) || pendingEmployees.some(req => req.username === username);
             if (usernameTaken) {
-                alert("اسم المستخدم مستعمل مسبقاً!");
+                alert("❌ اسم المستخدم هذا مستعمل مسبقاً من قِبل موظف آخر، اختر اسماً مغايراً!");
                 return;
             }
 
             pendingEmployees.push({ id: 'req_' + Date.now(), name: name, phone: phone, username: username, password: password });
             localStorage.setItem('italian_clinic_pending_employees', JSON.stringify(pendingEmployees));
-            alert("تم إرسال طلبك! بانتظار موافقة الإدارة.");
+            alert("✅ تم إرسال طلب انضمامك للنظام بنجاح! يرجى مراجعة الأدمن لتفعيل الحساب.");
             document.getElementById('employeeRegisterForm').reset();
             showLoginForm();
         });
 
+        // تشغيل وفك التعبئة للبيانات بمجرد تحميل المتصفح للمشروع بالكامل
         window.onload = loadSavedData;
     </script>
 </body>
