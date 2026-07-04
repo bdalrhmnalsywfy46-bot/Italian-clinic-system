@@ -259,11 +259,12 @@
             right: -280px;
             width: 280px;
             height: 100%;
-            background: #ffffff;
-            box-shadow: -4px 0 15px rgba(0,0,0,0.1);
+            background: linear-gradient(180deg, #0a0a0a 0%, #1c1c1c 60%, #0a0a0a 100%);
+            box-shadow: -6px 0 25px rgba(0,0,0,0.5);
             z-index: 90;
             transition: 0.3s ease;
-            padding: 80px 20px 20px 20px;
+            padding: 80px 16px 20px 16px;
+            border-left: 3px solid #d4af37;
         }
 
         .sidebar.open {
@@ -275,18 +276,24 @@
         }
 
         .sidebar-menu li {
-            padding: 15px 10px;
-            border-bottom: 1px solid #f1f5f9;
+            padding: 16px 14px;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            border: 1px solid rgba(212, 175, 55, 0.25);
             font-size: 16px;
             font-weight: bold;
-            color: #334155;
+            color: #e8c96a;
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.25s ease;
+            letter-spacing: 0.3px;
         }
 
         .sidebar-menu li:hover, .sidebar-menu li.active {
-            background: #f8fafc;
-            color: #0284c7;
+            background: linear-gradient(90deg, #b8860b, #f0d478);
+            color: #0a0a0a;
+            border-color: #f0d478;
+            box-shadow: 0 4px 14px rgba(212, 175, 55, 0.45);
+            transform: translateX(-3px);
         }
 
         .sidebar-overlay {
@@ -296,7 +303,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.55);
             z-index: 80;
         }
 
@@ -731,7 +738,7 @@
                 <li id="menu-warehouse" onclick="switchPage('warehouse')" style="display:none;">المخزن</li>
                 <li id="menu-requests" onclick="switchPage('requests')" style="display:none;">الإدارة <span id="requestsBadge" class="req-badge">0</span></li>
                 <li id="menu-admin" onclick="switchPage('admin')" style="display:none;">الإدارة والماليات 🔐</li>
-                <li onclick="logoutSystem()" style="color: #b91c1c;">تسجيل الخروج</li>
+                <li onclick="logoutSystem()" style="color: #ff6b6b; border-color: rgba(255,107,107,0.35); margin-top: 20px;">تسجيل الخروج</li>
             </ul>
         </div>
         
@@ -1215,7 +1222,7 @@
             }
 
             if (currentUserDisplay) {
-                currentUserDisplay.innerText = currentRole === 'admin' ? `👑 الإدارة: ${currentUserLabel}` : `👤 ${currentUserLabel}`;
+                currentUserDisplay.innerText = currentRole === 'admin' ? `👑 ${currentUserLabel}` : `👤 ${currentUserLabel}`;
             }
         }
 
