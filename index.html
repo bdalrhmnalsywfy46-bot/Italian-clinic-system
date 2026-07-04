@@ -414,6 +414,7 @@
         .bg-purple { background: #6366f1; }
         .bg-teal { background: #0d9488; }
         .bg-dark-blue { background: #1e293b; }
+        .bg-green { background: #059669; }
 
         table {
             width: 100%;
@@ -507,6 +508,9 @@
         .badge-lab-making { background: #fef3c7; color: #d97706; }
         .badge-lab-ready { background: #e0f2fe; color: #0369a1; }
         .badge-lab-done { background: #dcfce7; color: #15803d; }
+
+        .badge-stock-ok { background: #dcfce7; color: #15803d; }
+        .badge-stock-low { background: #fee2e2; color: #b91c1c; }
 
         .note-badge {
             display: inline-block; 
@@ -651,6 +655,21 @@
         .req-accept { background: #10b981; }
         .req-reject { background: #ef4444; }
 
+        .stock-btn {
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 15px;
+            color: #ffffff;
+            margin: 0 3px;
+        }
+        .stock-plus { background: #10b981; }
+        .stock-minus { background: #ef4444; }
+        .stock-del { background: #94a3b8; }
+
         .req-badge {
             display: none;
             background: #ef4444;
@@ -752,6 +771,7 @@
                 <li id="menu-add" onclick="switchPage('add')">إضافة موعد جديد</li>
                 <li id="menu-history" onclick="switchPage('history')">سجل المرضى</li>
                 <li id="menu-lab" onclick="switchPage('lab')">المعامل والتركيبات</li>
+                <li id="menu-warehouse" onclick="switchPage('warehouse')">المخزن</li>
                 <li id="menu-requests" onclick="switchPage('requests')" style="display:none;">طلبات الموظفين الجدد <span id="requestsBadge" class="req-badge">0</span></li>
                 <li id="menu-admin" onclick="switchPage('admin')" style="display:none;">الإدارة والماليات 🔐</li>
                 <li onclick="logoutSystem()" style="color: #b91c1c;">تسجيل الخروج</li>
@@ -966,6 +986,65 @@
             </div>
         </div>
 
+        <!-- ================= صفحة المخزن ================= -->
+        <div id="page-warehouse" class="page-section">
+            <div class="form-card">
+                <h3>إضافة صنف جديد للمخزن</h3>
+                <form id="warehouseForm">
+                    <div class="custom-form-group">
+                        <label for="itemName">اسم الصنف:</label>
+                        <input type="text" id="itemName" placeholder="مثال: قفازات، مخدر موضعي، زيركون..." required>
+                    </div>
+
+                    <div class="form-row-2">
+                        <div class="custom-form-group">
+                            <label for="itemQuantity">الكمية الحالية:</label>
+                            <input type="number" id="itemQuantity" placeholder="0" min="0" required>
+                        </div>
+                        <div class="custom-form-group">
+                            <label for="itemUnit">الوحدة:</label>
+                            <input type="text" id="itemUnit" placeholder="مثال: علبة، قطعة، لفة..." required>
+                        </div>
+                    </div>
+
+                    <div class="custom-form-group">
+                        <label for="itemMinLimit">الحد الأدنى للتنبيه (اختياري):</label>
+                        <input type="number" id="itemMinLimit" placeholder="0" min="0">
+                    </div>
+
+                    <div class="custom-form-group">
+                        <label for="itemNote">ملاحظات:</label>
+                        <input type="text" id="itemNote" placeholder="أي تفاصيل إضافية عن الصنف">
+                    </div>
+
+                    <button type="submit" class="submit-appointment-btn" style="background: #059669;">حفظ الصنف بالمخزن</button>
+                </form>
+            </div>
+
+            <br>
+
+            <div class="table-container">
+                <div class="table-header bg-green">أصناف المخزن الحالية</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">اسم الصنف</th>
+                            <th style="width: 15%;">الكمية</th>
+                            <th style="width: 15%;">الوحدة</th>
+                            <th style="width: 20%;">ملاحظات</th>
+                            <th style="width: 10%;">الحالة</th>
+                            <th style="width: 15%;">تحكم</th>
+                        </tr>
+                    </thead>
+                    <tbody id="warehouseTableBody">
+                        <tr id="noWarehouseRow">
+                            <td colspan="6" class="no-data">لا توجد أصناف مسجلة بالمخزن حالياً</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- ================= صفحة طلبات الموظفين الجدد (أدمن فقط) ================= -->
         <div id="page-requests" class="page-section">
             <div class="table-container">
@@ -1080,6 +1159,7 @@
         let archivePatientsMap = {}; 
         let labDataList = []; 
         let financeTransactions = [];
+        let warehouseDataList = [];
 
         // بيانات نظام الحسابات: الأدمن + الموظفين
         let adminAccount = { email: "italian$dental$center", password: "OMAR ELSİOFY $$" };
@@ -1097,6 +1177,7 @@
             const savedArchive = localStorage.getItem('italian_clinic_archive');
             const savedLab = localStorage.getItem('italian_clinic_lab');
             const savedFinance = localStorage.getItem('italian_clinic_finance');
+            const savedWarehouse = localStorage.getItem('italian_clinic_warehouse');
             const savedLoginStatus = localStorage.getItem('italian_clinic_logged_in');
             const savedRole = localStorage.getItem('italian_clinic_role');
             const savedUserLabel = localStorage.getItem('italian_clinic_current_user');
@@ -1109,6 +1190,7 @@
             if (savedArchive) archivePatientsMap = JSON.parse(savedArchive);
             if (savedLab) labDataList = JSON.parse(savedLab);
             if (savedFinance) financeTransactions = JSON.parse(savedFinance);
+            if (savedWarehouse) warehouseDataList = JSON.parse(savedWarehouse);
 
             if (savedAdmin) {
                 adminAccount = JSON.parse(savedAdmin);
@@ -1140,6 +1222,7 @@
             rebuildCurrentVisitsTables();
             rebuildLabTable();
             rebuildFinanceDOM();
+            rebuildWarehouseTable();
         }
 
         function checkLabDeadlines() {
@@ -1165,6 +1248,7 @@
             localStorage.setItem('italian_clinic_archive', JSON.stringify(archivePatientsMap));
             localStorage.setItem('italian_clinic_lab', JSON.stringify(labDataList));
             localStorage.setItem('italian_clinic_finance', JSON.stringify(financeTransactions));
+            localStorage.setItem('italian_clinic_warehouse', JSON.stringify(warehouseDataList));
         }
 
         function toggleMute(event) {
@@ -1236,6 +1320,11 @@
                 document.getElementById('menu-lab').classList.add('active');
                 document.getElementById('pageMainTitle').innerText = "المركز الإيطالي للأسنان - المعامل والتركيبات";
                 rebuildLabTable();
+            } else if (pageName === 'warehouse') {
+                document.getElementById('page-warehouse').classList.add('active-page');
+                document.getElementById('menu-warehouse').classList.add('active');
+                document.getElementById('pageMainTitle').innerText = "المركز الإيطالي للأسنان - المخزن";
+                rebuildWarehouseTable();
             } else if (pageName === 'requests') {
                 document.getElementById('page-requests').classList.add('active-page');
                 document.getElementById('menu-requests').classList.add('active');
@@ -1492,6 +1581,78 @@
                 tbody.appendChild(row);
             });
             checkTableEmptyState('labTableBody', 'noLabRow');
+        }
+
+        /* ================= أكواد قسم المخزن ================= */
+        document.getElementById('warehouseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('itemName').value;
+            const quantity = parseFloat(document.getElementById('itemQuantity').value);
+            const unit = document.getElementById('itemUnit').value;
+            const minLimitRaw = document.getElementById('itemMinLimit').value;
+            const minLimit = minLimitRaw !== '' ? parseFloat(minLimitRaw) : 0;
+            const note = document.getElementById('itemNote').value || '-';
+
+            const itemId = 'item_' + Date.now();
+            warehouseDataList.push({
+                id: itemId,
+                name: name,
+                quantity: quantity,
+                unit: unit,
+                minLimit: minLimit,
+                note: note
+            });
+
+            saveDataToStorage();
+            rebuildWarehouseTable();
+            document.getElementById('warehouseForm').reset();
+            alert('تم حفظ الصنف بالمخزن بنجاح!');
+        });
+
+        function changeWarehouseQuantity(itemId, delta) {
+            const item = warehouseDataList.find(i => i.id === itemId);
+            if (!item) return;
+            item.quantity = Math.max(0, item.quantity + delta);
+            saveDataToStorage();
+            rebuildWarehouseTable();
+        }
+
+        function deleteWarehouseItem(itemId) {
+            const item = warehouseDataList.find(i => i.id === itemId);
+            if (!item) return;
+            if (!confirm(`هل أنت متأكد من حذف صنف: ${item.name}؟`)) return;
+            warehouseDataList = warehouseDataList.filter(i => i.id !== itemId);
+            saveDataToStorage();
+            rebuildWarehouseTable();
+        }
+
+        function rebuildWarehouseTable() {
+            const tbody = document.getElementById('warehouseTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = `<tr id="noWarehouseRow"><td colspan="6" class="no-data">لا توجد أصناف مسجلة بالمخزن حالياً</td></tr>`;
+
+            warehouseDataList.forEach(item => {
+                const isLow = item.minLimit > 0 && item.quantity <= item.minLimit;
+                const badgeHTML = isLow
+                    ? `<span class="status-badge badge-stock-low">⚠️ الكمية منخفضة</span>`
+                    : `<span class="status-badge badge-stock-ok">✅ متوفر</span>`;
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${item.name}</strong></td>
+                    <td style="${isLow ? 'color:#b91c1c; font-weight:900;' : ''}">${item.quantity}</td>
+                    <td>${item.unit}</td>
+                    <td>${item.note}</td>
+                    <td>${badgeHTML}</td>
+                    <td>
+                        <button class="stock-btn stock-plus" onclick="changeWarehouseQuantity('${item.id}', 1)">+</button>
+                        <button class="stock-btn stock-minus" onclick="changeWarehouseQuantity('${item.id}', -1)">-</button>
+                        <button class="stock-btn stock-del" onclick="deleteWarehouseItem('${item.id}')">🗑️</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            checkTableEmptyState('warehouseTableBody', 'noWarehouseRow');
         }
 
         /* ================= طلبات تسجيل الموظفين (صفحة الأدمن) ================= */
