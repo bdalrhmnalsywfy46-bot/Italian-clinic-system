@@ -772,7 +772,7 @@
                 <li id="menu-history" onclick="switchPage('history')">سجل المرضى</li>
                 <li id="menu-lab" onclick="switchPage('lab')">المعامل والتركيبات</li>
                 <li id="menu-warehouse" onclick="switchPage('warehouse')" style="display:none;">المخزن</li>
-                <li id="menu-requests" onclick="switchPage('requests')" style="display:none;">طلبات الموظفين الجدد <span id="requestsBadge" class="req-badge">0</span></li>
+                <li id="menu-requests" onclick="switchPage('requests')" style="display:none;">الإدارة <span id="requestsBadge" class="req-badge">0</span></li>
                 <li id="menu-admin" onclick="switchPage('admin')" style="display:none;">الإدارة والماليات 🔐</li>
                 <li onclick="logoutSystem()" style="color: #b91c1c;">تسجيل الخروج</li>
             </ul>
@@ -811,7 +811,7 @@
 
             <!-- جدول الزيارات المتأخرة -->
             <div class="table-container" id="lateTableContainer">
-                <div class="table-header bg-orange">الزيارات المتأخرة (اضغط ضغطة مطولة لتعديل الزيارة)</div>
+                <div class="table-header bg-orange">الزيارات المتأخرة</div>
                 <table>
                     <thead>
                         <tr>
@@ -1116,7 +1116,10 @@
 
             <!-- جدول القيود المالية التقديرية للعيادة -->
             <div class="table-container">
-                <div class="table-header bg-dark-blue">دفتر الحسابات والتدفقات النقدية العام</div>
+                <div class="table-header bg-dark-blue" style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>دفتر الحسابات والتدفقات النقدية العام</span>
+                    <button onclick="resetFinances()" style="background:#b91c1c; color:#fff; border:none; padding:8px 14px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:13px;">🗑️ تصفير الماليات</button>
+                </div>
                 <table>
                     <thead>
                         <tr>
@@ -1478,6 +1481,7 @@
                             <div onclick="changePatientStatus('${rowId}', 'confirmed')">🔵 مؤكد</div>
                             <div onclick="changePatientStatus('${rowId}', 'canceled')">❌ تم إلغاؤه</div>
                             <div onclick="changePatientStatus('${rowId}', 'lost')">⚠️ فقد</div>
+                            <div onclick="deletePatientVisit('${rowId}')" style="color:#b91c1c;">🗑️ حذف الزيارة</div>
                         </div>
                     </td>
                     <td>${patient.clinic || 'غير محدد'}</td>
@@ -1489,6 +1493,18 @@
 
             checkTableEmptyState('upcomingVisitsBody', 'noUpcomingRow');
             checkTableEmptyState('lateVisitsBody', 'noLateRow');
+        }
+
+        function deletePatientVisit(rowId) {
+            const patient = patientDataMap[rowId];
+            if (!patient) return;
+            if (!confirm(`هل أنت متأكد من حذف زيارة: ${patient.name}؟`)) return;
+
+            if (patient.status) stats[patient.status]--;
+            delete patientDataMap[rowId];
+            updateStatsDOM();
+            saveDataToStorage();
+            rebuildCurrentVisitsTables();
         }
 
         function pushToArchive(patient) {
@@ -1554,6 +1570,15 @@
             }
         }
 
+        function deleteLabItem(labId) {
+            const item = labDataList.find(l => l.id === labId);
+            if (!item) return;
+            if (!confirm(`هل أنت متأكد من حذف حالة: ${item.patientName}؟`)) return;
+            labDataList = labDataList.filter(l => l.id !== labId);
+            saveDataToStorage();
+            rebuildLabTable();
+        }
+
         function rebuildLabTable() {
             const tbody = document.getElementById('labTableBody');
             if (!tbody) return;
@@ -1578,6 +1603,7 @@
                             <div onclick="changeLabStatus('${item.id}', 'making')">⏳ تحت التصنيع</div>
                             <div onclick="changeLabStatus('${item.id}', 'ready')">🔵 جاهز بالمعمل</div>
                             <div onclick="changeLabStatus('${item.id}', 'done')">✅ تم الاستلام</div>
+                            <div onclick="deleteLabItem('${item.id}')" style="color:#b91c1c;">🗑️ حذف الحالة</div>
                         </div>
                     </td>
                 `;
@@ -1741,6 +1767,14 @@
             document.getElementById('financeForm').reset();
             alert('تم تسجيل العملية المالية وتقييدها بالدفاتر بنجاح!');
         });
+
+        function resetFinances() {
+            if (!confirm('هل أنت متأكد من تصفير كل السجلات المالية؟ لا يمكن التراجع عن هذه الخطوة.')) return;
+            financeTransactions = [];
+            saveDataToStorage();
+            rebuildFinanceDOM();
+            alert('تم تصفير الماليات بنجاح!');
+        }
 
         function rebuildFinanceDOM() {
             const tbody = document.getElementById('financeTableBody');
