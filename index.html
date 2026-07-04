@@ -698,7 +698,6 @@
 </head>
 <body>
 
-    <!-- الواجهة الأولى: تسجيل الدخول بالفيديو والأصوات -->
     <div id="loginScreen">
         <video class="video-bg" id="bgVideo" autoplay playsinline>
             <source src="intro.mp4" type="video/mp4">
@@ -760,11 +759,9 @@
         </div>
     </div>
 
-    <!-- الواجهة الثانية: لوحة التحكم الديناميكية الشاملة -->
     <div id="dashboard">
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-        <!-- القائمة الجانبية -->
         <div class="sidebar" id="sidebar">
             <ul class="sidebar-menu">
                 <li id="menu-home" class="active" onclick="switchPage('home')">الرئيسية</li>
@@ -779,15 +776,13 @@
         </div>
         
         <div class="dash-header">
-            <!-- تم دمج اللوجو هنا باستخدام ملف 1000564518.jpg مع كتم الخلفية برمجياً -->
             <button class="logo-toggle" onclick="toggleSidebar()" title="القائمة الجانبية">
-                <img src="1000564518.jpg" alt="Italian Lab Logo">
+                <img src="IMG-20251207-WA0050.jpg" alt="Italian Lab Logo">
             </button>
             <div class="dash-title" id="pageMainTitle">المركز الإيطالي للأسنان - الرئيسية</div>
             <div class="user-badge" id="currentUserDisplay"></div>
         </div>
 
-        <!-- ================= صفحة الرئيسية (المواعيد الحالية) ================= -->
         <div id="page-home" class="page-section active-page">
             <div class="stats-card">
                 <div class="stats-left">
@@ -808,7 +803,6 @@
                 <div class="live-clock" id="liveClock">--:-- --</div>
             </div>
 
-            <!-- جدول الزيارات المتأخرة باللون الأحمر -->
             <div class="table-container" id="lateTableContainer">
                 <div class="table-header bg-red">الزيارات المتأخرة</div>
                 <table>
@@ -828,7 +822,6 @@
                 </table>
             </div>
 
-            <!-- جدول الزيارات القادمة -->
             <div class="table-container" id="upcomingTableContainer">
                 <div class="table-header bg-blue">الزيارات القادمة</div>
                 <table>
@@ -849,7 +842,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة إضافة موعد جديد ================= -->
         <div id="page-add" class="page-section">
             <div class="form-card">
                 <h3>حجز موعد عيادة جديد</h3>
@@ -891,7 +883,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة سجل المرضى ================= -->
         <div id="page-history" class="page-section">
             <div class="search-wrapper">
                 <input type="text" id="historySearchInput" class="search-input" oninput="filterHistory()" placeholder="🔍 ابحث عن مريض بالاسم، رقم الهاتف، أو الكود...">
@@ -915,7 +906,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة المعامل والتركيبات ================= -->
         <div id="page-lab" class="page-section">
             <div class="form-card">
                 <h3>إرسال حالة جديدة للمعمل</h3>
@@ -972,7 +962,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة المخزن ================= -->
         <div id="page-warehouse" class="page-section">
             <div class="form-card">
                 <h3>إضافة صنف جديد للمخزن</h3>
@@ -1025,7 +1014,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة طلبات الموظفين الجدد ================= -->
         <div id="page-requests" class="page-section">
             <div class="table-container">
                 <div class="table-header bg-purple">طلبات تسجيل الموظفين الجدد (بانتظار الموافقة)</div>
@@ -1047,7 +1035,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة الإدارة والماليات ================= -->
         <div id="page-admin" class="page-section">
             <div class="finance-cards-grid">
                 <div class="fin-card fin-inc">
