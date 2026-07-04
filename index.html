@@ -771,7 +771,7 @@
                 <li id="menu-add" onclick="switchPage('add')">إضافة موعد جديد</li>
                 <li id="menu-history" onclick="switchPage('history')">سجل المرضى</li>
                 <li id="menu-lab" onclick="switchPage('lab')">المعامل والتركيبات</li>
-                <li id="menu-warehouse" onclick="switchPage('warehouse')">المخزن</li>
+                <li id="menu-warehouse" onclick="switchPage('warehouse')" style="display:none;">المخزن</li>
                 <li id="menu-requests" onclick="switchPage('requests')" style="display:none;">طلبات الموظفين الجدد <span id="requestsBadge" class="req-badge">0</span></li>
                 <li id="menu-admin" onclick="switchPage('admin')" style="display:none;">الإدارة والماليات 🔐</li>
                 <li onclick="logoutSystem()" style="color: #b91c1c;">تسجيل الخروج</li>
@@ -1277,15 +1277,18 @@
         function applyRoleToUI() {
             const adminMenu = document.getElementById('menu-admin');
             const requestsMenu = document.getElementById('menu-requests');
+            const warehouseMenu = document.getElementById('menu-warehouse');
             const currentUserDisplay = document.getElementById('currentUserDisplay');
 
             if (currentRole === 'admin') {
                 if (adminMenu) adminMenu.style.display = 'block';
                 if (requestsMenu) requestsMenu.style.display = 'block';
+                if (warehouseMenu) warehouseMenu.style.display = 'block';
                 updateRequestsBadge();
             } else {
                 if (adminMenu) adminMenu.style.display = 'none';
                 if (requestsMenu) requestsMenu.style.display = 'none';
+                if (warehouseMenu) warehouseMenu.style.display = 'none';
             }
 
             if (currentUserDisplay) {
@@ -1294,7 +1297,7 @@
         }
 
         function switchPage(pageName) {
-            if ((pageName === 'admin' || pageName === 'requests') && currentRole !== 'admin') {
+            if ((pageName === 'admin' || pageName === 'requests' || pageName === 'warehouse') && currentRole !== 'admin') {
                 alert('🚫 هذا القسم مخصص للإدارة فقط.');
                 return;
             }
