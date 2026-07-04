@@ -204,32 +204,36 @@
             align-items: center;
             justify-content: flex-start;
             background: #ffffff;
-            padding: 15px 20px;
+            padding: 8px 20px;
             border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             margin-bottom: 20px;
             gap: 15px;
         }
 
-        .menu-toggle {
+        /* تنسيق زر اللوجو الجديد مع إزالة الخلفية البيضاء برمجياً */
+        .logo-toggle {
             background: none;
             border: none;
             cursor: pointer;
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            width: 24px;
-            height: 18px;
+            align-items: center;
+            justify-content: center;
             z-index: 95;
+            transition: transform 0.2s ease;
+            padding: 0;
+        }
+        
+        .logo-toggle:hover {
+            transform: scale(1.05);
         }
 
-        .menu-toggle span {
-            display: block;
-            height: 3px;
-            width: 100%;
-            background-color: #1e293b;
-            border-radius: 3px;
-            transition: 0.3s;
+        .logo-toggle img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            /* دمج الخلفية البيضاء لتصبح شفافة على الهيدر الأبيض */
+            mix-blend-mode: multiply; 
         }
 
         .dash-title {
@@ -409,7 +413,7 @@
             left: 0;
         }
 
-        .bg-orange { background: #f59e0b; }
+        .bg-red { background: #b91c1c; }
         .bg-blue { background: #38bdf8; }
         .bg-purple { background: #6366f1; }
         .bg-teal { background: #0d9488; }
@@ -711,8 +715,6 @@
             </div>
 
             <div class="form-container" id="loginArea">
-
-                <!-- فورم دخول موحّد: يحدد تلقائياً لو الحساب أدمن أو موظف -->
                 <form id="unifiedLoginForm">
                     <div class="input-group">
                         <label>اسم المستخدم / الإيميل:</label>
@@ -728,7 +730,6 @@
                     </div>
                 </form>
 
-                <!-- فورم طلب تسجيل موظف جديد (يحتاج موافقة الأدمن) -->
                 <form id="employeeRegisterForm" style="display:none;">
                     <div class="input-group">
                         <label>الاسم بالكامل:</label>
@@ -751,7 +752,6 @@
                         <span class="link-btn" onclick="showLoginForm()">لديك حساب بالفعل؟ سجّل الدخول</span>
                     </div>
                 </form>
-
             </div>
 
             <div class="footer-address">
@@ -779,10 +779,9 @@
         </div>
         
         <div class="dash-header">
-            <button class="menu-toggle" onclick="toggleSidebar()">
-                <span></span>
-                <span></span>
-                <span></span>
+            <!-- تم دمج اللوجو هنا باستخدام ملف 1000564518.jpg مع كتم الخلفية برمجياً -->
+            <button class="logo-toggle" onclick="toggleSidebar()" title="القائمة الجانبية">
+                <img src="1000564518.jpg" alt="Italian Lab Logo">
             </button>
             <div class="dash-title" id="pageMainTitle">المركز الإيطالي للأسنان - الرئيسية</div>
             <div class="user-badge" id="currentUserDisplay"></div>
@@ -809,9 +808,9 @@
                 <div class="live-clock" id="liveClock">--:-- --</div>
             </div>
 
-            <!-- جدول الزيارات المتأخرة -->
+            <!-- جدول الزيارات المتأخرة باللون الأحمر -->
             <div class="table-container" id="lateTableContainer">
-                <div class="table-header bg-orange">الزيارات المتأخرة</div>
+                <div class="table-header bg-red">الزيارات المتأخرة</div>
                 <table>
                     <thead>
                         <tr>
@@ -859,42 +858,34 @@
                         <label for="patientName">اسم المريض:</label>
                         <input type="text" id="patientName" placeholder="أدخل اسم المريض الرباعي" required>
                     </div>
-
                     <div class="custom-form-group">
                         <label for="patientPhone">رقم المريض:</label>
                         <input type="tel" id="patientPhone" placeholder="أدخل رقم الهاتف" required>
                     </div>
-
                     <div class="custom-form-group">
                         <label for="appointmentDate">تاريخ الموعد:</label>
                         <input type="date" id="appointmentDate" required>
                     </div>
-
                     <div class="custom-form-group">
                         <label for="appointmentTime">ساعة الموعد:</label>
                         <input type="time" id="appointmentTime" required>
                     </div>
-
                     <div class="custom-form-group">
                         <label for="appointmentClinic">رقم أو اسم العيادة (الغرفة):</label>
                         <input type="text" id="appointmentClinic" placeholder="عيادة 1..." required>
                     </div>
-
                     <div class="custom-form-group">
                         <label for="appointmentDoctor">اسم الطبيب المعالج:</label>
                         <input type="text" id="appointmentDoctor" placeholder="أدخل اسم الطبيب" required>
                     </div>
-
                     <div class="custom-form-group">
                         <label for="appointmentCode">الكود (رقم):</label>
                         <input type="number" id="appointmentCode" placeholder="أدخل رقم الكود الخاص بالمريض" required>
                     </div>
-
                     <div class="custom-form-group">
                         <label for="appointmentNote">نوع الزيارة / الملاحظات:</label>
                         <input type="text" id="appointmentNote" placeholder="مثال: حشو عصب، زراعة...">
                     </div>
-
                     <button type="submit" class="submit-appointment-btn">حفظ وتأكيد الموعد</button>
                 </form>
             </div>
@@ -905,7 +896,6 @@
             <div class="search-wrapper">
                 <input type="text" id="historySearchInput" class="search-input" oninput="filterHistory()" placeholder="🔍 ابحث عن مريض بالاسم، رقم الهاتف، أو الكود...">
             </div>
-
             <div class="table-container">
                 <div class="table-header bg-purple">سجل الأرشيف التاريخي للمرضى</div>
                 <table>
@@ -946,7 +936,6 @@
                         <label for="labDoctor">الطبيب المسؤول:</label>
                         <input type="text" id="labDoctor" placeholder="اسم الدكتور المشرف" required>
                     </div>
-                    
                     <div class="form-row-2">
                         <div class="custom-form-group">
                             <label for="labExitDate">تاريخ خروج الشغل (الإرسال):</label>
@@ -957,13 +946,10 @@
                             <input type="date" id="labDeliveryDate" required>
                         </div>
                     </div>
-                    
                     <button type="submit" class="submit-appointment-btn" style="background: #0d9488;">إرسال وتسجيل للمعمل</button>
                 </form>
             </div>
-
             <br>
-
             <div class="table-container">
                 <div class="table-header bg-teal">حالات المعمل والتركيبات الحالية</div>
                 <table>
@@ -995,7 +981,6 @@
                         <label for="itemName">اسم الصنف:</label>
                         <input type="text" id="itemName" placeholder="مثال: قفازات، مخدر موضعي، زيركون..." required>
                     </div>
-
                     <div class="form-row-2">
                         <div class="custom-form-group">
                             <label for="itemQuantity">الكمية الحالية:</label>
@@ -1006,23 +991,18 @@
                             <input type="text" id="itemUnit" placeholder="مثال: علبة، قطعة، لفة..." required>
                         </div>
                     </div>
-
                     <div class="custom-form-group">
                         <label for="itemMinLimit">الحد الأدنى للتنبيه (اختياري):</label>
                         <input type="number" id="itemMinLimit" placeholder="0" min="0">
                     </div>
-
                     <div class="custom-form-group">
                         <label for="itemNote">ملاحظات:</label>
                         <input type="text" id="itemNote" placeholder="أي تفاصيل إضافية عن الصنف">
                     </div>
-
                     <button type="submit" class="submit-appointment-btn" style="background: #059669;">حفظ الصنف بالمخزن</button>
                 </form>
             </div>
-
             <br>
-
             <div class="table-container">
                 <div class="table-header bg-green">أصناف المخزن الحالية</div>
                 <table>
@@ -1045,7 +1025,7 @@
             </div>
         </div>
 
-        <!-- ================= صفحة طلبات الموظفين الجدد (أدمن فقط) ================= -->
+        <!-- ================= صفحة طلبات الموظفين الجدد ================= -->
         <div id="page-requests" class="page-section">
             <div class="table-container">
                 <div class="table-header bg-purple">طلبات تسجيل الموظفين الجدد (بانتظار الموافقة)</div>
@@ -1067,9 +1047,8 @@
             </div>
         </div>
 
-        <!-- ================= صفحة الإدارة والماليات (أدمن فقط) ================= -->
+        <!-- ================= صفحة الإدارة والماليات ================= -->
         <div id="page-admin" class="page-section">
-            <!-- كروت الملخص المالي السريع -->
             <div class="finance-cards-grid">
                 <div class="fin-card fin-inc">
                     <h4>إجمالي الإيرادات</h4>
@@ -1085,7 +1064,6 @@
                 </div>
             </div>
 
-            <!-- نموذج إضافة عملية مالية -->
             <div class="form-card">
                 <h3>تسجيل حركة مالية جديدة (حسابات المركز)</h3>
                 <form id="financeForm">
@@ -1102,19 +1080,14 @@
                             <input type="number" id="finAmount" placeholder="0.00" required>
                         </div>
                     </div>
-
                     <div class="custom-form-group">
                         <label for="finStatement">البيان / الوصف التفصيلي للعملية:</label>
                         <input type="text" id="finStatement" placeholder="مثال: قسط زراعة أسنان مريض ممدوح / فاتورة معمل الحرمين" required>
                     </div>
-
                     <button type="submit" class="submit-appointment-btn" style="background: #1e293b;">حفظ وتقييد الدفتر المالي</button>
                 </form>
             </div>
-
             <br>
-
-            <!-- جدول القيود المالية التقديرية للعيادة -->
             <div class="table-container">
                 <div class="table-header bg-dark-blue" style="display:flex; justify-content:space-between; align-items:center;">
                     <span>دفتر الحسابات والتدفقات النقدية العام</span>
@@ -1137,14 +1110,10 @@
                 </table>
             </div>
         </div>
-
     </div>
 
     <script>
         const video = document.getElementById('bgVideo');
-
-        // بعض المتصفحات بتمنع تشغيل الفيديو بصوت تلقائياً بدون تفاعل المستخدم،
-        // فلو التشغيل بالصوت فشل، نشغّله صامت كحل بديل بدل ما يتوقف خالص
         if (video) {
             const playPromise = video.play();
             if (playPromise !== undefined) {
@@ -1164,11 +1133,10 @@
         let financeTransactions = [];
         let warehouseDataList = [];
 
-        // بيانات نظام الحسابات: الأدمن + الموظفين
         let adminAccount = { email: "italian$dental$center", password: "OMAR ELSİOFY $$" };
-        let pendingEmployees = [];   // طلبات تسجيل بانتظار موافقة الأدمن
-        let approvedEmployees = [];  // حسابات موظفين مُعتمدة
-        let currentRole = null;      // 'admin' أو 'employee'
+        let pendingEmployees = [];   
+        let approvedEmployees = [];  
+        let currentRole = null;      
         let currentUserLabel = "";
 
         let longPressTimer;
@@ -1206,7 +1174,6 @@
             if (savedApproved) {
                 approvedEmployees = JSON.parse(savedApproved);
             } else {
-                // حساب استقبال افتراضي (بيانات الدخول القديمة) عشان السيستيم مايتقفلش على حد
                 approvedEmployees = [{ username: "Italian dental center", password: "Italian 712554", name: "موظف الاستقبال", phone: "" }];
                 localStorage.setItem('italian_clinic_approved_employees', JSON.stringify(approvedEmployees));
             }
@@ -1231,13 +1198,11 @@
         function checkLabDeadlines() {
             const todayStr = new Date().toISOString().split('T')[0]; 
             let alertsMessage = "";
-
             labDataList.forEach(item => {
                 if (item.status !== 'done' && item.rawDeliveryDate <= todayStr) {
                     alertsMessage += `⚠️ الحالة: ${item.patientName} - شغل: ${item.workType} (تاريخ استلامها: ${item.deliveryDate})\n`;
                 }
             });
-
             if (alertsMessage !== "") {
                 setTimeout(() => {
                     alert(`🚨 تنبيه حالات المعمل المطلوبة اليوم:\n\n${alertsMessage}\nيرجى مراجعة المعمل واستلام الشغل المتبقي!`);
@@ -1265,7 +1230,6 @@
             document.getElementById('sidebarOverlay').classList.toggle('show');
         }
 
-        /* ================= التبديل بين فورم الدخول وفورم التسجيل ================= */
         function showRegisterForm() {
             document.getElementById('unifiedLoginForm').style.display = 'none';
             document.getElementById('employeeRegisterForm').style.display = 'block';
@@ -1276,7 +1240,6 @@
             document.getElementById('unifiedLoginForm').style.display = 'block';
         }
 
-        /* ================= صلاحيات الواجهة حسب الدور ================= */
         function applyRoleToUI() {
             const adminMenu = document.getElementById('menu-admin');
             const requestsMenu = document.getElementById('menu-requests');
@@ -1456,7 +1419,6 @@
                 newRow.setAttribute('id', rowId);
 
                 const timeColor = isLateTable ? 'style="color: #b91c1c;"' : '';
-
                 const longPressEvents = `
                     onmousedown="handleLongPressStart('${rowId}')" 
                     onmouseup="handleLongPressEnd()" 
@@ -1474,7 +1436,6 @@
                             ${badgeHTML}
                             <span class="note-badge">${patient.note}</span>
                         </div>
-
                         <div class="status-dropdown" id="drop_${rowId}">
                             <div onclick="changePatientStatus('${rowId}', 'waiting')">⏳ منتظر</div>
                             <div onclick="changePatientStatus('${rowId}', 'unconfirmed')">⚪ غير مؤكد</div>
@@ -1487,7 +1448,6 @@
                     <td>${patient.clinic || 'غير محدد'}</td>
                     <td>${patient.doctor || 'غير محدد'}</td>
                 `;
-
                 targetTbody.appendChild(newRow);
             });
 
@@ -1544,21 +1504,13 @@
 
             const labId = 'lab_' + Date.now();
             labDataList.push({
-                id: labId,
-                patientName: pName,
-                labName: lName,
-                workType: wType,
-                doctor: doc,
-                exitDate: formattedExitDate,
-                deliveryDate: formattedDelDate,
-                rawDeliveryDate: delDateRaw, 
-                status: 'making'
+                id: labId, patientName: pName, labName: lName, workType: wType, doctor: doc, exitDate: formattedExitDate, deliveryDate: formattedDelDate, rawDeliveryDate: delDateRaw, status: 'making'
             });
 
             saveDataToStorage();
             rebuildLabTable();
             document.getElementById('labForm').reset();
-            alert('تم تسجيل طلب المعمل وتواريخ الإرسال والاستلام بنجاح!');
+            alert('تم تسجيل طلب المعمل بنجاح!');
         });
 
         function changeLabStatus(labId, newStatus) {
@@ -1612,7 +1564,6 @@
             checkTableEmptyState('labTableBody', 'noLabRow');
         }
 
-        /* ================= أكواد قسم المخزن ================= */
         document.getElementById('warehouseForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const name = document.getElementById('itemName').value;
@@ -1624,12 +1575,7 @@
 
             const itemId = 'item_' + Date.now();
             warehouseDataList.push({
-                id: itemId,
-                name: name,
-                quantity: quantity,
-                unit: unit,
-                minLimit: minLimit,
-                note: note
+                id: itemId, name: name, quantity: quantity, unit: unit, minLimit: minLimit, note: note
             });
 
             saveDataToStorage();
@@ -1684,7 +1630,6 @@
             checkTableEmptyState('warehouseTableBody', 'noWarehouseRow');
         }
 
-        /* ================= طلبات تسجيل الموظفين (صفحة الأدمن) ================= */
         function renderRequestsDOM() {
             const tbody = document.getElementById('requestsTableBody');
             if (!tbody) return;
@@ -1703,7 +1648,6 @@
                 `;
                 tbody.appendChild(row);
             });
-
             checkTableEmptyState('requestsTableBody', 'noRequestsRow');
             updateRequestsBadge();
         }
@@ -1720,14 +1664,13 @@
             localStorage.setItem('italian_clinic_pending_employees', JSON.stringify(pendingEmployees));
 
             renderRequestsDOM();
-            alert(`✅ تم قبول الموظف: ${req.name}، هيقدر يدخل بنفس بياناته دلوقتي.`);
+            alert(`✅ تم قبول الموظف: ${req.name}`);
         }
 
         function rejectEmployee(id) {
             const idx = pendingEmployees.findIndex(r => r.id === id);
             if (idx === -1) return;
-            const req = pendingEmployees[idx];
-            if (!confirm(`هل أنت متأكد من رفض طلب: ${req.name}؟`)) return;
+            if (!confirm(`هل أنت متأكد من الرفض؟`)) return;
 
             pendingEmployees.splice(idx, 1);
             localStorage.setItem('italian_clinic_pending_employees', JSON.stringify(pendingEmployees));
@@ -1745,7 +1688,6 @@
             }
         }
 
-        /* --- الأكواد البرمجية لقسم الماليات --- */
         document.getElementById('financeForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const type = document.getElementById('finType').value;
@@ -1756,20 +1698,17 @@
             const timestamp = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
             financeTransactions.push({
-                dateTime: timestamp,
-                type: type,
-                amount: amount,
-                statement: statement
+                dateTime: timestamp, type: type, amount: amount, statement: statement
             });
 
             saveDataToStorage();
             rebuildFinanceDOM();
             document.getElementById('financeForm').reset();
-            alert('تم تسجيل العملية المالية وتقييدها بالدفاتر بنجاح!');
+            alert('تم تسجيل العملية المالية بنجاح!');
         });
 
         function resetFinances() {
-            if (!confirm('هل أنت متأكد من تصفير كل السجلات المالية؟ لا يمكن التراجع عن هذه الخطوة.')) return;
+            if (!confirm('هل أنت متأكد من تصفير كل السجلات المالية؟')) return;
             financeTransactions = [];
             saveDataToStorage();
             rebuildFinanceDOM();
@@ -1779,7 +1718,6 @@
         function rebuildFinanceDOM() {
             const tbody = document.getElementById('financeTableBody');
             if(!tbody) return;
-
             tbody.innerHTML = `<tr id="noFinanceRow"><td colspan="4" class="no-data">لم يتم تقييد عمليات مالية لليوم حتى الآن</td></tr>`;
 
             let totalIncome = 0;
@@ -1810,7 +1748,6 @@
             });
 
             const netProfit = totalIncome - totalExpenses;
-
             document.getElementById('total-income').innerText = `${totalIncome.toFixed(2)} EGP`;
             document.getElementById('total-expenses').innerText = `${totalExpenses.toFixed(2)} EGP`;
             document.getElementById('total-net').innerText = `${netProfit.toFixed(2)} EGP`;
@@ -1840,7 +1777,7 @@
                     let statusText = '';
                     if (v.status === 'waiting') statusText = '⏳ منتظر';
                     if (v.status === 'unconfirmed') statusText = '⚪ غير مؤكد';
-                    if (v.status === 'confirmed') statusText = '🔵 مؤكد وبانتظار الإتمام';
+                    if (v.status === 'confirmed') statusText = '🔵 مؤكد';
                     if (v.status === 'canceled') statusText = '❌ تم إلغاؤه';
                     if (v.status === 'lost') statusText = '⚠️ فقد';
 
@@ -1915,7 +1852,7 @@
                     const tbody = document.getElementById('historyTableBody');
                     const emptyRow = document.createElement('tr');
                     emptyRow.id = 'noHistoryRow';
-                    emptyRow.innerHTML = `<td colspan="3" class="no-data">عذراً، لم يتم العثور على نتائج!</td>`;
+                    emptyRow.innerHTML = `<td colspan="3" class="no-data">لم يتم العثور على نتائج!</td>`;
                     tbody.appendChild(emptyRow);
                 } else {
                     noRow.style.display = 'table-row';
@@ -1948,10 +1885,9 @@
             if (!timeString) return '--:--';
             const [sHours, sMinutes] = timeString.split(':');
             let hours = parseInt(sHours);
-            const minutes = sMinutes;
             const ampm = hours >= 12 ? 'م' : 'ص';
             hours = hours % 12 || 12;
-            return `${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
+            return `${String(hours).padStart(2, '0')}:${sMinutes} ${ampm}`;
         }
 
         document.getElementById('appointmentForm').addEventListener('submit', function(e) {
@@ -1963,7 +1899,7 @@
             const clinic = document.getElementById('appointmentClinic').value;
             const doctor = document.getElementById('appointmentDoctor').value;
             const code = document.getElementById('appointmentCode').value;
-            const note = document.getElementById('appointmentNote').value || "حشو فحص عام"; 
+            const note = document.getElementById('appointmentNote').value || "فحص عام"; 
 
             const dateObj = new Date(rawDate);
             const formattedDate = `${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth() + 1).padStart(2, '0')}/${dateObj.getFullYear()}`;
@@ -1997,13 +1933,11 @@
         const dateEl = document.getElementById('currentDate');
         if(dateEl) dateEl.innerText = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
 
-        /* ================= دخول موحّد: يتعرف تلقائياً على نوع الحساب (أدمن أو موظف) ================= */
         document.getElementById('unifiedLoginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const user = document.getElementById('unifiedUserInput').value.trim();
             const pass = document.getElementById('unifiedPassInput').value;
 
-            // 1) هل البيانات دي بيانات الأدمن؟
             if (user === adminAccount.email && pass === adminAccount.password) {
                 currentRole = 'admin';
                 currentUserLabel = 'الإدارة';
@@ -2018,7 +1952,6 @@
                 return;
             }
 
-            // 2) هل البيانات دي بيانات موظف معتمد؟
             const match = approvedEmployees.find(emp => emp.username === user && emp.password === pass);
             if (match) {
                 currentRole = 'employee';
@@ -2033,12 +1966,9 @@
                 checkLabDeadlines();
                 return;
             }
-
-            // 3) البيانات غلط في الحالتين
-            alert("اسم المستخدم / كلمة المرور غير صحيحة، أو حسابك لسه مستنى موافقة الإدارة!");
+            alert("بيانات الدخول غير صحيحة!");
         });
 
-        /* ================= طلب تسجيل موظف جديد ================= */
         document.getElementById('employeeRegisterForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const name = document.getElementById('regNameInput').value.trim();
@@ -2049,20 +1979,16 @@
             const usernameTaken = approvedEmployees.some(emp => emp.username === username) ||
                                    pendingEmployees.some(req => req.username === username);
             if (usernameTaken) {
-                alert("اسم المستخدم ده مستخدم بالفعل، اختار اسم مستخدم تاني.");
+                alert("اسم المستخدم ده مستخدم بالفعل!");
                 return;
             }
 
             pendingEmployees.push({
-                id: 'req_' + Date.now(),
-                name: name,
-                phone: phone,
-                username: username,
-                password: password
+                id: 'req_' + Date.now(), name: name, phone: phone, username: username, password: password
             });
             localStorage.setItem('italian_clinic_pending_employees', JSON.stringify(pendingEmployees));
 
-            alert("تم إرسال طلبك بنجاح! هتقدر تسجل دخولك بعد ما الإدارة توافق على طلبك.");
+            alert("تم إرسال طلبك بنجاح! بانتظار موافقة الإدارة.");
             document.getElementById('employeeRegisterForm').reset();
             showLoginForm();
         });
