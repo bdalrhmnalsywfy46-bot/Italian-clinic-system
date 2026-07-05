@@ -19,7 +19,7 @@
             background-color: #f1f5f9;
         }
 
-        /* --- الشاشة الأولى: تسجيل الدخول --- */
+        /* --- الشاشة الأولى: تسجيل الدخول (بدون أي تغيير) --- */
         #loginScreen {
             position: fixed;
             top: 0;
@@ -189,7 +189,7 @@
             font-size: 12px;
         }
 
-        /* --- الشاشة الثانية: لوحة التحكم العامة --- */
+        /* --- الشاشة الثانية: لوحة التحكم العامة (ألوان جديدة موحّدة) --- */
         #dashboard {
             display: none;
             width: 100%;
@@ -211,7 +211,6 @@
             gap: 15px;
         }
 
-        /* زر اللوجو - يعرض الشعار الشفاف كامل وبحجم صغير */
         .logo-toggle {
             background: none;
             border: none;
@@ -235,7 +234,7 @@
         .logo-toggle img {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* عرض اللوجو كامل بدون قص */
+            object-fit: contain;
             object-position: center;
         }
 
@@ -319,9 +318,9 @@
             display: block;
         }
 
-        /* كروت الإحصائيات */
+        /* كروت الإحصائيات - كحلي طبي راقي بدل الأخضر العشوائي */
         .stats-card {
-            background: #4caf50;
+            background: #123a5c;
             color: white;
             border-radius: 12px;
             padding: 20px;
@@ -329,7 +328,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 25px;
-            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+            box-shadow: 0 4px 12px rgba(18, 58, 92, 0.35);
         }
 
         .stats-left {
@@ -362,7 +361,7 @@
             font-weight: bold;
         }
 
-        /* كروت المنيو المالي الصغير */
+        /* كروت المنيو المالي - الأرباح بلون ذهبي يربطها بهوية السايدبار */
         .finance-cards-grid {
             display: flex;
             gap: 15px;
@@ -377,9 +376,9 @@
             font-weight: bold;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
-        .fin-inc { background: #10b981; }
-        .fin-exp { background: #ef4444; }
-        .fin-net { background: #3b82f6; }
+        .fin-inc { background: #0f766e; }
+        .fin-exp { background: #b91c1c; }
+        .fin-net { background: linear-gradient(135deg, #b8860b, #d4af37); color: #1c1c1c; }
         .fin-card h4 { font-size: 14px; margin-bottom: 5px; opacity: 0.9; }
         .fin-card div { font-size: 20px; font-weight: 900; }
 
@@ -423,12 +422,13 @@
             left: 0;
         }
 
+        /* عائلة ألوان موحّدة بدل الألوان المتفرقة: أحمر=عاجل، الباقي درجات كحلي/بترولي/ذهبي */
         .bg-red { background: #b91c1c; }
-        .bg-blue { background: #38bdf8; }
-        .bg-purple { background: #6366f1; }
+        .bg-blue { background: #0e7490; }
+        .bg-purple { background: #123a5c; }
         .bg-teal { background: #0d9488; }
-        .bg-dark-blue { background: #1e293b; }
-        .bg-green { background: #059669; }
+        .bg-dark-blue { background: #8a5a13; }
+        .bg-green { background: #047857; }
 
         table {
             width: 100%;
@@ -473,7 +473,7 @@
             -webkit-user-select: none;
         }
         .patient-name-click:hover {
-            color: #0284c7;
+            color: #123a5c;
             text-decoration: underline;
         }
 
@@ -502,7 +502,7 @@
         }
         .status-dropdown div:hover, .lab-dropdown div:hover {
             background: #f1f5f9;
-            color: #0284c7;
+            color: #123a5c;
         }
 
         .status-badge {
@@ -550,7 +550,7 @@
         .submit-appointment-btn {
             width: 100%;
             padding: 14px;
-            background: #0284c7;
+            background: #123a5c;
             color: white;
             border: none;
             border-radius: 8px;
@@ -562,7 +562,7 @@
         }
 
         .submit-appointment-btn:hover {
-            background: #0369a1;
+            background: #0e2f4a;
         }
 
         .search-wrapper {
@@ -585,8 +585,8 @@
         }
 
         .search-input:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+            border-color: #123a5c;
+            box-shadow: 0 0 0 3px rgba(18, 58, 92, 0.15);
         }
 
         .history-sub-table {
@@ -620,8 +620,8 @@
             margin-left: 6px;
             color: #ffffff;
         }
-        .req-accept { background: #10b981; }
-        .req-reject { background: #ef4444; }
+        .req-accept { background: #0f766e; }
+        .req-reject { background: #b91c1c; }
 
         .stock-btn {
             border: none;
@@ -634,13 +634,13 @@
             color: #ffffff;
             margin: 0 3px;
         }
-        .stock-plus { background: #10b981; }
-        .stock-minus { background: #ef4444; }
+        .stock-plus { background: #0f766e; }
+        .stock-minus { background: #b91c1c; }
         .stock-del { background: #94a3b8; }
 
         .req-badge {
             display: none;
-            background: #ef4444;
+            background: #b91c1c;
             color: #fff;
             border-radius: 10px;
             padding: 2px 8px;
@@ -963,7 +963,7 @@
                         <label for="itemNote">ملاحظات:</label>
                         <input type="text" id="itemNote" placeholder="أي تفاصيل إضافية عن الصنف">
                     </div>
-                    <button type="submit" class="submit-appointment-btn" style="background: #059669;">حفظ الصنف بالمخزن</button>
+                    <button type="submit" class="submit-appointment-btn" style="background: #047857;">حفظ الصنف بالمخزن</button>
                 </form>
             </div>
             <br>
@@ -1048,7 +1048,7 @@
                         <label for="finStatement">البيان / الوصف التفصيلي للعملية:</label>
                         <input type="text" id="finStatement" placeholder="مثال: قسط زراعة أسنان مريض ممدوح / فاتورة معمل الحرمين" required>
                     </div>
-                    <button type="submit" class="submit-appointment-btn" style="background: #1e293b;">حفظ وتقييد الدفتر المالي</button>
+                    <button type="submit" class="submit-appointment-btn" style="background: #8a5a13;">حفظ وتقييد الدفتر المالي</button>
                 </form>
             </div>
             <br>
@@ -1695,11 +1695,11 @@
                 if (trans.type === 'income') {
                     totalIncome += trans.amount;
                     typeText = '📈 إيرادات';
-                    amountStyle = 'style="color: #10b981; font-weight: bold;"';
+                    amountStyle = 'style="color: #0f766e; font-weight: bold;"';
                 } else {
                     totalExpenses += trans.amount;
                     typeText = '📉 مصروفات';
-                    amountStyle = 'style="color: #ef4444; font-weight: bold;"';
+                    amountStyle = 'style="color: #b91c1c; font-weight: bold;"';
                 }
 
                 row.innerHTML = `
@@ -1769,7 +1769,7 @@
                         <div style="font-size: 12px; color: #64748b; margin-top: 4px;">الكود: ${p.code}</div>
                         <div style="font-size: 12px; color: #64748b;">الهاتف: ${p.phone}</div>
                     </td>
-                    <td style="text-align: center; font-size: 18px; color: #6366f1; font-weight: bold;">${visitCount}</td>
+                    <td style="text-align: center; font-size: 18px; color: #123a5c; font-weight: bold;">${visitCount}</td>
                     <td>
                         <div style="overflow-x: auto;">
                             <table class="history-sub-table">
