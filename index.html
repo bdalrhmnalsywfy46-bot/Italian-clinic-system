@@ -189,7 +189,7 @@
             font-size: 12px;
         }
 
-        /* --- الشاشة الثانية: لوحة التحكم العامة (ألوان جديدة موحّدة) --- */
+        /* --- الشاشة الثانية: لوحة التحكم العامة --- */
         #dashboard {
             display: none;
             width: 100%;
@@ -201,10 +201,10 @@
 
         .dash-header {
             display: flex;
-            align-items: flex-start;
+            align-items: center; /* تم تعديلها لتوسيط العناصر عمودياً بشكل متناسق */
             justify-content: flex-start;
             background: #ffffff;
-            padding: 14px 20px 8px 20px;
+            padding: 14px 20px;
             border-radius: 10px;
             border: 3px solid #d4af37;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
@@ -212,32 +212,25 @@
             gap: 15px;
         }
 
-        .logo-toggle {
+        /* زر فتح القائمة الجديد في الهيدر (أيقونة همبرجر بسيطة) */
+        .menu-toggle-btn {
             background: none;
             border: none;
             cursor: pointer;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
+            gap: 5px;
+            padding: 5px;
             z-index: 95;
-            transition: transform 0.2s ease;
-            padding: 0;
-            width: 170px;
-            height: 170px;
-            margin-top: -22px;
-            overflow: visible;
-            border-radius: 4px;
-        }
-        
-        .logo-toggle:hover {
-            transform: scale(1.05);
         }
 
-        .logo-toggle img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            object-position: center;
+        .menu-toggle-btn span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background-color: #1e293b;
+            border-radius: 2px;
+            transition: 0.3s;
         }
 
         .dash-title {
@@ -254,6 +247,7 @@
             white-space: nowrap;
         }
 
+        /* تعديل السايدبار لإضافة حاوية اللوجو بداخلها */
         .sidebar {
             position: fixed;
             top: 0;
@@ -264,16 +258,44 @@
             box-shadow: -6px 0 25px rgba(0,0,0,0.5);
             z-index: 90;
             transition: 0.3s ease;
-            padding: 80px 16px 20px 16px;
+            padding: 20px 16px; /* تقليل البادينج العلوي لاستيعاب حاوية اللوجو الجديدة */
             border-left: 3px solid #d4af37;
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar.open {
             right: 0;
         }
 
+        /* حاوية اللوجو الجديدة داخل القائمة الجانبية المخصصة للمساحة الفاضية */
+        .sidebar-logo-container {
+            width: 100%;
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            padding-bottom: 15px;
+        }
+
+        .sidebar-logo-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .sidebar-logo-container img:hover {
+            transform: scale(1.05);
+        }
+
         .sidebar-menu {
             list-style: none;
+            overflow-y: auto; /* لضمان التمرير إذا زادت العناصر */
+            flex: 1;
         }
 
         .sidebar-menu li {
@@ -320,7 +342,7 @@
             display: block;
         }
 
-        /* كروت الإحصائيات - كحلي طبي راقي بدل الأخضر العشوائي */
+        /* كروت الإحصائيات */
         .stats-card {
             background: #123a5c;
             color: white;
@@ -363,7 +385,7 @@
             font-weight: bold;
         }
 
-        /* كروت المنيو المالي - الأرباح بلون ذهبي يربطها بهوية السايدبار */
+        /* كروت المنيو المالي */
         .finance-cards-grid {
             display: flex;
             gap: 15px;
@@ -424,7 +446,6 @@
             left: 0;
         }
 
-        /* عائلة ألوان موحّدة بدل الألوان المتفرقة: أحمر=عاجل، الباقي درجات كحلي/بترولي/ذهبي */
         .bg-red { background: #b91c1c; }
         .bg-blue { background: #0e7490; }
         .bg-purple { background: #123a5c; }
@@ -664,7 +685,6 @@
 </head>
 <body>
 
-    <!-- الواجهة الأولى: تسجيل الدخول بالفيديو والأصوات -->
     <div id="loginScreen">
         <video class="video-bg" id="bgVideo" autoplay playsinline>
             <source src="intro.mp4" type="video/mp4">
@@ -726,12 +746,13 @@
         </div>
     </div>
 
-    <!-- الواجهة الثانية: لوحة التحكم الديناميكية الشاملة -->
     <div id="dashboard">
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-        <!-- القائمة الجانبية -->
         <div class="sidebar" id="sidebar">
+            <div class="sidebar-logo-container">
+                <img src="https://raw.githubusercontent.com/bdalrhmnalsywfy46-bot/Italian-clinic-system/main/italian-lab-logo-transparent.png" alt="Italian Lab Logo" onclick="toggleSidebar()">
+            </div>
             <ul class="sidebar-menu">
                 <li id="menu-home" class="active" onclick="switchPage('home')">الرئيسية</li>
                 <li id="menu-add" onclick="switchPage('add')">إضافة موعد جديد</li>
@@ -745,15 +766,15 @@
         </div>
         
         <div class="dash-header">
-            <!-- تم تعديل رابط اللوجو ليشير إلى النسخة الشفافة على GitHub -->
-            <button class="logo-toggle" onclick="toggleSidebar()" title="القائمة الجانبية">
-                <img src="https://raw.githubusercontent.com/bdalrhmnalsywfy46-bot/Italian-clinic-system/main/italian-lab-logo-transparent.png" alt="Italian Lab Logo">
+            <button class="menu-toggle-btn" onclick="toggleSidebar()" title="القائمة الجانبية">
+                <span></span>
+                <span></span>
+                <span></span>
             </button>
             <div class="dash-title" id="pageMainTitle">المركز الإيطالي للأسنان - الرئيسية</div>
             <div class="user-badge" id="currentUserDisplay"></div>
         </div>
 
-        <!-- ================= صفحة الرئيسية (المواعيد الحالية) ================= -->
         <div id="page-home" class="page-section active-page">
             <div class="stats-card">
                 <div class="stats-left">
@@ -774,7 +795,6 @@
                 <div class="live-clock" id="liveClock">--:-- --</div>
             </div>
 
-            <!-- جدول الزيارات المتأخرة باللون الأحمر -->
             <div class="table-container" id="lateTableContainer">
                 <div class="table-header bg-red">الزيارات المتأخرة</div>
                 <table>
@@ -794,7 +814,6 @@
                 </table>
             </div>
 
-            <!-- جدول الزيارات القادمة -->
             <div class="table-container" id="upcomingTableContainer">
                 <div class="table-header bg-blue">الزيارات القادمة</div>
                 <table>
@@ -815,7 +834,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة إضافة موعد جديد ================= -->
         <div id="page-add" class="page-section">
             <div class="form-card">
                 <h3>حجز موعد عيادة جديد</h3>
@@ -857,7 +875,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة سجل المرضى ================= -->
         <div id="page-history" class="page-section">
             <div class="search-wrapper">
                 <input type="text" id="historySearchInput" class="search-input" oninput="filterHistory()" placeholder="🔍 ابحث عن مريض بالاسم، رقم الهاتف، أو الكود...">
@@ -881,7 +898,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة المعامل والتركيبات ================= -->
         <div id="page-lab" class="page-section">
             <div class="form-card">
                 <h3>إرسال حالة جديدة للمعمل</h3>
@@ -938,7 +954,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة المخزن ================= -->
         <div id="page-warehouse" class="page-section">
             <div class="form-card">
                 <h3>إضافة صنف جديد للمخزن</h3>
@@ -991,7 +1006,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة طلبات الموظفين الجدد ================= -->
         <div id="page-requests" class="page-section">
             <div class="table-container">
                 <div class="table-header bg-purple">طلبات تسجيل الموظفين الجدد (بانتظار الموافقة)</div>
@@ -1013,7 +1027,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة الإدارة والماليات ================= -->
         <div id="page-admin" class="page-section">
             <div class="finance-cards-grid">
                 <div class="fin-card fin-inc">
