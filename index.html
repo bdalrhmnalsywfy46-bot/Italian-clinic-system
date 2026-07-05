@@ -201,17 +201,15 @@
 
         .dash-header {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: flex-start;
             background: #ffffff;
-            padding: 14px 150px 8px 20px;
+            padding: 10px 20px;
             border-radius: 10px;
             border: 3px solid #d4af37;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             margin-bottom: 20px;
             gap: 15px;
-            position: relative;
-            min-height: 90px;
         }
 
         .logo-toggle {
@@ -221,16 +219,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 95;
-            transition: transform 0.2s ease;
             padding: 0;
-            width: 170px;
-            height: 170px;
-            position: absolute;
-            top: -18px;
-            right: 6px;
-            overflow: visible;
+            width: 100px;
+            height: 100px;
+            overflow: hidden;
             border-radius: 4px;
+            flex-shrink: 0;
         }
         
         .logo-toggle:hover {
@@ -268,12 +262,29 @@
             box-shadow: -6px 0 25px rgba(0,0,0,0.5);
             z-index: 90;
             transition: 0.3s ease;
-            padding: 80px 16px 20px 16px;
+            padding: 30px 16px 20px 16px;
             border-left: 3px solid #d4af37;
         }
 
         .sidebar.open {
             right: 0;
+        }
+
+        .sidebar-logo-wrap {
+            width: calc(100% + 32px);
+            margin: -30px -16px 15px -16px;
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 1080 / 630;
+            border-bottom: 2px solid #d4af37;
+        }
+
+        .sidebar-logo-wrap img {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: auto;
+            top: -65.9%;
         }
 
         .sidebar-menu {
@@ -736,6 +747,9 @@
 
         <!-- القائمة الجانبية -->
         <div class="sidebar" id="sidebar">
+            <div class="sidebar-logo-wrap">
+                <img src="https://raw.githubusercontent.com/bdalrhmnalsywfy46-bot/Italian-clinic-system/main/italian-lab-logo-transparent.png" alt="Italian Lab Logo">
+            </div>
             <ul class="sidebar-menu">
                 <li id="menu-home" class="active" onclick="switchPage('home')">الرئيسية</li>
                 <li id="menu-add" onclick="switchPage('add')">إضافة موعد جديد</li>
