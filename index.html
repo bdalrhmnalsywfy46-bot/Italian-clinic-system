@@ -278,6 +278,7 @@
             background: #ffffff;
             border-radius: 10px;
             border: 2px solid #d4af37;
+            cursor: pointer; /* تم إضافة مؤشر الماوس ليوحي بقابلية الضغط */
         }
 
         .sidebar-logo-wrap img {
@@ -678,7 +679,6 @@
 </head>
 <body>
 
-    <!-- الواجهة الأولى: تسجيل الدخول بالفيديو والأصوات -->
     <div id="loginScreen">
         <video class="video-bg" id="bgVideo" autoplay playsinline>
             <source src="intro.mp4" type="video/mp4">
@@ -740,13 +740,11 @@
         </div>
     </div>
 
-    <!-- الواجهة الثانية: لوحة التحكم الديناميكية الشاملة -->
     <div id="dashboard">
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-        <!-- القائمة الجانبية -->
         <div class="sidebar" id="sidebar">
-            <div class="sidebar-logo-wrap">
+            <div class="sidebar-logo-wrap" ondblclick="logoutSystem()" title="اضغط مرتين لتسجيل الخروج">
                 <img src="https://raw.githubusercontent.com/bdalrhmnalsywfy46-bot/Italian-clinic-system/main/italian-lab-logo-transparent.png" alt="Italian Lab Logo">
             </div>
             <ul class="sidebar-menu">
@@ -757,12 +755,10 @@
                 <li id="menu-warehouse" onclick="switchPage('warehouse')" style="display:none;">المخزن</li>
                 <li id="menu-requests" onclick="switchPage('requests')" style="display:none;">الإدارة <span id="requestsBadge" class="req-badge">0</span></li>
                 <li id="menu-admin" onclick="switchPage('admin')" style="display:none;">الإدارة والماليات 🔐</li>
-                <li onclick="logoutSystem()" style="color: #ff6b6b; border-color: rgba(255,107,107,0.35); margin-top: 20px;">تسجيل الخروج</li>
-            </ul>
+                </ul>
         </div>
         
         <div class="dash-header">
-            <!-- تم تعديل رابط اللوجو ليشير إلى النسخة الشفافة على GitHub -->
             <button class="logo-toggle" onclick="toggleSidebar()" title="القائمة الجانبية">
                 <img src="https://raw.githubusercontent.com/bdalrhmnalsywfy46-bot/Italian-clinic-system/main/italian-lab-logo-transparent.png" alt="Italian Lab Logo">
             </button>
@@ -770,7 +766,6 @@
             <div class="user-badge" id="currentUserDisplay"></div>
         </div>
 
-        <!-- ================= صفحة الرئيسية (المواعيد الحالية) ================= -->
         <div id="page-home" class="page-section active-page">
             <div class="stats-card">
                 <div class="stats-left">
@@ -791,7 +786,6 @@
                 <div class="live-clock" id="liveClock">--:-- --</div>
             </div>
 
-            <!-- جدول الزيارات المتأخرة باللون الأحمر -->
             <div class="table-container" id="lateTableContainer">
                 <div class="table-header bg-red">الزيارات المتأخرة</div>
                 <table>
@@ -811,7 +805,6 @@
                 </table>
             </div>
 
-            <!-- جدول الزيارات القادمة -->
             <div class="table-container" id="upcomingTableContainer">
                 <div class="table-header bg-blue">الزيارات القادمة</div>
                 <table>
@@ -832,7 +825,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة إضافة موعد جديد ================= -->
         <div id="page-add" class="page-section">
             <div class="form-card">
                 <h3>حجز موعد عيادة جديد</h3>
@@ -874,7 +866,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة سجل المرضى ================= -->
         <div id="page-history" class="page-section">
             <div class="search-wrapper">
                 <input type="text" id="historySearchInput" class="search-input" oninput="filterHistory()" placeholder="🔍 ابحث عن مريض بالاسم، رقم الهاتف، أو الكود...">
@@ -898,7 +889,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة المعامل والتركيبات ================= -->
         <div id="page-lab" class="page-section">
             <div class="form-card">
                 <h3>إرسال حالة جديدة للمعمل</h3>
@@ -955,7 +945,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة المخزن ================= -->
         <div id="page-warehouse" class="page-section">
             <div class="form-card">
                 <h3>إضافة صنف جديد للمخزن</h3>
@@ -1008,7 +997,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة طلبات الموظفين الجدد ================= -->
         <div id="page-requests" class="page-section">
             <div class="table-container">
                 <div class="table-header bg-purple">طلبات تسجيل الموظفين الجدد (بانتظار الموافقة)</div>
@@ -1030,7 +1018,6 @@
             </div>
         </div>
 
-        <!-- ================= صفحة الإدارة والماليات ================= -->
         <div id="page-admin" class="page-section">
             <div class="finance-cards-grid">
                 <div class="fin-card fin-inc">
