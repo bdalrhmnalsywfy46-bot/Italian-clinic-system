@@ -201,7 +201,7 @@
 
         .dash-header {
             display: flex;
-            align-items: center; /* تم تعديلها لتوسيط العناصر عمودياً بشكل متناسق */
+            align-items: center; 
             justify-content: flex-start;
             background: #ffffff;
             padding: 14px 20px;
@@ -212,7 +212,6 @@
             gap: 15px;
         }
 
-        /* زر فتح القائمة الجديد في الهيدر (أيقونة همبرجر بسيطة) */
         .menu-toggle-btn {
             background: none;
             border: none;
@@ -247,7 +246,6 @@
             white-space: nowrap;
         }
 
-        /* تعديل السايدبار لإضافة حاوية اللوجو بداخلها */
         .sidebar {
             position: fixed;
             top: 0;
@@ -258,7 +256,7 @@
             box-shadow: -6px 0 25px rgba(0,0,0,0.5);
             z-index: 90;
             transition: 0.3s ease;
-            padding: 20px 16px; /* تقليل البادينج العلوي لاستيعاب حاوية اللوجو الجديدة */
+            padding: 20px 16px; 
             border-left: 3px solid #d4af37;
             display: flex;
             flex-direction: column;
@@ -268,7 +266,6 @@
             right: 0;
         }
 
-        /* حاوية اللوجو الجديدة داخل القائمة الجانبية المخصصة للمساحة الفاضية */
         .sidebar-logo-container {
             width: 100%;
             height: 150px;
@@ -285,7 +282,9 @@
             max-height: 100%;
             object-fit: contain;
             cursor: pointer;
-            transition: transform 0.2s ease;
+            transition: transform 0.2s ease, filter 0.2s ease;
+            /* الحيلة السحرية: تحويل الكلمة السوداء والخطين إلى الأبيض الناصع */
+            filter: brightness(0) invert(1);
         }
 
         .sidebar-logo-container img:hover {
@@ -294,7 +293,7 @@
 
         .sidebar-menu {
             list-style: none;
-            overflow-y: auto; /* لضمان التمرير إذا زادت العناصر */
+            overflow-y: auto; 
             flex: 1;
         }
 
