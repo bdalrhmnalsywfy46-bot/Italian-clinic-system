@@ -217,19 +217,23 @@
             border: none;
             cursor: pointer;
             display: flex;
-            flex-direction: column;
-            gap: 5px;
-            padding: 5px;
+            align-items: center;
+            justify-content: center;
+            width: 46px;
+            height: 46px;
+            padding: 2px;
             z-index: 95;
+            transition: transform 0.2s ease;
         }
 
-        .menu-toggle-btn span {
-            display: block;
-            width: 25px;
-            height: 3px;
-            background-color: #1e293b;
-            border-radius: 2px;
-            transition: 0.3s;
+        .menu-toggle-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .menu-toggle-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .dash-title {
@@ -252,11 +256,14 @@
             right: -280px;
             width: 280px;
             height: 100%;
-            background: linear-gradient(180deg, #08192b 0%, #123a5c 60%, #08192b 100%);
+            background-image: linear-gradient(180deg, rgba(8,25,43,0.88) 0%, rgba(18,58,92,0.85) 60%, rgba(8,25,43,0.92) 100%), url('https://raw.githubusercontent.com/bdalrhmnalsywfy46-bot/Italian-clinic-system/main/italian-lab-logo-transparent.png');
+            background-size: 260px auto;
+            background-repeat: no-repeat;
+            background-position: center center;
             box-shadow: -6px 0 25px rgba(0,0,0,0.5);
             z-index: 90;
             transition: 0.3s ease;
-            padding: 20px 16px; 
+            padding: 90px 16px 20px 16px; 
             border-left: 3px solid #d4af37;
             display: flex;
             flex-direction: column;
@@ -264,30 +271,6 @@
 
         .sidebar.open {
             right: 0;
-        }
-
-        .sidebar-logo-container {
-            width: 100%;
-            height: 150px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-            padding-bottom: 15px;
-        }
-
-        .sidebar-logo-container img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-            /* النسخة البيضاء من اللوجو مصممة خصيصًا لتظهر بوضوح فوق الخلفية الكحلي الغامقة */
-        }
-
-        .sidebar-logo-container img:hover {
-            transform: scale(1.05);
         }
 
         .sidebar-menu {
@@ -748,9 +731,6 @@
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
         <div class="sidebar" id="sidebar">
-            <div class="sidebar-logo-container">
-                <img src="https://raw.githubusercontent.com/bdalrhmnalsywfy46-bot/Italian-clinic-system/main/italian-lab-logo-white.png" alt="Italian Lab Logo" onclick="toggleSidebar()">
-            </div>
             <ul class="sidebar-menu">
                 <li id="menu-home" class="active" onclick="switchPage('home')">الرئيسية</li>
                 <li id="menu-add" onclick="switchPage('add')">إضافة موعد جديد</li>
@@ -765,9 +745,7 @@
         
         <div class="dash-header">
             <button class="menu-toggle-btn" onclick="toggleSidebar()" title="القائمة الجانبية">
-                <span></span>
-                <span></span>
-                <span></span>
+                <img src="https://raw.githubusercontent.com/bdalrhmnalsywfy46-bot/Italian-clinic-system/main/italian-lab-logo-transparent.png" alt="Italian Lab Logo">
             </button>
             <div class="dash-title" id="pageMainTitle">المركز الإيطالي للأسنان - الرئيسية</div>
             <div class="user-badge" id="currentUserDisplay"></div>
