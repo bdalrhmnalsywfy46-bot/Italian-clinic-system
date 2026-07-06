@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Italian Dental Center</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         * {
             box-sizing: border-box;
@@ -302,6 +304,16 @@
             cursor: pointer;
             transition: 0.25s ease;
             letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* يخلي الأيقونات على الأطراف بشكل منسق */
+        }
+
+        /* تنسيق الأيقونات داخل القائمة */
+        .sidebar-menu li i.menu-icon {
+            font-size: 18px;
+            width: 25px;
+            text-align: center;
         }
 
         .sidebar-menu li:hover, .sidebar-menu li.active {
@@ -310,6 +322,11 @@
             border-color: #f0d478;
             box-shadow: 0 4px 14px rgba(212, 175, 55, 0.45);
             transform: translateX(-3px);
+        }
+
+        /* تغيير لون الأيقونات عند عمل hover */
+        .sidebar-menu li:hover i.menu-icon, .sidebar-menu li.active i.menu-icon {
+            color: #08192b;
         }
 
         .sidebar-overlay {
@@ -391,11 +408,11 @@
             font-weight: bold;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
+        .fin-card h4 { font-size: 14px; margin-bottom: 5px; opacity: 0.9; }
+        .fin-card div { font-size: 20px; font-weight: 900; }
         .fin-inc { background: #0f766e; }
         .fin-exp { background: #b91c1c; }
         .fin-net { background: linear-gradient(135deg, #b8860b, #d4af37); color: #1c1c1c; }
-        .fin-card h4 { font-size: 14px; margin-bottom: 5px; opacity: 0.9; }
-        .fin-card div { font-size: 20px; font-weight: 900; }
 
         .room-section {
             text-align: center;
@@ -443,7 +460,7 @@
         .bg-teal { background: #0d9488; }
         .bg-dark-blue { background: #8a5a13; }
         .bg-green { background: #047857; }
-        .bg-navy { background: #123a5c; } /* الستايل الموحد لجدول زيارات الغد */
+        .bg-navy { background: #123a5c; } 
 
         table {
             width: 100%;
@@ -746,14 +763,35 @@
                 <img src="https://raw.githubusercontent.com/bdalrhmnalsywfy46-bot/Italian-clinic-system/main/italian-lab-logo-transparent.png" alt="Italian Lab Logo">
             </div>
             <ul class="sidebar-menu">
-                <li id="menu-home" class="active" onclick="switchPage('home')">الرئيسية</li>
-                <li id="menu-add" onclick="switchPage('add')">إضافة موعد جديد</li>
-                <li id="menu-history" onclick="switchPage('history')">سجل المرضى</li>
-                <li id="menu-lab" onclick="switchPage('lab')">المعامل والتركيبات</li>
-                <li id="menu-warehouse" onclick="switchPage('warehouse')" style="display:none;">المخزن</li>
-                <li id="menu-requests" onclick="switchPage('requests')" style="display:none;">الإدارة <span id="requestsBadge" class="req-badge">0</span></li>
-                <li id="menu-admin" onclick="switchPage('admin')" style="display:none;">الإدارة والماليات 🔐</li>
-                </ul>
+                <li id="menu-home" class="active" onclick="switchPage('home')">
+                    <span>الرئيسية</span>
+                    <i class="fas fa-home menu-icon"></i>
+                </li>
+                <li id="menu-add" onclick="switchPage('add')">
+                    <span>إضافة موعد جديد</span>
+                    <i class="fas fa-user-plus menu-icon"></i>
+                </li>
+                <li id="menu-history" onclick="switchPage('history')">
+                    <span>سجل المرضى</span>
+                    <i class="fas fa-users menu-icon"></i>
+                </li>
+                <li id="menu-lab" onclick="switchPage('lab')">
+                    <span>المعامل والتركيبات</span>
+                    <i class="fas fa-flask menu-icon"></i>
+                </li>
+                <li id="menu-warehouse" onclick="switchPage('warehouse')" style="display:none;">
+                    <span>المخزن</span>
+                    <i class="fas fa-box menu-icon"></i>
+                </li>
+                <li id="menu-requests" onclick="switchPage('requests')" style="display:none;">
+                    <span>الإدارة <span id="requestsBadge" class="req-badge">0</span></span>
+                    <i class="fas fa-cogs menu-icon"></i>
+                </li>
+                <li id="menu-admin" onclick="switchPage('admin')" style="display:none;">
+                    <span>الماليات</span>
+                    <i class="fas fa-dollar-sign menu-icon"></i>
+                </li>
+            </ul>
         </div>
         
         <div class="dash-header">
@@ -1127,7 +1165,6 @@
         let longPressTimer;
         const longPressDuration = 1000; 
 
-        // دالة مساعدة لحساب تاريخ الغد بصيغة DD/MM/YYYY ديناميكياً
         function getTomorrowDateString() {
             const todayObj = new Date();
             const tomorrowObj = new Date(todayObj);
@@ -1244,9 +1281,9 @@
             const currentUserDisplay = document.getElementById('currentUserDisplay');
 
             if (currentRole === 'admin') {
-                if (adminMenu) adminMenu.style.display = 'block';
-                if (requestsMenu) requestsMenu.style.display = 'block';
-                if (warehouseMenu) warehouseMenu.style.display = 'block';
+                if (adminMenu) adminMenu.style.display = 'flex';
+                if (requestsMenu) requestsMenu.style.display = 'flex';
+                if (warehouseMenu) warehouseMenu.style.display = 'flex';
                 updateRequestsBadge();
             } else {
                 if (adminMenu) adminMenu.style.display = 'none';
@@ -1299,7 +1336,7 @@
             } else if (pageName === 'admin') {
                 document.getElementById('page-admin').classList.add('active-page');
                 document.getElementById('menu-admin').classList.add('active');
-                document.getElementById('pageMainTitle').innerText = "المركز الإيطالي للأسنان - الإدارة والماليات العامة";
+                document.getElementById('pageMainTitle').innerText = "المركز الإيطالي للأسنان - الماليات العامة";
                 rebuildFinanceDOM();
             }
             toggleSidebar();
@@ -1384,7 +1421,6 @@
             clearTimeout(longPressTimer);
         }
 
-        // بناء وتحديث جداول الزيارات وجدول زيارات الغد إحصائياً تلقائياً
         function rebuildCurrentVisitsTables() {
             const upcomingBody = document.getElementById('upcomingVisitsBody');
             const lateBody = document.getElementById('lateVisitsBody');
@@ -1403,7 +1439,6 @@
                 const patient = patientDataMap[rowId];
                 const newStatus = patient.status;
 
-                // التجميع الإحصائي لجدول الغد ديناميكياً بناءً على تاريخ الحجز المكتوب
                 if (patient.date === tomorrowDateStr) {
                     const docName = patient.doctor ? patient.doctor.trim() : "غير محدد";
                     doctorTomorrowCounts[docName] = (doctorTomorrowCounts[docName] || 0) + 1;
@@ -1460,10 +1495,9 @@
                 targetTbody.appendChild(newRow);
             });
 
-            // بناء صفوف جدول زيارات الغد بناءً على فلترة تجميع الدكاترة الحقيقية
             const docKeys = Object.keys(doctorTomorrowCounts);
             if (docKeys.length > 0) {
-                tomorrowBody.innerHTML = ''; // إزالة جملة الصفر والبدء بالرسم
+                tomorrowBody.innerHTML = ''; 
                 docKeys.forEach(doctor => {
                     const tRow = document.createElement('tr');
                     tRow.innerHTML = `
