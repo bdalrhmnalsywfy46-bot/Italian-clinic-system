@@ -423,6 +423,16 @@
             -webkit-overflow-scrolling: touch;
         }
 
+        .table-container {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            position: relative;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
         .table-header {
             padding: 15px;
             color: white;
@@ -1125,12 +1135,12 @@
 
         let adminAccount = { email: "italian$dental$center", password: "OMAR ELSİOFY $$" };
         let activeSessions = {}; 
-        let employeeAccountsMap = {}; // خريطة لتخزين حسابات الموظفين وحالات موافقة الإدارة عليها
+        let employeeAccountsMap = {}; 
         let currentRole = null;      
         let currentUserLabel = "";
         let loggedInSessionId = ""; 
 
-        let isDataModeActive = false; // فلاج لمعرفة هل نحن في نمط استكمال البيانات للموظف الجديد أم لا
+        let isDataModeActive = false; 
 
         let longPressTimer;
         const longPressDuration = 1000; 
@@ -1188,16 +1198,20 @@
                 localStorage.setItem('italian_clinic_admin', JSON.stringify(adminAccount));
             }
 
-            // الحساب الافتراضي التلقائي
+            // تعديل الحساب الافتراضي التلقائي هنا لحذف كلمة "الافتراضي"
             const defaultKey = "italian dental center_italian 712554";
             if (!employeeAccountsMap[defaultKey]) {
                 employeeAccountsMap[defaultKey] = {
                     username: "Italian dental center",
                     password: "Italian 712554",
-                    name: "موظف الاستقبال الافتراضي",
+                    name: "موظف الاستقبال",
                     phone: "",
                     status: "approved"
                 };
+                localStorage.setItem('italian_clinic_employee_accounts', JSON.stringify(employeeAccountsMap));
+            } else if (employeeAccountsMap[defaultKey].name === "موظف الاستقبال الافتراضي") {
+                // لتعديل البيانات المحفوظة مسبقاً في المتصفح تلقائياً
+                employeeAccountsMap[defaultKey].name = "موظف الاستقبال";
                 localStorage.setItem('italian_clinic_employee_accounts', JSON.stringify(employeeAccountsMap));
             }
 
@@ -1205,6 +1219,12 @@
                 currentRole = savedRole;
                 currentUserLabel = savedUserLabel || "";
                 
+                // تحديث اللlabel الحالي إذا كان الموظف الافتراضي القديم مسجلاً لديه
+                if (currentUserLabel === "موظف الاستقبال الافتراضي") {
+                    currentUserLabel = "موظف الاستقبال";
+                    localStorage.setItem('italian_clinic_current_user', currentUserLabel);
+                }
+
                 if (currentRole === 'employee' && (!activeSessions[loggedInSessionId])) {
                     logoutSystem();
                     return;
@@ -1473,7 +1493,7 @@
                             <div onclick="deletePatientVisit('${rowId}')" style="color:#b91c1c;">🗑️ حذف الزيارة</div>
                         </div>
                     </td>
-                    <td>${patient.clinic || 'غير مححدد'}</td>
+                    <td>${patient.clinic || 'غير محدد'}</td>
                     <td>${patient.doctor || 'غير محدد'}</td>
                 `;
                 targetTbody.appendChild(newRow);
@@ -1672,7 +1692,6 @@
             checkTableEmptyState('warehouseTableBody', 'noWarehouseRow');
         }
 
-        // لوحة تحكم الإدارة المعدلة بالكامل لعرض حسابات الموظفين والطلبات والنشطين
         function renderRequestsDOM() {
             const tbody = document.getElementById('requestsTableBody');
             if (!tbody) return;
@@ -1696,10 +1715,8 @@
                     row.className = 'active-user-row';
                     row.title = "اضغط مرتين متتاليتين لطرد هذا الموظف وقفل حسابه فوراً";
                     
-                    // حدث الطرد بالنقر المزدوج
                     row.addEventListener('dblclick', function() {
                         if (confirm(`🚨 هل أنت متأكد من إنهاء جلسة وطرد الموظف: ${emp.name}؟`)) {
-                            // 1. إنهاء أي جلسة نشطة له لمنعه من التحرك داخل السيستم
                             Object.keys(activeSessions).forEach(sId => {
                                 if (activeSessions[sId].username === emp.username) {
                                     delete activeSessions[sId];
@@ -1707,7 +1724,6 @@
                             });
                             localStorage.setItem('italian_clinic_active_sessions', JSON.stringify(activeSessions));
                             
-                            // 2. تصفية حسابه وإعادته لوضع الانتظار حتى لا يفتح مجدداً إلا بطلب جديد
                             emp.status = 'pending';
                             localStorage.setItem('italian_clinic_employee_accounts', JSON.stringify(employeeAccountsMap));
                             
@@ -1997,13 +2013,11 @@
         const dateEl = document.getElementById('currentDate');
         if(dateEl) dateEl.innerText = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
 
-        // ================= كود تسجيل الدخول والطلبات المعزز والذكي بالكامل =================
         document.getElementById('unifiedLoginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const user = document.getElementById('unifiedUserInput').value.trim();
             const pass = document.getElementById('unifiedPassInput').value;
 
-            // 1. فحص حساب الإدمن أولاً
             if (user === adminAccount.email && pass === adminAccount.password) {
                 currentRole = 'admin';
                 currentUserLabel = 'الإدارة';
@@ -2018,11 +2032,9 @@
                 return;
             }
 
-            // توليد مفتاح الحساب الفريد
             const accountKey = user + "_" + pass;
             const existingAccount = employeeAccountsMap[accountKey];
 
-            // 2. إذا كان الحساب مسجل ومقبول من الإدارة (دخول فوري مباشر)
             if (existingAccount && existingAccount.status === 'approved') {
                 currentRole = 'employee';
                 currentUserLabel = existingAccount.name || existingAccount.username;
@@ -2054,29 +2066,24 @@
                 return;
             }
 
-            // 3. إذا كان الحساب مسجل ولكنه معلق (ينتظر الإدارة)
             if (existingAccount && existingAccount.status === 'pending') {
                 alert("⏳ بياناتك مقيدة بالسيستم بالفعل، ولكن حسابك في انتظار موافقة وتفعيل الإدارة من لوحة التحكم.");
                 return;
             }
 
-            // 4. إذا كان الحساب مسجل ومرفوض
             if (existingAccount && existingAccount.status === 'rejected') {
                 alert("🚫 هذا الحساب تم رفضه من قبل الإدارة. يرجى مراجعة المسؤول.");
                 return;
             }
 
-            // 5. إذا كان الحساب جديداً تماماً (أو تم طرده وإعادته لقائمة الانتظار السابقة)
             if (!isDataModeActive) {
-                // تفعيل النمط وعرض الخانات الإضافية بدون إعادة تحميل الصفحة
                 isDataModeActive = true;
                 document.getElementById('employeeInfoFields').style.display = 'block';
-                document.getElementById('employeeRealName').setAttribute('required', 'true'); // جعل الاسم إجباري
+                document.getElementById('employeeRealName').setAttribute('required', 'true'); 
                 document.getElementById('loginSubmitBtn').innerText = "تقديم طلب الدخول للإدارة";
                 alert("📝 هذا الحساب غير مسجل حالياً. يرجى كتابة اسمك ورقم تليفونك لتقديم طلب تفعيل فوري للإدارة.");
                 return;
             } else {
-                // معالجة البيانات بعد تعبئتها في الخانات الإضافية
                 const realName = document.getElementById('employeeRealName').value.trim();
                 const realPhone = document.getElementById('employeeRealPhone').value.trim();
 
@@ -2085,7 +2092,6 @@
                     return;
                 }
 
-                // حفظ الحساب الجديد في الانتظار
                 employeeAccountsMap[accountKey] = {
                     username: user,
                     password: pass,
@@ -2096,7 +2102,6 @@
 
                 localStorage.setItem('italian_clinic_employee_accounts', JSON.stringify(employeeAccountsMap));
                 
-                // إعادة تصفير شكل شاشة الدخول للوضع الطبيعي
                 isDataModeActive = false;
                 document.getElementById('employeeInfoFields').style.display = 'none';
                 document.getElementById('employeeRealName').removeAttribute('required');
