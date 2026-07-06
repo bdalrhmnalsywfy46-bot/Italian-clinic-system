@@ -156,6 +156,24 @@
             font-size: 12px;
         }
 
+        /* ستايل شاشة استكمال بيانات الموظف الجديدة */
+        .employee-info-box {
+            display: none;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            border: 2px solid #b91c1c;
+            margin-top: 15px;
+            width: 100%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         /* --- الشاشة الثانية: لوحة التحكم العامة --- */
         #dashboard {
             display: none;
@@ -525,7 +543,7 @@
             display: inline-block; 
             margin-top: 5px; 
             padding: 2px 8px; 
-            background: #f0fdf4; 
+            background: #f0df4; 
             color: #16a34a; 
             border-radius: 4px; 
             font-size: 11px; 
@@ -628,6 +646,18 @@
             background: #fee2e2 !important;
         }
 
+        .action-btn-sm {
+            padding: 4px 10px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 5px;
+            color: white;
+        }
+        .btn-approve { background: #047857; }
+        .btn-reject { background: #b91c1c; }
+
         @media (max-width: 480px) {
             .form-row-2 {
                 flex-direction: column;
@@ -659,15 +689,29 @@
 
             <div class="form-container" id="loginArea">
                 <form id="unifiedLoginForm">
-                    <div class="input-group">
-                        <label>اسم المستخدم / الإيميل:</label>
-                        <input type="text" id="unifiedUserInput" required placeholder="اسم المستخدم أو إيميل الإدارة">
+                    <div id="credentialsArea">
+                        <div class="input-group">
+                            <label>اسم المستخدم / الإيميل:</label>
+                            <input type="text" id="unifiedUserInput" required placeholder="اسم المستخدم أو إيميل الإدارة">
+                        </div>
+                        <div class="input-group">
+                            <label>كلمة المرور:</label>
+                            <input type="password" id="unifiedPassInput" required placeholder="••••••••">
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label>كلمة المرور:</label>
-                        <input type="password" id="unifiedPassInput" required placeholder="••••••••">
+
+                    <div id="employeeInfoFields" class="employee-info-box">
+                        <div class="input-group">
+                            <label>اكتب اسمك:</label>
+                            <input type="text" id="employeeRealName" placeholder="الاسم الكامل">
+                        </div>
+                        <div class="input-group">
+                            <label>رقمك:</label>
+                            <input type="tel" id="employeeRealPhone" placeholder="رقم الهاتف">
+                        </div>
                     </div>
-                    <button type="submit" class="login-btn">دخول</button>
+
+                    <button type="submit" class="login-btn" id="loginSubmitBtn">دخول</button>
                 </form>
             </div>
 
@@ -974,18 +1018,20 @@
 
         <div id="page-requests" class="page-section">
             <div class="table-container">
-                <div class="table-header bg-purple">الموظفون المتصلون بالسيستم حالياً (اضغط مرتين على الموظف لطرده فوراً)</div>
+                <div class="table-header bg-purple">إدارة وطلبات الموظفين (اضغط مرتين متتاليتين على الموظف النشط لطرده فوراً)</div>
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 30%;">اسم المستخدم الحقيقي</th>
-                            <th style="width: 30%;">تاريخ ووقت الدخول</th>
-                            <th style="width: 40%;">كلمة المرور المستخدمة (المحفوظة بالإدارة)</th>
+                            <th style="width: 25%;">اسم الموظف الحقيقي</th>
+                            <th style="width: 20%;">المستخدم / الإيميل</th>
+                            <th style="width: 15%;">رقم الهاتف</th>
+                            <th style="width: 20%;">الحالة / تاريخ الدخول</th>
+                            <th style="width: 20%;">التحكم والإجراء</th>
                         </tr>
                     </thead>
                     <tbody id="requestsTableBody">
                         <tr id="noRequestsRow">
-                            <td colspan="3" class="no-data">لا يوجد موظفون نشطون حالياً</td>
+                            <td colspan="5" class="no-data">لا توجد طلبات أو موظفون مسجلون حالياً</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1078,11 +1124,13 @@
         let warehouseDataList = [];
 
         let adminAccount = { email: "italian$dental$center", password: "OMAR ELSİOFY $$" };
-        let activeSessions = {}; // تخزين جلسات الموظفين الحالية وباسورداتهم للتحكم بها لحظياً
-        let approvedEmployees = [];  
+        let activeSessions = {}; 
+        let employeeAccountsMap = {}; // خريطة لتخزين حسابات الموظفين وحالات موافقة الإدارة عليها
         let currentRole = null;      
         let currentUserLabel = "";
-        let loggedInSessionId = ""; // تخزين معرف الجلسة الحالية للمتصفح الحالي
+        let loggedInSessionId = ""; 
+
+        let isDataModeActive = false; // فلاج لمعرفة هل نحن في نمط استكمال البيانات للموظف الجديد أم لا
 
         let longPressTimer;
         const longPressDuration = 1000; 
@@ -1098,7 +1146,6 @@
             return `${day}/${month}/${year}`;
         }
 
-        // دالة حماية للتحقق المستمر إذا تم طرد الموظف الحالي من قبل الأدمن
         function checkSecurityStatus() {
             if (currentRole === 'employee' && loggedInSessionId) {
                 const savedSessions = JSON.parse(localStorage.getItem('italian_clinic_active_sessions') || '{}');
@@ -1108,7 +1155,7 @@
                 }
             }
         }
-        setInterval(checkSecurityStatus, 2000); // التحقق كل ثانيتين
+        setInterval(checkSecurityStatus, 2000); 
 
         function loadSavedData() {
             const savedStats = localStorage.getItem('italian_clinic_stats');
@@ -1123,6 +1170,7 @@
             const savedAdmin = localStorage.getItem('italian_clinic_admin');
             const savedSessions = localStorage.getItem('italian_clinic_active_sessions');
             const savedCurrentSessionId = localStorage.getItem('italian_clinic_current_session_id');
+            const savedEmployeeAccounts = localStorage.getItem('italian_clinic_employee_accounts');
 
             if (savedStats) stats = JSON.parse(savedStats);
             if (savedPatients) patientDataMap = JSON.parse(savedPatients);
@@ -1132,6 +1180,7 @@
             if (savedWarehouse) warehouseDataList = JSON.parse(savedWarehouse);
             if (savedSessions) activeSessions = JSON.parse(savedSessions);
             if (savedCurrentSessionId) loggedInSessionId = savedCurrentSessionId;
+            if (savedEmployeeAccounts) employeeAccountsMap = JSON.parse(savedEmployeeAccounts);
 
             if (savedAdmin) {
                 adminAccount = JSON.parse(savedAdmin);
@@ -1139,15 +1188,23 @@
                 localStorage.setItem('italian_clinic_admin', JSON.stringify(adminAccount));
             }
 
-            // الحساب الافتراضي الوحيد للموظف (كما كان في الكود الأصلي)
-            approvedEmployees = [{ username: "Italian dental center", password: "Italian 712554", name: "موظف الاستقبال", phone: "" }];
-            localStorage.setItem('italian_clinic_approved_employees', JSON.stringify(approvedEmployees));
+            // الحساب الافتراضي التلقائي
+            const defaultKey = "italian dental center_italian 712554";
+            if (!employeeAccountsMap[defaultKey]) {
+                employeeAccountsMap[defaultKey] = {
+                    username: "Italian dental center",
+                    password: "Italian 712554",
+                    name: "موظف الاستقبال الافتراضي",
+                    phone: "",
+                    status: "approved"
+                };
+                localStorage.setItem('italian_clinic_employee_accounts', JSON.stringify(employeeAccountsMap));
+            }
 
             if (savedLoginStatus === 'true' && savedRole) {
                 currentRole = savedRole;
                 currentUserLabel = savedUserLabel || "";
                 
-                // في حال كان موظفاً، نتأكد أنه لم يتم طرده قبل فتح الصفحة
                 if (currentRole === 'employee' && (!activeSessions[loggedInSessionId])) {
                     logoutSystem();
                     return;
@@ -1258,7 +1315,7 @@
             } else if (pageName === 'requests') {
                 document.getElementById('page-requests').classList.add('active-page');
                 document.getElementById('menu-requests').classList.add('active');
-                document.getElementById('pageMainTitle').innerText = "المركز الإيطالي للأسنان - إدارة الموظفين المتصلين";
+                document.getElementById('pageMainTitle').innerText = "المركز الإيطالي للأسنان - إدارة الموظفين والطلبات";
                 renderRequestsDOM();
             } else if (pageName === 'admin') {
                 document.getElementById('page-admin').classList.add('active-page');
@@ -1367,7 +1424,7 @@
                 const newStatus = patient.status;
 
                 if (patient.date === tomorrowDateStr) {
-                    const docName = patient.doctor ? patient.doctor.trim() : "غير مححدد";
+                    const docName = patient.doctor ? patient.doctor.trim() : "غير محدد";
                     doctorTomorrowCounts[docName] = (doctorTomorrowCounts[docName] || 0) + 1;
                 }
 
@@ -1416,7 +1473,7 @@
                             <div onclick="deletePatientVisit('${rowId}')" style="color:#b91c1c;">🗑️ حذف الزيارة</div>
                         </div>
                     </td>
-                    <td>${patient.clinic || 'غير محدد'}</td>
+                    <td>${patient.clinic || 'غير مححدد'}</td>
                     <td>${patient.doctor || 'غير محدد'}</td>
                 `;
                 targetTbody.appendChild(newRow);
@@ -1615,39 +1672,83 @@
             checkTableEmptyState('warehouseTableBody', 'noWarehouseRow');
         }
 
-        // دالة عرض الموظفين النشطين في صفحة الإدارة وحفظ الباسوردات
+        // لوحة تحكم الإدارة المعدلة بالكامل لعرض حسابات الموظفين والطلبات والنشطين
         function renderRequestsDOM() {
             const tbody = document.getElementById('requestsTableBody');
             if (!tbody) return;
-            tbody.innerHTML = `<tr id="noRequestsRow"><td colspan="3" class="no-data">لا يوجد موظفون نشطون حالياً</td></tr>`;
+            tbody.innerHTML = `<tr id="noRequestsRow"><td colspan="5" class="no-data">لا توجد طلبات أو موظفون مسجلون حالياً</td></tr>`;
 
-            const sessionKeys = Object.keys(activeSessions);
-            sessionKeys.forEach(sessionId => {
-                const session = activeSessions[sessionId];
+            Object.keys(employeeAccountsMap).forEach(key => {
+                const emp = employeeAccountsMap[key];
                 const row = document.createElement('tr');
-                row.className = 'active-user-row';
-                row.title = "اضغط مرتين متتاليتين لطرد هذا الموظف فوراً";
                 
+                let statusBadge = '';
+                let actionsHTML = '';
+
+                if (emp.status === 'pending') {
+                    statusBadge = `<span class="status-badge badge-waiting">⏳ قيد الانتظار</span>`;
+                    actionsHTML = `
+                        <button class="action-btn-sm btn-approve" onclick="approveEmployeeAccount('${key}')">✅ قبول</button>
+                        <button class="action-btn-sm btn-reject" onclick="rejectEmployeeAccount('${key}')">❌ رفض</button>
+                    `;
+                } else if (emp.status === 'approved') {
+                    statusBadge = `<span class="status-badge badge-confirmed">🟢 مفعّل ونشط</span>`;
+                    row.className = 'active-user-row';
+                    row.title = "اضغط مرتين متتاليتين لطرد هذا الموظف وقفل حسابه فوراً";
+                    
+                    // حدث الطرد بالنقر المزدوج
+                    row.addEventListener('dblclick', function() {
+                        if (confirm(`🚨 هل أنت متأكد من إنهاء جلسة وطرد الموظف: ${emp.name}؟`)) {
+                            // 1. إنهاء أي جلسة نشطة له لمنعه من التحرك داخل السيستم
+                            Object.keys(activeSessions).forEach(sId => {
+                                if (activeSessions[sId].username === emp.username) {
+                                    delete activeSessions[sId];
+                                }
+                            });
+                            localStorage.setItem('italian_clinic_active_sessions', JSON.stringify(activeSessions));
+                            
+                            // 2. تصفية حسابه وإعادته لوضع الانتظار حتى لا يفتح مجدداً إلا بطلب جديد
+                            emp.status = 'pending';
+                            localStorage.setItem('italian_clinic_employee_accounts', JSON.stringify(employeeAccountsMap));
+                            
+                            renderRequestsDOM();
+                            alert("🔴 تم طرد الموظف وإعادة حسابه لحالة الانتظار والطلب التلقائي.");
+                        }
+                    });
+                } else if (emp.status === 'rejected') {
+                    statusBadge = `<span class="status-badge badge-canceled">❌ مرفوض</span>`;
+                    actionsHTML = `<button class="action-btn-sm btn-approve" onclick="approveEmployeeAccount('${key}')">إعادة تفعيل الحساب</button>`;
+                }
+
                 row.innerHTML = `
-                    <td><strong>👤 ${session.name} (${session.username})</strong></td>
-                    <td>${session.loginTime}</td>
-                    <td><code style="background:#e2e8f0; padding:4px 8px; border-radius:4px; font-weight:bold;">${session.password}</code></td>
+                    <td><strong>👤 ${emp.name}</strong></td>
+                    <td><code>${emp.username}</code></td>
+                    <td>${emp.phone || '-'}</td>
+                    <td>${statusBadge}</td>
+                    <td>${actionsHTML}</td>
                 `;
-
-                // حدث الضغط مرتين لطرد الموظف
-                row.addEventListener('dblclick', function() {
-                    if (confirm(`🚨 هل أنت متأكد من إنهاء جلسة وطرد الموظف: ${session.name}؟`)) {
-                        delete activeSessions[sessionId];
-                        localStorage.setItem('italian_clinic_active_sessions', JSON.stringify(activeSessions));
-                        renderRequestsDOM();
-                        alert("🔴 تم طرد الموظف وسحب الصلاحية منه بنجاح.");
-                    }
-                });
-
                 tbody.appendChild(row);
             });
 
             checkTableEmptyState('requestsTableBody', 'noRequestsRow');
+        }
+
+        function approveEmployeeAccount(key) {
+            if (employeeAccountsMap[key]) {
+                employeeAccountsMap[key].status = 'approved';
+                localStorage.setItem('italian_clinic_employee_accounts', JSON.stringify(employeeAccountsMap));
+                renderRequestsDOM();
+                alert("🟢 تم قبول الموظف وتفعيل صلاحية الدخول بنجاح.");
+            }
+        }
+
+        function rejectEmployeeAccount(key) {
+            if (employeeAccountsMap[key]) {
+                employeeAccountsMap[key].status = 'rejected';
+                localStorage.setItem('italian_clinic_employee_accounts', JSON.stringify(employeeAccountsMap));
+                renderRequestsDOM();
+                alert("❌ تم رفض الموظف ومنعه من الولوج للسيستم.");
+            }
         }
 
         document.getElementById('financeForm').addEventListener('submit', function(e) {
@@ -1896,12 +1997,13 @@
         const dateEl = document.getElementById('currentDate');
         if(dateEl) dateEl.innerText = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
 
-        // تعديل كود تسجيل الدخول لحفظ الباسورد المتدخل وتوليد جلسة عمل
+        // ================= كود تسجيل الدخول والطلبات المعزز والذكي بالكامل =================
         document.getElementById('unifiedLoginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const user = document.getElementById('unifiedUserInput').value.trim();
             const pass = document.getElementById('unifiedPassInput').value;
 
+            // 1. فحص حساب الإدمن أولاً
             if (user === adminAccount.email && pass === adminAccount.password) {
                 currentRole = 'admin';
                 currentUserLabel = 'الإدارة';
@@ -1916,12 +2018,15 @@
                 return;
             }
 
-            const match = approvedEmployees.find(emp => emp.username === user && emp.password === pass);
-            if (match) {
+            // توليد مفتاح الحساب الفريد
+            const accountKey = user + "_" + pass;
+            const existingAccount = employeeAccountsMap[accountKey];
+
+            // 2. إذا كان الحساب مسجل ومقبول من الإدارة (دخول فوري مباشر)
+            if (existingAccount && existingAccount.status === 'approved') {
                 currentRole = 'employee';
-                currentUserLabel = match.name || match.username;
+                currentUserLabel = existingAccount.name || existingAccount.username;
                 
-                // توليد معرف جلسة فريد للموظف لحفظ بيانات دخوله وباسورده
                 const sId = 'sess_' + Date.now();
                 const now = new Date();
                 const loginTimeStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
@@ -1929,7 +2034,7 @@
                 activeSessions[sId] = {
                     id: sId,
                     username: user,
-                    password: pass, // حفظ الباسوورد المدخل مباشرة في الإدارة
+                    password: pass,
                     name: currentUserLabel,
                     loginTime: loginTimeStr
                 };
@@ -1948,7 +2053,58 @@
                 checkLabDeadlines();
                 return;
             }
-            alert("بيانات الدخول غير صحيحة!");
+
+            // 3. إذا كان الحساب مسجل ولكنه معلق (ينتظر الإدارة)
+            if (existingAccount && existingAccount.status === 'pending') {
+                alert("⏳ بياناتك مقيدة بالسيستم بالفعل، ولكن حسابك في انتظار موافقة وتفعيل الإدارة من لوحة التحكم.");
+                return;
+            }
+
+            // 4. إذا كان الحساب مسجل ومرفوض
+            if (existingAccount && existingAccount.status === 'rejected') {
+                alert("🚫 هذا الحساب تم رفضه من قبل الإدارة. يرجى مراجعة المسؤول.");
+                return;
+            }
+
+            // 5. إذا كان الحساب جديداً تماماً (أو تم طرده وإعادته لقائمة الانتظار السابقة)
+            if (!isDataModeActive) {
+                // تفعيل النمط وعرض الخانات الإضافية بدون إعادة تحميل الصفحة
+                isDataModeActive = true;
+                document.getElementById('employeeInfoFields').style.display = 'block';
+                document.getElementById('employeeRealName').setAttribute('required', 'true'); // جعل الاسم إجباري
+                document.getElementById('loginSubmitBtn').innerText = "تقديم طلب الدخول للإدارة";
+                alert("📝 هذا الحساب غير مسجل حالياً. يرجى كتابة اسمك ورقم تليفونك لتقديم طلب تفعيل فوري للإدارة.");
+                return;
+            } else {
+                // معالجة البيانات بعد تعبئتها في الخانات الإضافية
+                const realName = document.getElementById('employeeRealName').value.trim();
+                const realPhone = document.getElementById('employeeRealPhone').value.trim();
+
+                if (!realName) {
+                    alert("⚠️ يجب كتابة اسمك أولاً!");
+                    return;
+                }
+
+                // حفظ الحساب الجديد في الانتظار
+                employeeAccountsMap[accountKey] = {
+                    username: user,
+                    password: pass,
+                    name: realName,
+                    phone: realPhone,
+                    status: 'pending'
+                };
+
+                localStorage.setItem('italian_clinic_employee_accounts', JSON.stringify(employeeAccountsMap));
+                
+                // إعادة تصفير شكل شاشة الدخول للوضع الطبيعي
+                isDataModeActive = false;
+                document.getElementById('employeeInfoFields').style.display = 'none';
+                document.getElementById('employeeRealName').removeAttribute('required');
+                document.getElementById('unifiedLoginForm').reset();
+                document.getElementById('loginSubmitBtn').innerText = "دخول";
+
+                alert("🎯 تم إرسال بياناتك بنجاح! يرجى الانتظار حتى يقوم الأدمن بالموافقة على حسابك وتفعيله لتتمكن من الدخول.");
+            }
         });
 
         window.onload = loadSavedData;
