@@ -278,7 +278,7 @@
             background: #ffffff;
             border-radius: 10px;
             border: 2px solid #d4af37;
-            cursor: pointer; /* تم إضافة مؤشر الماوس ليوحي بقابلية الضغط */
+            cursor: pointer;
         }
 
         .sidebar-logo-wrap img {
@@ -335,7 +335,6 @@
             display: block;
         }
 
-        /* كروت الإحصائيات - كحلي طبي راقي بدل الأخضر العشوائي */
         .stats-card {
             background: #123a5c;
             color: white;
@@ -378,7 +377,6 @@
             font-weight: bold;
         }
 
-        /* كروت المنيو المالي - الأرباح بلون ذهبي يربطها بهوية السايدبار */
         .finance-cards-grid {
             display: flex;
             gap: 15px;
@@ -439,13 +437,13 @@
             left: 0;
         }
 
-        /* عائلة ألوان موحّدة بدل الألوان المتفرقة: أحمر=عاجل، الباقي درجات كحلي/بترولي/ذهبي */
         .bg-red { background: #b91c1c; }
         .bg-blue { background: #0e7490; }
         .bg-purple { background: #123a5c; }
         .bg-teal { background: #0d9488; }
         .bg-dark-blue { background: #8a5a13; }
         .bg-green { background: #047857; }
+        .bg-navy { background: #123a5c; } /* الستايل الموحد لجدول زيارات الغد */
 
         table {
             width: 100%;
@@ -823,6 +821,23 @@
                     </tbody>
                 </table>
             </div>
+
+            <div class="table-container" id="tomorrowTableContainer">
+                <div class="table-header bg-navy">زيارات الغد</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 50%; text-align: center;">الزيارات</th>
+                            <th style="width: 50%; text-align: center;">الطبيب</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tomorrowVisitsBody">
+                        <tr id="noTomorrowRow">
+                            <td colspan="2" class="no-data">لا توجد زيارات قادمة غداً (0)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div id="page-add" class="page-section">
@@ -1112,6 +1127,18 @@
         let longPressTimer;
         const longPressDuration = 1000; 
 
+        // دالة مساعدة لحساب تاريخ الغد بصيغة DD/MM/YYYY ديناميكياً
+        function getTomorrowDateString() {
+            const todayObj = new Date();
+            const tomorrowObj = new Date(todayObj);
+            tomorrowObj.setDate(todayObj.getDate() + 1);
+            
+            const day = String(tomorrowObj.getDate()).padStart(2, '0');
+            const month = String(tomorrowObj.getMonth() + 1).padStart(2, '0');
+            const year = tomorrowObj.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
         function loadSavedData() {
             const savedStats = localStorage.getItem('italian_clinic_stats');
             const savedPatients = localStorage.getItem('italian_clinic_patients');
@@ -1357,18 +1384,30 @@
             clearTimeout(longPressTimer);
         }
 
+        // بناء وتحديث جداول الزيارات وجدول زيارات الغد إحصائياً تلقائياً
         function rebuildCurrentVisitsTables() {
             const upcomingBody = document.getElementById('upcomingVisitsBody');
             const lateBody = document.getElementById('lateVisitsBody');
+            const tomorrowBody = document.getElementById('tomorrowVisitsBody');
 
-            if(!upcomingBody || !lateBody) return;
+            if(!upcomingBody || !lateBody || !tomorrowBody) return;
 
             upcomingBody.innerHTML = `<tr id="noUpcomingRow"><td colspan="4" class="no-data">لا توجد زيارات قادمة اليوم</td></tr>`;
             lateBody.innerHTML = `<tr id="noLateRow"><td colspan="4" class="no-data">لا توجد زيارات متأخرة حالياً</td></tr>`;
+            tomorrowBody.innerHTML = `<tr id="noTomorrowRow"><td colspan="2" class="no-data">لا توجد زيارات قادمة غداً (0)</td></tr>`;
+
+            const tomorrowDateStr = getTomorrowDateString();
+            const doctorTomorrowCounts = {};
 
             Object.keys(patientDataMap).forEach(rowId => {
                 const patient = patientDataMap[rowId];
                 const newStatus = patient.status;
+
+                // التجميع الإحصائي لجدول الغد ديناميكياً بناءً على تاريخ الحجز المكتوب
+                if (patient.date === tomorrowDateStr) {
+                    const docName = patient.doctor ? patient.doctor.trim() : "غير محدد";
+                    doctorTomorrowCounts[docName] = (doctorTomorrowCounts[docName] || 0) + 1;
+                }
 
                 let badgeHTML = '';
                 if (newStatus === 'waiting') badgeHTML = `<span class="status-badge badge-waiting">منتظر</span>`;
@@ -1421,8 +1460,23 @@
                 targetTbody.appendChild(newRow);
             });
 
+            // بناء صفوف جدول زيارات الغد بناءً على فلترة تجميع الدكاترة الحقيقية
+            const docKeys = Object.keys(doctorTomorrowCounts);
+            if (docKeys.length > 0) {
+                tomorrowBody.innerHTML = ''; // إزالة جملة الصفر والبدء بالرسم
+                docKeys.forEach(doctor => {
+                    const tRow = document.createElement('tr');
+                    tRow.innerHTML = `
+                        <td style="text-align: center; color: #123a5c;"><strong>${doctorTomorrowCounts[doctor]}</strong></td>
+                        <td style="text-align: center;">${doctor}</td>
+                    `;
+                    tomorrowBody.appendChild(tRow);
+                });
+            }
+
             checkTableEmptyState('upcomingVisitsBody', 'noUpcomingRow');
             checkTableEmptyState('lateVisitsBody', 'noLateRow');
+            checkTableEmptyState('tomorrowVisitsBody', 'noTomorrowRow');
         }
 
         function deletePatientVisit(rowId) {
