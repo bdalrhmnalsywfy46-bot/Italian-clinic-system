@@ -423,16 +423,6 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        .table-container {
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
-            position: relative;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
         .table-header {
             padding: 15px;
             color: white;
@@ -1049,7 +1039,7 @@
             </div>
             <br>
             <div class="table-container">
-                <div class="table-header bg-purple">إدارة وطلبات الموظفين</div>
+                <div class="table-header bg-purple">طلبات الموظفين</div>
                 <table>
                     <thead>
                         <tr>
@@ -1219,7 +1209,6 @@
                 localStorage.setItem('italian_clinic_admin', JSON.stringify(adminAccount));
             }
 
-            // تعديل الحساب الافتراضي التلقائي هنا لحذف كلمة "الافتراضي"
             const defaultKey = "italian dental center_italian 712554";
             if (!employeeAccountsMap[defaultKey]) {
                 employeeAccountsMap[defaultKey] = {
@@ -1231,7 +1220,6 @@
                 };
                 localStorage.setItem('italian_clinic_employee_accounts', JSON.stringify(employeeAccountsMap));
             } else if (employeeAccountsMap[defaultKey].name === "موظف الاستقبال الافتراضي") {
-                // لتعديل البيانات المحفوظة مسبقاً في المتصفح تلقائياً
                 employeeAccountsMap[defaultKey].name = "موظف الاستقبال";
                 localStorage.setItem('italian_clinic_employee_accounts', JSON.stringify(employeeAccountsMap));
             }
@@ -1240,7 +1228,6 @@
                 currentRole = savedRole;
                 currentUserLabel = savedUserLabel || "";
                 
-                // تحديث اللlabel الحالي إذا كان الموظف الافتراضي القديم مسجلاً لديه
                 if (currentUserLabel === "موظف الاستقبال الافتراضي") {
                     currentUserLabel = "موظف الاستقبال";
                     localStorage.setItem('italian_clinic_current_user', currentUserLabel);
@@ -1714,7 +1701,6 @@
             checkTableEmptyState('warehouseTableBody', 'noWarehouseRow');
         }
 
-        /* ===================== قائمة الموظفين (الموظفون المفعّلون فقط) ===================== */
         function renderEmployeesDOM() {
             const tbody = document.getElementById('employeesTableBody');
             if (!tbody) return;
@@ -1759,7 +1745,6 @@
             checkTableEmptyState('employeesTableBody', 'noEmployeesRow');
         }
 
-        /* ===================== طلبات التسجيل الجديدة فقط (قيد الانتظار) ===================== */
         function renderRequestsDOM() {
             const tbody = document.getElementById('requestsTableBody');
             if (!tbody) return;
